@@ -182,18 +182,17 @@ where:
 
 relevant class methods:
 
-- impute("model",posit_y,posit_x,force) - impute data under characterstics form object like a optional grouping or weighting variable
+- impute("model",posit_y,posit_x) - impute data under characterstics form object like a optional grouping or weighting variable
+- impute_force("model",posit_y,posit_x) - impute data under characterstics form object like a optional grouping or weighting variable and permanently update variable at the object. WARNING, use it only if you are sure about model parameters.
 - get_models() - possible quantitative models for a certain type of dependent variable
 - get_model() - a recommended quantitative model for a certain type of dependent variable
 - get_index_NA_R(posit_y,posit_x) - index of rows where the data was imputed
 - get_index_full_R(posit_y,posit_x) - index of rows which was used for model estimation
-- is_VarsUpdated() - is variables at the object modified by impute with a force parameter set to TRUE
+- is_vars_updated() - is any variable at the object modified by impute with a force parameter set to TRUE
 
 model - character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")
-model2 - character - posibble options ("lm_pred","lm_bayes","lm_noise")
 posit_y - integer - position of dependent variable
 posit_x - integer vector - positions of independent variables
-force - boolen - if you want to update variables at object for next imputations use TRUE
 
 - for simple mean use "lm_pred" and x=as.matrix(rep(1,"nrow"))
 
@@ -210,10 +209,10 @@ model$get_models(posit_y)
 
 #get recommended prediction model
 
-model$get_model(posit_y)
+model$get_model(posit_y) # usefull at loops
 
 #implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x,FALSE)
+pred =  model$impute("lm_pred",posit_y,posit_x)
 
 sum((pred$imputations[pred$index_NA]-data_con[index_NA,1])^2)
 
@@ -230,7 +229,7 @@ model = new(miceFast,cbind(fill_NA(data_disc[,posit_y],index_NA),data_disc[,posi
 model$get_models(posit_y)
 
 #implementing lda
-pred =  model$impute("lda",posit_y,posit_x,FALSE)
+pred =  model$impute("lda",posit_y,posit_x)
 
 index_imp = model$get_index_NA_R(posit_y,posit_x)
 
@@ -251,9 +250,7 @@ model = new(miceFast,cbind(fill_NA(data_con[,posit_y],index_NA),data_con[,posit_
 model$get_models(posit_y)
 
 #implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x,FALSE)
-
-index_imp = model$get_index_NA_R(posit_y,posit_x)
+pred =  model$impute("lm_pred",posit_y,posit_x)
 
 sum((pred$imputations[pred$index_NA]-data_con[index_NA,1])^2)
 
@@ -272,7 +269,7 @@ model = new(miceFast,x=cbind(fill_NA(data_disc[,posit_y],index_NA),data_disc[,po
 model$get_models(posit_y)
 
 #implementing lda
-pred =  model$impute("lda",posit_y,posit_x,FALSE)
+pred =  model$impute("lda",posit_y,posit_x)
 
 table(pred$imputations[pred$index_NA],data_disc[index_NA,1])
 
@@ -297,9 +294,7 @@ model = new(miceFast,cbind(fill_NA(data_con[,posit_y],index_NA),data_con[,posit_
 model$get_models(posit_y)
 
 #implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x[-length(posit_x)],FALSE)
-
-index_imp =  model$get_index_NA_R(posit_y,posit_x[-length(posit_x)])
+pred =  model$impute("lm_pred",posit_y,posit_x[-length(posit_x)])
 
 sum((pred$imputations[pred$index_NA]-data_con[index_NA,1])^2)
 
@@ -319,9 +314,9 @@ model = new(miceFast,cbind(fill_NA(data_con[,posit_y],index_NA),data_con[,posit_
 model$get_models(posit_y)
 
 #implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x[-length(posit_x)],FALSE)
+pred =  model$impute("lm_pred",posit_y,posit_x[-length(posit_x)])
 
-index_imp =  model$get_index_NA_R(posit_y,posit_x[-length(posit_x)])
+#index_imp =  model$get_index_NA_R(posit_y,posit_x[-length(posit_x)])
 
 sum((pred$imputations[pred$index_NA]-data_con[index_NA,1])^2)
 

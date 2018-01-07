@@ -30,12 +30,14 @@ miceFast module usage:
 library(miceFast)
 library(mice)
 
-model = new(miceFast,as.matrix(nhanes))
+model = new(miceFast,cbind(as.matrix(nhanes),1))
 
 cbind(nhanes[,1],
-      model$impute("lm_pred",2,1,TRUE)$imputations,
-      model$impute("lda",3,c(1,2),TRUE)$imputations,
-      model$impute("lm_bayes",4,c(1,2,3),FALSE)$imputations)
+      model$impute_force("lm_pred",2,5)$imputations, #Simple mean by linear regression with one variable - constant
+      model$impute_force("lda",3,c(1,2))$imputations,
+      rowMeans(sapply(1:10,function(x) model$impute("lm_bayes",4,c(1,2,3))$imputations)))
+      
+# Be careful with impute_force - check the documentation
 
 ```
 

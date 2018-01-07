@@ -223,11 +223,13 @@ std::map<std::string, pfunc> funMap = {{"lda",fastLda},
 //   return new_x;
 // }
 
-Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x,bool force){
+
+Rcpp::List miceFast::impute_force(std::string s, int posit_y,arma::uvec posit_x){
+
+  updated = true;
 
   if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
   if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
-
 
   posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
@@ -251,10 +253,43 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x,bool f
     pred = miceFast::imputebyW(s,posit_y,posit_x);
   }
 
-  if(force){
+  x.col(posit_y) = pred;
 
-    x.col(posit_y) = pred;
-    updated = true;
+  arma::uvec index_NA = miceFast::get_index_NA_R(posit_y+1,posit_x+1);
+  arma::uvec index_full = miceFast::get_index_NA_R(posit_y+1,posit_x+1);
+
+  return Rcpp::List::create(Rcpp::Named("imputations") = pred,
+                            Rcpp::Named("index_NA") = index_NA,
+                            Rcpp::Named("index_full") = index_full);
+
+}
+
+
+Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
+
+  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
+  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
+
+  posit_x =  posit_x - 1;
+  posit_y = posit_y - 1;
+
+  arma::colvec pred;
+
+  if(w.is_empty() && !g.is_empty())
+  {
+    pred = miceFast::imputeby(s,posit_y,posit_x);
+  }
+  else if(w.is_empty() && g.is_empty())
+  {
+    pred = miceFast::impute_raw(s,posit_y,posit_x);
+  }
+  else if(!w.is_empty() && g.is_empty())
+  {
+    pred = miceFast::imputeW(s,posit_y,posit_x);
+  }
+  else if(!w.is_empty() && !g.is_empty())
+  {
+    pred = miceFast::imputebyW(s,posit_y,posit_x);
   }
 
   arma::uvec index_NA = miceFast::get_index_NA_R(posit_y+1,posit_x+1);
@@ -502,6 +537,7 @@ RCPP_MODULE(miceFast){
     .constructor<arma::mat,arma::colvec>()
     .constructor<arma::mat,arma::uvec,bool,arma::colvec>()
     .method("impute", &miceFast::impute)
+    .method("impute_force", &miceFast::impute_force)
     .method("get_models", &miceFast::get_models)
     .method("get_model", &miceFast::get_model)
     .method("is_vars_updated", &miceFast::is_vars_updated)

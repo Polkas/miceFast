@@ -36,11 +36,12 @@ new(miceFast)
   \describe{
     \item{\code{initialize(...)}:}{ ~~ }
     \item{\code{finalize()}:}{ ~~ }
-    \item{\code{impute(...)}:}{ impute data }
+    \item{\code{impute(...)}:}{ impute data under characterstics from the object like a optional grouping or weighting variable }
+    \item{\code{impute_force(...)}:}{ impute data under characterstics from the object like a optional grouping or weighting variable and permanently update the variable at the object. WARNING, use it only if you are sure about model parameters. }
     \item{\code{get_models(...)}:}{  possible quantitative models for a certain type of dependent variable }
     \item{\code{get_model(...)}:}{  a recommended quantitative model for a certain type of dependent variable }
     \item{\code{get_index_full_R(...)}:}{ get index of rows where dependent and independent variable exists }
     \item{\code{get_index_NA_R(...)}:}{ get index of rows where dependent is missing and independent variable exists }
-    \item{\code{is_updated(...)}:}{ is variables at the object modified by impute with a force parameter set to TRUE }
+    \item{\code{is_vars_updated(...)}:}{ is any variable at the object modified by impute with a force parameter set to TRUE }
   }
 }
