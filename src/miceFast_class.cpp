@@ -504,7 +504,7 @@ RCPP_MODULE(miceFast){
     .method("impute", &miceFast::impute)
     .method("get_models", &miceFast::get_models)
     .method("get_model", &miceFast::get_model)
-    .method("is_vars_updated", &miceFast::sortData_byg)
+    .method("is_vars_updated", &miceFast::is_vars_updated)
     .method("get_index_NA_R", &miceFast::get_index_NA_R)
     .method("get_index_full_R", &miceFast::get_index_full_R)
   ;}

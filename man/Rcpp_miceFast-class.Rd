@@ -36,7 +36,6 @@ new(miceFast)
   \describe{
     \item{\code{initialize(...)}:}{ ~~ }
     \item{\code{finalize()}:}{ ~~ }
-    \item{\code{sortData_byg()}:}{ sort data by a grouping variable }
     \item{\code{impute(...)}:}{ impute data }
     \item{\code{get_models(...)}:}{  possible quantitative models for a certain type of dependent variable }
     \item{\code{get_model(...)}:}{  a recommended quantitative model for a certain type of dependent variable }
