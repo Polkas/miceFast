@@ -21,7 +21,8 @@ public:
   miceFast(arma::mat _x,arma::colvec _w);
   miceFast(arma::mat _x,arma::uvec _g,bool _s,arma::colvec _w);
 
-  Rcpp::List impute(std::string s, int posit_y,arma::uvec posit_x, bool force);
+  Rcpp::List impute_force(std::string s, int posit_y,arma::uvec posit_x);
+  Rcpp::List impute(std::string s, int posit_y,arma::uvec posit_x);
   arma::colvec impute_raw(std::string s, int posit_y,arma::uvec posit_x);
   arma::colvec imputeby(std::string s, int posit_y,arma::uvec posit_x);
   arma::colvec imputeW(std::string s, int posit_y,arma::uvec posit_x);

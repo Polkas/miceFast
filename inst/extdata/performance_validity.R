@@ -72,7 +72,7 @@ fill_NA = function(v,index_NA){
 mice.impute.lda = mice.impute.lda(data_disc[,1],!index_NA,data_disc[,c(2:nr_var)])
 
 model = new(miceFast,cbind(fill_NA(data_disc[,1],index_NA),data_disc[,2:nr_var]))
-pred_miceFast =  model$impute("lda",1,2:nr_var,FALSE)
+pred_miceFast =  model$impute("lda",1,2:nr_var)
 #index_NA = pred_miceFast$index_NA
 
 table(pred_miceFast$imputations[index_NA] ,data_disc[index_NA,1])
@@ -81,7 +81,7 @@ table(as.numeric(mice.impute.lda),data_disc[index_NA,1])
 m1 = microbenchmark::microbenchmark(R=mice.impute.lda(data_disc[,1],!index_NA,data_disc[,c(2:nr_var)]),
                                miceFast={
                                  model = new(miceFast,cbind(fill_NA(data_disc[,1],index_NA),data_disc[,2:nr_var]))
-                                 pred_miceFast =  model$impute("lda",1,2:nr_var,FALSE)
+                                 pred_miceFast =  model$impute("lda",1,2:nr_var)
                                },
                                times=iters)
 m1
@@ -119,7 +119,7 @@ pred_dplyr = data_disc %>%
   tidy(im)  %>% ungroup()%>% select(x) %>% unlist() %>% as.numeric()
 
 model = new(miceFast,cbind(fill_NA(data_disc[,1],index_NA),data_disc[,2:(nr_var-1)]),gr,TRUE)
-pred_miceFast =  model$impute("lda",1,2:(nr_var-1),FALSE)
+pred_miceFast =  model$impute("lda",1,2:(nr_var-1))
 #index_NA = pred_miceFast$index_NA
 
 
@@ -148,7 +148,7 @@ m2 = microbenchmark::microbenchmark(
         pred_all = c(pred_all,as.numeric(pred))}},
   miceFast={
     model = new(miceFast,cbind(fill_NA(data_disc[,1],index_NA),data_disc[,2:(nr_var-1)]),gr,TRUE)
-    pred_miceFast =  model$impute("lda",1,2:(nr_var-1),FALSE)},
+    pred_miceFast =  model$impute("lda",1,2:(nr_var-1))},
   times=iters)
 
 m2
@@ -163,7 +163,7 @@ ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g2.png
 mice.impute.lda = mice.impute.lda(data_bin[,1],!index_NA,data_bin[,c(2:(nr_var-1))])
 
 model = new(miceFast,cbind(fill_NA(data_bin[,1],index_NA),data_bin[,2:(nr_var-1)]))
-pred_miceFast =  model$impute("lda",1,2:(nr_var-1),FALSE)
+pred_miceFast =  model$impute("lda",1,2:(nr_var-1))
 #index_NA = pred_miceFast$index_NA
 
 table(pred_miceFast$imputations[index_NA] ,data_bin[index_NA,1])
@@ -172,7 +172,7 @@ table(mice.impute.lda,data_bin[index_NA,1])
 m3 = microbenchmark::microbenchmark(R=mice.impute.lda(data_bin[,1],!index_NA,data_bin[,c(2:(nr_var-1))]),
                                miceFast={
                                  model = new(miceFast,cbind(fill_NA(data_bin[,1],index_NA),data_bin[,2:(nr_var-1)]))
-                                 pred_miceFast =  model$impute("lda",1,2:(nr_var-1),FALSE)
+                                 pred_miceFast =  model$impute("lda",1,2:(nr_var-1))
                                },
                                times=iters)
 
@@ -189,7 +189,7 @@ ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g3.png
 mice.impute.norm.nob = mice.impute.norm.nob(data_con[,1],!index_NA,data_con[,c(2:(nr_var-1))])
 
 model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),data_con[,2:(nr_var-1)]))
-pred_miceFast =  model$impute("lm_noise",1,2:(nr_var-1),FALSE)
+pred_miceFast =  model$impute("lm_noise",1,2:(nr_var-1))
 #index_NA = pred_miceFast$index_NA
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,1])^2)
@@ -198,7 +198,7 @@ sum((mice.impute.norm.nob - data_con[index_NA,1])^2)
 m4 = microbenchmark::microbenchmark(R = mice.impute.norm.nob(data_con[,1],!index_NA,data_con[,c(2:(nr_var-1))]),
                                miceFast={
                                  model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),data_con[,2:(nr_var-1)]))
-                                 pred_miceFast =  model$impute("lm_noise",1,2:(nr_var-1),FALSE)
+                                 pred_miceFast =  model$impute("lm_noise",1,2:(nr_var-1))
                                },
                                times=iters)
 m4
@@ -215,7 +215,7 @@ ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g4.png
 mice.impute.norm.bayes = mice.impute.norm(data_con[,1],!index_NA,data_con[,c(2:(nr_var-1))])
 
 model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),data_con[,2:(nr_var-1)]))
-pred_miceFast =  model$impute("lm_bayes",1,2:(nr_var-1),FALSE)
+pred_miceFast =  model$impute("lm_bayes",1,2:(nr_var-1))
 #index_NA = pred_miceFast$index_NA
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,1])^2)
@@ -224,7 +224,7 @@ sum((mice.impute.norm.bayes - data_con[index_NA,1])^2)
 m5 = microbenchmark::microbenchmark(R = mice.impute.norm(data_con[,1],!index_NA,data_con[,c(2:(nr_var-1))]),
                                miceFast={
                                  model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),data_con[,2:(nr_var-1)]))
-                                 pred_miceFast =  model$impute("lm_bayes",1,2:(nr_var-1),FALSE)
+                                 pred_miceFast =  model$impute("lm_bayes",1,2:(nr_var-1))
                                },
                                times=iters)
 m5
@@ -241,7 +241,7 @@ ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g5.png
 mice.impute.norm.pred = mice.impute.norm.predict(data_con[,1],!index_NA,data_con[,c(2:(nr_var-1))])
 
 model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),1,data_con[,c(2:(nr_var-1))]))
-pred_miceFast =  model$impute("lm_pred",1,2:(nr_var),FALSE)
+pred_miceFast =  model$impute("lm_pred",1,2:(nr_var))
 #index_NA = pred_miceFast$index_NA
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,1])^2)
@@ -252,8 +252,8 @@ m6 = microbenchmark::microbenchmark(R = {
   }
 ,
 miceFast={
-  model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),1,data_con[,c(2:(nr_var-1))]),index_NA)
-  pred_miceFast =  model$impute("lm_pred",1,2:(nr_var-1),FALSE)
+  model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),1,data_con[,c(2:(nr_var-1))]))
+  pred_miceFast =  model$impute("lm_pred",1,2:(nr_var-1))
 },times=iters)
 
 m6
@@ -291,7 +291,7 @@ pred_dplyr = data_con %>%
     tidy(im)  %>% ungroup()%>% select(x) %>% unlist() %>% as.numeric()
 
 model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),1,data_con[,c(2:(nr_var-1))]),gr,TRUE)
-pred_miceFast =  model$impute("lm_pred",1,2:(nr_var),FALSE)
+pred_miceFast =  model$impute("lm_pred",1,2:(nr_var))
 #index_NA = pred_miceFast$index_NA
 
 sum((pred_miceFast$imputations[index_NA]-data_con[index_NA,1])^2)
@@ -321,7 +321,7 @@ m7 = microbenchmark::microbenchmark(
     }},
   miceFast={
     model = new(miceFast,cbind(fill_NA(data_con[,1],index_NA),1,data_con[,c(2:(nr_var-1))]),gr,TRUE)
-    pred_miceFast =  model$impute("lm_pred",1,(nr_var),FALSE)},
+    pred_miceFast =  model$impute("lm_pred",1,(nr_var))},
   times=iters)
 
 m7
