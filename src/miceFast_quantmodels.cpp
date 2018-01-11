@@ -94,7 +94,7 @@ arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-  arma::colvec coef = arma::solve(X,y,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
+  arma::colvec coef = arma::solve(X,y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
 
   arma::colvec res = y - X*coef;
 
@@ -123,7 +123,7 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-  arma::colvec coef = arma::solve(X,y,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
+  arma::colvec coef = arma::solve(X,y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
 
   arma::colvec res = y - X*coef;
 
@@ -140,7 +140,7 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1) {
 
 arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1) {
 
-  arma::colvec coef = arma::solve(X, y,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
+  arma::colvec coef = arma::solve(X, y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
 
   return X1*coef;
 
@@ -154,7 +154,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
 
   X = X.cols(vars);
 
-  double tol = 1e-5;
+  double tol = 1e-6;
 
   int N = X.n_rows; int C = X.n_cols;
 

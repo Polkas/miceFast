@@ -7,36 +7,39 @@
 //Building class
 
 class miceFast{
+  public:
 
   arma::mat x;       //variables
   arma::uvec g;    //grouping
-  bool sorted = false;    //sorted by g or not
   arma::colvec w;//weights
-  bool updated = false;
+  std::vector<int> updated;
+  bool sorted = false;
+  arma::uvec index;
+  arma::uvec index_rev;
 
-public:
 
-  miceFast(arma::mat _x);
-  miceFast(arma::mat _x,arma::uvec _g,bool _s);
-  miceFast(arma::mat _x,arma::colvec _w);
-  miceFast(arma::mat _x,arma::uvec _g,bool _s,arma::colvec _w);
+  miceFast();
+  ~miceFast();
 
   Rcpp::List impute_force(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List impute(std::string s, int posit_y,arma::uvec posit_x);
-  arma::colvec impute_raw(std::string s, int posit_y,arma::uvec posit_x);
-  arma::colvec imputeby(std::string s, int posit_y,arma::uvec posit_x);
-  arma::colvec imputeW(std::string s, int posit_y,arma::uvec posit_x);
-  arma::colvec imputebyW(std::string s, int posit_y,arma::uvec posit_x);
+  Rcpp::List impute_raw(std::string s, int posit_y,arma::uvec posit_x);
+  Rcpp::List imputeby(std::string s, int posit_y,arma::uvec posit_x);
+  Rcpp::List imputeW(std::string s, int posit_y,arma::uvec posit_x);
+  Rcpp::List imputebyW(std::string s, int posit_y,arma::uvec posit_x);
+  Rcpp::List option_impute(std::string s,int posit_y,arma::uvec posit_x);
 
   std::string get_models(int posit_y);
   std::string get_model(int posit_y);
   arma::uvec get_index_full(int posit_y, arma::uvec posit_x);
   arma::uvec get_index_NA(int posit_y, arma::uvec posit_x);
-  arma::uvec get_index_full_R(int posit_y, arma::uvec posit_x);
-  arma::uvec get_index_NA_R(int posit_y, arma::uvec posit_x);
 
-  bool is_vars_updated();
+  std::vector<int> which_updated();
   void sortData_byg();
+  void set_data(arma::mat& _x);
+  void set_g(arma::uvec& _g);
+  void set_w(arma::colvec& _w);
+  arma::uvec get_index_data();
 
 };
 
