@@ -196,7 +196,7 @@ Rcpp::List miceFast::impute_force(std::string s, int posit_y,arma::uvec posit_x)
 
   arma::colvec pred_arma = pred["imputations"];
 
-  x.col(posit_y) = pred_arma;
+  x.col(posit_y) = pred_arma.rows(index);
 
   updated.push_back(posit_y + 1);
 
@@ -524,8 +524,8 @@ RCPP_MODULE(miceFast){
 
   class_<miceFast>("miceFast")
     .default_constructor()
-    .field("data",&miceFast::x)
-    .field("g",&miceFast::g)
+    //.field("data",&miceFast::x)
+    //.field("g",&miceFast::g)
 
     .method("impute", &miceFast::impute)
     .method("impute_force", &miceFast::impute_force)

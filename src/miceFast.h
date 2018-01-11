@@ -7,7 +7,6 @@
 //Building class
 
 class miceFast{
-  public:
 
   arma::mat x;       //variables
   arma::uvec g;    //grouping
@@ -17,6 +16,7 @@ class miceFast{
   arma::uvec index;
   arma::uvec index_rev;
 
+  public:
 
   miceFast();
   ~miceFast();
