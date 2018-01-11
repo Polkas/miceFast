@@ -77,4 +77,3 @@ bool different_x(arma::uvec posit_x){
 
   return different_vars;
 }
-
