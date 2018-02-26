@@ -46,7 +46,15 @@ test_that("fill-data",
             data_disc = model$fill("discrete")
             data_con = model$fill("contin")
 
-            expect_true(all())
+            cor_b=cor(data_bin)
+            cor_d=cor(data_disc)
+            cor_c=cor(data_con)
+
+            cor_cor_a = cor(cbind(as.vector(cors),as.vector(cor_c)))[1,2] > 0.99
+            cor_cor_b = cor(cbind(as.vector(cors),as.vector(cor_c)))[1,2] > 0.99
+            cor_cor_c = cor(cbind(as.vector(cors),as.vector(cor_c)))[1,2] > 0.99
+
+            expect_true(all(cor_cor_a,cor_cor_b,cor_cor_c))
 
           })
 
