@@ -1,20 +1,19 @@
 Package: miceFast
-Title: Fast multiple imputations using Rcpp and Armadillo
-Version: 1.0.0
+Title: Fast Imputations Using 'Rcpp' and 'Armadillo'
+Version: 0.0.1
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Description: 
-  R package was built under Rcpp and Armadillo for the purpose of fast multiple imputations.
-	There was used quantitative models with closed-form solution. Thus package is based on linear algebra operations.
+  Fast imputations under the object-oriented programming paradigm.
+	There was used quantitative models with a closed-form solution. Thus package is based on linear algebra operations.
 	The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.4.0)
 License: GPL (>= 2)
 Encoding: UTF-8
 Imports:
 	methods, 
-	Rcpp (>= 0.12.12),
-	RcppArmadillo
+	Rcpp (>= 0.12.12)
 Suggests:
-	knitr,
+	  knitr,
     rmarkdown,
     pacman,
     testthat,

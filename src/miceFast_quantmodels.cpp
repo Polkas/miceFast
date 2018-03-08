@@ -198,7 +198,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
   arma::mat V;
   arma::vec s;
 
-  arma::svd( U, s, V, input );
+  arma::svd( U, s, V, input);
 
   arma::uvec proper = arma::find(s > tol);
 

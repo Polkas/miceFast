@@ -15,22 +15,19 @@ miceFast::~miceFast(){
   x.clear();
   g.clear();
   w.clear();
+  index.clear();
   sorted=false;
-  index.reset();
   updated.clear();
-  index_rev.clear();
 
 };
 
 void miceFast::set_data(arma::mat & _x){
   x = arma::mat(_x.begin(),_x.n_rows,_x.n_cols,false);
-  index = arma::regspace<arma::uvec>(0,x.n_rows - 1);
+  index = arma::regspace<arma::uvec>(0,x.n_rows - 1) + 1;
 }
 
 void miceFast::set_g(arma::uvec & _g){
-
   g =_g;
-
   sorted = g.is_sorted();
 
 }
@@ -39,11 +36,29 @@ void miceFast::set_w(arma::colvec & _w){
   w = arma::colvec(_w.begin(),_w.n_rows,false);;
 }
 
-arma::uvec miceFast::get_index_data(){
+bool miceFast::is_sorted_byg(){
+  if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
+  return sorted;
+};
 
-  return index + 1;
+arma::mat miceFast::get_data(){
+  if(x.is_empty()){Rcpp::stop("There is no data provided");}
+  return x;
+};
 
-}
+arma::colvec miceFast::get_w(){
+  if(w.is_empty()){Rcpp::stop("There is no weighting variable provided");}
+  return w;
+};
+arma::uvec miceFast::get_g(){
+  if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
+  return g;
+};
+
+arma::uvec miceFast::get_index(){
+  if(x.is_empty()){Rcpp::stop("There is no data provided");}
+  return index;
+};
 
 //functions for getting indexes
 
@@ -91,11 +106,11 @@ arma::uvec miceFast::get_index_NA(int posit_y, arma::uvec posit_x){
 void miceFast::sortData_byg(){
 
   if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
-
+  Rcpp::warning("\n Data was sorted by the grouping variable - use `get_index()` to retrieve an order");
   arma::uvec order = arma::stable_sort_index(g);
   x = x.rows(order);
-  index = index.elem(order);
   g = g.elem(order);
+  index = index.elem(order);
   if(!w.is_empty()){w = w.elem(order);}
   sorted = true;
 
@@ -183,26 +198,16 @@ std::map<std::string, pfunc> funMap = {{"lda",fastLda},
 {"lm_bayes",fastLm_bayes}};
 
 
-Rcpp::List miceFast::impute_force(std::string s, int posit_y,arma::uvec posit_x){
+void miceFast::update_var(int posit_y,arma::vec impute){
 
-  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
-  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
   if(x.is_empty()){Rcpp::stop("at least set the data");}
+  if( x.n_rows != impute.n_elem ){Rcpp::stop("wrong number of observations");}
 
-  posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
 
-  Rcpp::List pred =  option_impute(s,posit_y,posit_x);
-
-  arma::colvec pred_arma = pred["imputations"];
-
-  x.col(posit_y) = pred_arma.rows(index);
+  x.col(posit_y) = impute;
 
   updated.push_back(posit_y + 1);
-
-  return Rcpp::List::create(Rcpp::Named("imputations") = pred["imputations"],
-                            Rcpp::Named("index_imputed") = pred["index_NA"],
-                             Rcpp::Named("index_full") = pred["index_full"]);
 
 }
 
@@ -285,7 +290,6 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
 
   if(sorted == false){
     sortData_byg();
-    index_rev = arma::stable_sort_index(index);
   }
 
   //index
@@ -341,19 +345,25 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
 
   for(unsigned int  a=0;a<group;a++){
 
-    if((starts_NA(a) <= ends_NA(a)) && (starts_full(a) <= ends_full(a))){
+    int ss_NA = starts_NA(a);
+    int ee_NA = ends_NA(a);
+    int ss_full = starts_full(a);
+    int ee_full = ends_full(a);
 
-    arma::mat X_full_0 = X_full.rows(starts_full(a),ends_full(a)) ;  // copying. It would be better to improve it to use reference
-    arma::mat X_NA_0 = X_NA.rows(starts_NA(a),ends_NA(a));  // copying. It would be better to improve it to use reference
-    arma::colvec Y_full_0 =  Y_full.rows(starts_full(a),ends_full(a));  // copying. It would be better to improve it to use reference
+    if((ss_NA < ee_NA) && (ss_full <= ee_full)){
 
-    arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0);
+      arma::mat X_full_0 = X_full.rows(ss_full,ee_full) ;  // copying. It would be better to improve it to use reference
+      arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
+      arma::colvec Y_full_0 =  Y_full.rows(ss_full,ee_full);  // copying. It would be better to improve it to use reference
 
-    end = start + pred.n_elem-1;
+      arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0);
 
-    pred_all.rows(start,end) = pred;
+      end = start + pred.n_elem - 1;
 
-    start = end+1;
+      pred_all.rows(start,end) = pred;
+
+      start = end + 1;
+
     }
   }
 
@@ -364,10 +374,6 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
 
   arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
   index_full_return.elem(index_full).fill(1);
-
-  if(!index_rev.is_empty()){index_full_return = index_full_return.elem(index_rev);}
-  if(!index_rev.is_empty()){index_NA_return = index_NA_return.elem(index_rev);}
-  if(!index_rev.is_empty()){Y = Y.rows(index_rev);}
 
   return Rcpp::List::create(Rcpp::Named("imputations") = Y,
                             Rcpp::Named("index_NA") = index_NA_return,
@@ -424,11 +430,9 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
 
   if(!sorted){
     sortData_byg();
-    index_rev = arma::stable_sort_index(index);
   }
 
   //index
-
   arma::uvec index_full = get_index_full(posit_y,posit_x);
   arma::uvec index_NA = get_index_NA(posit_y,posit_x);
 
@@ -437,7 +441,6 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
 
   if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(w.has_nan()){Rcpp::stop("There is NA values for weights variable");}
-  if(arma::any(w<0)){Rcpp::stop("There are ngative values for the weights variable");}
   if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
 
   //grouping variable
@@ -483,12 +486,17 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
 
   for(unsigned int  a=0;a<group;a++){
 
-    if((starts_NA(a) <= ends_NA(a)) && (starts_full(a) <= ends_full(a))){
+    int ss_NA = starts_NA(a);
+    int ee_NA = ends_NA(a);
+    int ss_full = starts_full(a);
+    int ee_full = ends_full(a);
 
-    arma::mat X_full_0 = X_full.rows(starts_full(a),ends_full(a)) ;  // copying. It would be better to improve it to use reference
-    arma::mat X_NA_0 = X_NA.rows(starts_NA(a),ends_NA(a));  // copying. It would be better to improve it to use reference
-    arma::colvec Y_full_0 =  Y_full.rows(starts_full(a),ends_full(a));  // copying. It would be better to improve it to use reference
-    arma::colvec w_full_0 =  w_full.rows(starts_full(a),ends_full(a)); // copying. It would be better to improve it to use reference
+    if((ss_NA < ee_NA) && (ss_full <= ee_full)){
+
+    arma::mat X_full_0 = X_full.rows(ss_full,ee_full) ;  // copying. It would be better to improve it to use reference
+    arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
+    arma::colvec Y_full_0 =  Y_full.rows(ss_full,ee_full);  // copying. It would be better to improve it to use reference
+    arma::colvec w_full_0 =  w_full.rows(ss_full,ee_full); // copying. It would be better to improve it to use reference
 
     arma::colvec pred =  (*fun)(Y_full_0,X_full_0,w_full_0,X_NA_0);
 
@@ -510,10 +518,6 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
   arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
   index_full_return.elem(index_full).fill(1);
 
-  if(!index_rev.is_empty()){index_full_return = index_full_return.elem(index_rev);}
-  if(!index_rev.is_empty()){index_NA_return = index_NA_return.elem(index_rev);}
-  if(!index_rev.is_empty()){Y = Y.rows(index_rev);}
-
   return Rcpp::List::create(Rcpp::Named("imputations") = Y,
                             Rcpp::Named("index_NA") = index_NA_return,
                             Rcpp::Named("index_full") = index_full_return);
@@ -526,15 +530,23 @@ RCPP_MODULE(miceFast){
     .default_constructor()
     //.field("data",&miceFast::x)
     //.field("g",&miceFast::g)
+    //.field("w",&miceFast::w)
+    //.field("updated",&miceFast::updated)
+    //.field("sorted",&miceFast::sorted)
+    .method("get_data", &miceFast::get_data)
+    .method("get_w", &miceFast::get_w)
+    .method("get_g", &miceFast::get_g)
+    .method("get_index", &miceFast::get_index)
+    .method("is_sorted_byg", &miceFast::is_sorted_byg)
+    .method("which_updated", &miceFast::which_updated)
 
     .method("impute", &miceFast::impute)
-    .method("impute_force", &miceFast::impute_force)
+    .method("update_var", &miceFast::update_var)
     .method("get_models", &miceFast::get_models)
     .method("get_model", &miceFast::get_model)
-    .method("which_updated", &miceFast::which_updated)
     .method("set_data", &miceFast::set_data)
     .method("set_g", &miceFast::set_g)
     .method("set_w", &miceFast::set_w)
-    .method("get_index_data", &miceFast::get_index_data)
+    .method("sort_byg",&miceFast::sortData_byg)
 
   ;}
