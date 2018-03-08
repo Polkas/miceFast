@@ -1,5 +1,5 @@
 Package: miceFast
-Title: Fast multiple imputations using Rcpp and Armadillo
+Title: Fast imputations using Rcpp and Armadillo
 Version: 0.0.1
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Description: 
