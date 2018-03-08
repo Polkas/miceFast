@@ -15,30 +15,29 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-Loading packages and set.seed:
+Loading the package and setting a seed:
 
 ```{r,echo=TRUE}
-
 library(miceFast)
-
 set.seed(1234)
 ```
 
 ## Motivations
 
-Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. But this will sometimes deteriorate quality of a project. Another solution will be to use methods such as multiple imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are comfortable for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
+Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will sometimes deteriorate quality of a project. Another solution will be to use methods such as multiple imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are comfortable for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
 
 The presented miceFast package was built under Rcpp packages and the C++ library Armadillo.
 The Rcpp package offers functionality of exporting full C++ capabilities to the R environment.
-More precisely miceFast and corrData are offered. The first module offers capabilities of multiple imputations models with a closed-form solution. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable and functions enhancement by C++ capabilities.
+More precisely miceFast and corrData are offered. The first module offers capabilities of multiple imputations models with a closed-form solution. Thus package is based on linear algebra operations. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable and functions enhancement by C++ capabilities.
 
 The second module was made for purpose of presenting the miceFast usage and performance. It provides functionality of generating correlated data with a discrete, binomial or continuous dependent variable and continuous independent variables. 
 
 ##Performance
 
-Environment: MRO Intel MKL - i7 6700HQ and 24GB DDR4 2133
+Environment: MRO 3.4.1 Intel MKL - i7 6700HQ and 24GB DDR4 2133
 
-MRO (Microsoft R Open) provide to R a sophisticated library for linear algebra operations so remember about that when reading a performance comparision. For example at MRO a X'X operation is a few hundred times faster than at regular R.
+MRO (Microsoft R Open) provide to R a sophisticated library for linear algebra operations so remember about that when reading a performance comparision. 
+The biggest improvement in time performance could be achieved for a calculation where a grouping variable have to be used (around x50 depending on data dimensions and number of groups and even more than x1000). Another performance boost could be achieved for Linear Discriminant Analysis (x10).
 
 If you are interested about the procedure of testing performance check performance_validity.R file at extdata folder.
 
@@ -53,277 +52,116 @@ system.file("extdata","images",package = "miceFast")
 ```
 
 
-Mice fast was compared with the mice package. For grouping option there was used a basic R looping and the popular dplyr package.
+miceFast was compared with the mice package. For grouping option there was used a basic R looping and the popular dplyr package.
 
 Summing up, miceFast offer a relevant boost of calculations for LDA and all implemented models with a grouping variable. 
 
-## Example
+\newpage
 
-###Genereting Data by corrData Module
+##Modules
+
+###Genereting data with the corrData Module
 
 Available constructors:
 
-**new(corrData,nr_cat,n_obs,means,cor_matrix)**
+`new(corrData,nr_cat,n_obs,means,cor_matrix)`
 
-**new(corrData,n_obs,means,cor_matrix)**
+`new(corrData,n_obs,means,cor_matrix)`
 
 where:
 
-- nr_cat : number of categories for discrete dependent variable
-- n_obs : number of observations
-- means: center independent variables
-- cor_mat : positive defined correlation matrix
+- `nr_cat` : number of categories for discrete dependent variable
+- `n_obs` : number of observations
+- `means`: center independent variables
+- `cor_mat` : positive defined correlation matrix
 
 relevant class methods:
 
-- fill("type") : generating data
+- `fill("type")` : generating data
 
-type - ("contin","binom","discrete")
+`type`:character - possible options ("contin","binom","discrete")
 
+###Imputing data with the miceFast Module:
 
-Generating correlated data for all three possible data types of dependent variable
+Available constructors:
 
-```{r,echo=TRUE}
+`new(miceFast)`
 
-power = 6 # power of 10 - number of observations - should be adjusted to a computer capabilities
+relevant class methods:
 
-grs = 10**(power-3) # grouping variable - number of groups
+- `set_data(x)` - providing the data
+- `set_g(g)` - providing grouping variable
+- `set_w(w)` - providing weighting variable
+- `impute("model",posit_y,posit_x)` - impute data under characterstics form object like a optional grouping or weighting variable
+- `impute_force("model",posit_y,posit_x)` - impute data under characterstics form object like a optional grouping or weighting variable and permanently update variable at the object. WARNING, use it only if you are sure about model parameters.
+- `get_models()` - possible quantitative models for a certain type of dependent variable
+- `get_model()` - a recommended quantitative model for a certain type of dependent variable
+- `which_updated()` - is any variable at the object modified by impute_force
 
-## generete example - data
+`x` : numeric matrix - variables  
+`g` : vector of integers for grouping variable - you could build it form several discrete variables  
+`w`:  numeric vector with positive values - weights for weighted linear regressions  
+`model`: character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")  
+`posit_y`: integer - position of dependent variable  
+`posit_x`: integer vector - positions of independent variables  
 
-##positive-defined correlation matrix
+For a simple mean add intercept to data `rep(1,nrow(data))` and use "lm_pred"
 
-cors = matrix(c(1,0.6,0.7,0.4,0.4,0.5,0.35,
-                NA,1,0.2,0.05,0.1,0.12,0.15,
-                NA,NA,1,0.15,0.15,0.1,0.08,
-                NA,NA,NA,1,0.12,0.15,0.1,
-                NA,NA,NA,NA,1,0.15,0.2,
-                NA,NA,NA,NA,NA,1,0.15,
-                NA,NA,NA,NA,NA,NA,1),7,7,byrow = TRUE)
-
-cors[lower.tri(cors)] = t(cors)[lower.tri(cors)]
-
-n_vars = 7 # number of variables
-
-# automatic corr matrix - close to diagonal
-
-#cors = stats::rWishart(100,10,diag(7)) 
-
-#cors = apply(cors,1:2,mean)/10
-
-#cors
-
-##
-
-model = new(corrData,10,10^power,rep(0,7),cors)
-
-data_bin = model$fill("binom")
-data_disc = model$fill("discrete")
-data_con = model$fill("contin")
-
-n_vars = ncol(cors)
-
-posit_y = 1
-posit_x = 2:(n_vars-2)
-posit_w = n_vars-1
-posit_grs = n_vars
-```
-
-Sampling 10% of observations - artificial missing values:
-
-```{r,echo=TRUE,echo=TRUE}
-## NA index
-index_NA = 1:nrow(data_con) %in% sample(1:nrow(data_con),10^(power-1))
-
-fill_NA = function(v,index_NA){
-
-  v[index_NA] = NA
-
-  v
-}
-
-```
-
-
-```{r,echo=TRUE}
-data_con_NA = cbind(fill_NA(data_con[,posit_y],index_NA),data_con[,posit_x])
-data_disc_NA = cbind(fill_NA(data_disc[,posit_y],index_NA),data_disc[,posit_x])
-data_bin_NA = cbind(fill_NA(data_bin[,posit_y],index_NA),data_bin[,posit_x])
-```
-
-A grouping variable:
-
-```{r,echo=TRUE}
-#Grouping variable
-
-data_disc[,posit_grs] = floor(pnorm(data_disc[,posit_grs])*grs)
-
-gr_disc = data_disc[,posit_grs]
-
-#continous model
-
-data_con[,posit_grs] = floor(pnorm(data_con[,posit_grs])*grs)
-
-gr_con = data_con[,posit_grs]
-
-```
-
-Weighting variable:
-
-```{r}
-weights = pnorm(data_con[,posit_w])
-```
-
-Presenting Data - Continuous & Discrete:
-
-```{r,echo=TRUE}
-# round(head(data_disc),3)
-# round(head(data_con),3)
-# 
-# round(cor(data_disc),3)
-# round(cor(data_con),3)
-```
+\newpage
 
 ###Imputations
 
-Building miceFast objects - a simple model or with a grouping variable:
-
-available constructors:
-
-**new(miceFast)**
-
-relevant class methods:
-
-- set_data(x) - providing the data
-- set_g(g) - providing grouping variable
-- set_w(w) - providing weighting variable
-- impute("model",posit_y,posit_x) - impute data under characterstics form object like a optional grouping or weighting variable
-- impute_force("model",posit_y,posit_x) - impute data under characterstics form object like a optional grouping or weighting variable and permanently update variable at the object. WARNING, use it only if you are sure about model parameters.
-- get_models() - possible quantitative models for a certain type of dependent variable
-- get_model() - a recommended quantitative model for a certain type of dependent variable
-- which_updated() - is any variable at the object modified by impute with a force parameter set to TRUE
-
-x : numeric matrix - variables
-g : vector of integers for grouping variable - you could build it form several discrete variables
-w:  numeric vector with positive values - weights for weighted linear regressions
-model: character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")
-posit_y: integer - position of dependent variable
-posit_x: integer vector - positions of independent variables
-
-!!!for simple mean use "lm_pred" and x=as.matrix(rep(1,nrow(data)))
-
-Base model:
-
-Continuous data:
+miceFast module usage:
 
 ```{r,echo=TRUE}
+library(miceFast)
+#install.packages("mice")
+
+data = cbind(as.matrix(mice::nhanes),1)
 model = new(miceFast)
+model$set_data(data) #providing data by a reference
 
-#Add data to object
-model$set_data(data_con_NA)
-#get availible predction models
-model$get_models(posit_y)
-#get recommended prediction model
-model$get_model(posit_y) # usefull at loops
-#implementing lm_pred
-pred = model$impute("lm_pred",posit_y,posit_x)
+# Setting imputations directly is preferable when working with "Big Data"
+#Simple mean - permanent imputation at the object
+data[,2] = model$impute_force("lm_pred",2,5)$imputations 
+# permanent imputation at the object
+data[,3] = model$impute_force("lda",3,c(1,2))$imputations 
+data[,4] = rowMeans(
+  sapply(1:10,
+         function(x) model$impute("lm_bayes",4,c(1,2,3))$imputations
+         ))
 
-mean((pred$imputations[as.logical(pred$index_imputed)]-data_con[index_NA,1])^2)
+# Be careful with impute_force because of the permanent update at the object
+# That is why impute_force could be used only ones for a certain column
+# check which variables was updated - only inside the object
+model$which_updated()
 
+rm(model)
 ```
 
-Discrete data:
-
 ```{r,echo=TRUE}
+###################################
+###Model with additional parameters
+###################################
+
+data = cbind(as.matrix(airquality[,-5]),1) # adding a intercept
+weights = rgamma(nrow(data),3,3) # positive numeric values
+groups = airquality[,5] # vector of integers
 
 model = new(miceFast)
-model$set_data(data_disc_NA)
 
-#get availible predction models for variable 1
-model$get_models(posit_y)
-#implementing lda
-pred =  model$impute("lda",posit_y,posit_x)
-#index_imp = model$get_index_NA_R(posit_y,posit_x)
-
-table(pred$imputations[as.logical(pred$index_imputed)],data_disc[index_NA,1])
-
-```
-
-Using a grouping variable:
-
-Continuous data:
-
-```{r,echo=TRUE}
-
-model = new(miceFast)
-model$set_data(data_con_NA)
-#get availible predction models for variable 1
-model$get_models(posit_y)
-#implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x)
-
-mean((pred$imputations[as.logical(pred$index_imputed)]-data_con[index_NA,1])^2)
-
-head(cbind(pred$imputations[as.logical(pred$index_imputed)],data_con[index_NA,1]))
-
-```
-
-Discrete data:
-
-```{r,echo=TRUE}
-
-model = new(miceFast)
-model$set_data(data_disc_NA)
-model$set_g(g=gr_disc)
-#get availible predction models for variable 1
-model$get_models(posit_y)
-#implementing lda
-pred =  model$impute("lda",posit_y,posit_x)
-
-table(pred$imputations[as.logical(pred$index_imputed)],data_disc[index_NA,1])
-
-```
-
-###Additional functionality -  weighted linear regressions
-
-Base model:
-
-```{r,echo=TRUE}
-
-model = new(miceFast)
-model$set_data(data_con_NA)
+model$set_data(data) # providing data by a reference
 model$set_w(weights)
-#get availible predction models
+model$set_g(groups)
 
-model$get_models(posit_y)
+#impute adapt to provided parmaters like w or g
+#Simple mean - permanent imputation at the object
+data[,1] = model$impute_force("lm_pred",1,c(6))$imputations
+data[,2] = rowMeans(
+  sapply(1:10,
+         function(x) model$impute("lm_bayes",2,c(1,3,4,5,6))$imputations
+         ))
+data = cbind(data,groups)
 
-#implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x)
-
-mean((pred$imputations[as.logical(pred$index_imputed)]-data_con[index_NA,1])^2)
-
-head(cbind(pred$imputations[as.logical(pred$index_imputed)],data_con[index_NA,1]))
-
+rm(model)
 ```
-
-with grouping variable:
-
-```{r,echo=TRUE}
-
-model = new(miceFast)
-model$set_data(data_con_NA)
-model$set_w(weights)
-model$set_g(g=gr_con)
-
-#get availible predction models
-model$get_models(posit_y)
-#implementing lm_pred
-pred =  model$impute("lm_pred",posit_y,posit_x)
-#index_imp =  model$get_index_NA_R(posit_y,posit_x[-length(posit_x)])
-
-mean((pred$imputations[as.logical(pred$index_imputed)] - data_con[index_NA,1])^2)
-
-head(cbind(pred$imputations[as.logical(pred$index_imputed)],data_con[index_NA,1]))
-
-```
-
