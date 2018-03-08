@@ -9,7 +9,7 @@ Travis badge - click on the image:
 
 Object-oriented R programming by [Rcpp Module](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf)
 
-R package was built under Rcpp and Armadillo for the purpose of fast multiple imputations in the face of **Big Data World** (but still fitting into the RAM).
+R package was built under Rcpp and Armadillo for the purpose of fast imputations in the face of **Big Data World** (but still fitting into the RAM).
 There was used quantitative models with closed-form solution. Thus package is based on linear algebra operations.
 The biggest improvement in time performance could be achieved for a calculation where a grouping variable have to be used (around x50 depending on data dimensions and number of groups and even more than x1000).
 Another performance boost could be achieved for Linear Discriminant Analysis (x10).
@@ -19,7 +19,7 @@ Implemented classes:
 - `miceFast` (methods:`set_data`,`set_w`,`set_g`,`impute`,`impute_force`,`which_updated`,`get_model`,`get_models`,...)
 - `corrData` (methods:`fill`)
 
-The first module offers capabilities of multiple imputations models with a closed-form solution. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable.
+The first module offers capabilities of imputations models with a closed-form solution. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable.
 The second module was made for purpose of presenting the miceFast usage and performance. It provides functionality of generating correlated data with a discrete, binomial or continuous dependent variable and continuous independent variables.
 
 Performance benchmarks (check performance_validity.R file at extdata).
