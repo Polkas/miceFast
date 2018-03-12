@@ -183,7 +183,7 @@ std::map<std::string, pfunc> funMap = {{"lda",fastLda},
 {"lm_bayes",fastLm_bayes}};
 
 
-Rcpp::List miceFast::impute_force(std::string s, int posit_y,arma::uvec posit_x){
+void miceFast::impute_force(std::string s, int posit_y,arma::uvec posit_x){
 
   if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
   if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
@@ -199,10 +199,6 @@ Rcpp::List miceFast::impute_force(std::string s, int posit_y,arma::uvec posit_x)
   x.col(posit_y) = pred_arma.rows(index);
 
   updated.push_back(posit_y + 1);
-
-  return Rcpp::List::create(Rcpp::Named("imputations") = pred["imputations"],
-                            Rcpp::Named("index_imputed") = pred["index_NA"],
-                             Rcpp::Named("index_full") = pred["index_full"]);
 
 }
 

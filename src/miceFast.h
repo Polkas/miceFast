@@ -21,7 +21,7 @@ class miceFast{
   miceFast();
   ~miceFast();
 
-  Rcpp::List impute_force(std::string s, int posit_y,arma::uvec posit_x);
+  void impute_force(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List impute(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List impute_raw(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List imputeby(std::string s, int posit_y,arma::uvec posit_x);
