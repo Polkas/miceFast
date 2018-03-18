@@ -14,14 +14,12 @@ class miceFast{
   std::vector<int> updated;
   bool sorted = false;
   arma::uvec index;
-  arma::uvec index_rev;
 
   public:
 
   miceFast();
   ~miceFast();
 
-  void impute_force(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List impute(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List impute_raw(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List imputeby(std::string s, int posit_y,arma::uvec posit_x);
@@ -34,12 +32,18 @@ class miceFast{
   arma::uvec get_index_full(int posit_y, arma::uvec posit_x);
   arma::uvec get_index_NA(int posit_y, arma::uvec posit_x);
 
-  std::vector<int> which_updated();
   void sortData_byg();
   void set_data(arma::mat& _x);
   void set_g(arma::uvec& _g);
   void set_w(arma::colvec& _w);
-  arma::uvec get_index_data();
+  void update_var(int posit_y,arma::vec impute);
+
+  std::vector<int> which_updated();
+  bool is_sorted_byg();
+  arma::mat get_data();
+  arma::colvec get_w();
+  arma::uvec get_g();
+  arma::uvec get_index();
 
 };
 

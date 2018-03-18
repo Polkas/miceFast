@@ -37,11 +37,17 @@ new(miceFast)
     \item{\code{set_data(...)}:}{ providing the data by a reference }
     \item{\code{set_g(...)}:}{ providing a grouping variable }
     \item{\code{set_w(...)}:}{ providing a weightinh variable by a reference }
+    \item{\code{get_data(...)}:}{ retrieving the data }
+    \item{\code{get_w(...)}:}{ retrieving the weighting variable }
+    \item{\code{get_g(...)}:}{ retireiving the grouping variable }
+    \item{\code{get_index(...)}:}{ getting the index }
     \item{\code{impute(...)}:}{ impute data under characterstics from the object like a optional grouping or weighting variable }
-    \item{\code{impute_force(...)}:}{ impute data under characterstics from the object like a optional grouping or weighting variable and permanently update the variable at the object. WARNING, use it only if you are sure about model parameters. }
-    \item{\code{get_models(...)}:}{  possible quantitative models for a certain type of dependent variable }
-    \item{\code{get_model(...)}:}{  a recommended quantitative model for a certain type of dependent variable }
-    \item{\code{which_updated(...)}:}{ which variables at the object was modified by impute_force}
+    \item{\code{update_var(...)}:}{ permanently update the variable at the object and data. Use it only if you are sure about model parameters.}
+    \item{\code{get_models(...)}:}{  get possible quantitative models for a certain type of dependent variable }
+    \item{\code{get_model(...)}:}{  get a recommended quantitative model for a certain type of dependent variable }
+    \item{\code{which_updated(...)}:}{ which variables at the object was modified by update_var}
+    \item{\code{sort_byg(...)}:}{ sort data by the grouping variable }
+    \item{\code{is_sorted_byg(...)}:}{check if data is sorted by the grouping variable }
     \item{\code{initialize(...)}:}{ ... }
     \item{\code{finalize()}:}{ ... }
   }

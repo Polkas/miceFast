@@ -24,12 +24,11 @@ set.seed(1234)
 
 ## Motivations
 
-Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will sometimes deteriorate quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are comfortable for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
+Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will sometimes deteriorate quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are user-friendly for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
 
 The presented miceFast package was built under Rcpp packages and the C++ library Armadillo.
 The Rcpp package offers functionality of exporting full C++ capabilities to the R environment.
 More precisely miceFast and corrData are offered. The first module offers capabilities of multiple imputations models with a closed-form solution. Thus package is based on linear algebra operations. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable and functions enhancement by C++ capabilities.
-
 The second module was made for purpose of presenting the miceFast usage and performance. It provides functionality of generating correlated data with a discrete, binomial or continuous dependent variable and continuous independent variables. 
 
 ##Performance
@@ -90,20 +89,26 @@ Available constructors:
 relevant class methods:
 
 - `set_data(x)` - providing the data
-- `set_g(g)` - providing grouping variable
-- `set_w(w)` - providing weighting variable
+- `get_data()` - retrieving the data
+- `set_g(g)` - providing the grouping variable
+- `get_g()` - retrieving the grouping variable
+- `set_w(w)` - providing the weighting variable
+- `get_w()` - retrieving the weighting variable
+- `get_index()` - getting the index
 - `impute("model",posit_y,posit_x)` - impute data under characterstics form object like a optional grouping or weighting variable
-- `impute_force("model",posit_y,posit_x)` - impute data under characterstics form object like a optional grouping or weighting variable and permanently update variable at the object. WARNING, use it only if you are sure about model parameters.
+- `update_var(posit_y,imputations)` - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters.
 - `get_models()` - possible quantitative models for a certain type of dependent variable
 - `get_model()` - a recommended quantitative model for a certain type of dependent variable
-- `which_updated()` - is any variable at the object modified by impute_force
-
+- `which_updated()` - which variables were modified by update_var at the object (and data)
+- `sort_byg()` - sort data by the grouping variable 
+- `is_sorted_byg()` - is data sorted by the grouping variable
 `x` : numeric matrix - variables  
 `g` : vector of integers for grouping variable - you could build it form several discrete variables  
 `w`:  numeric vector with positive values - weights for weighted linear regressions  
 `model`: character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")  
 `posit_y`: integer - position of dependent variable  
 `posit_x`: integer vector - positions of independent variables  
+`imputations` : numeric vector - imputations
 
 For a simple mean add intercept to data `rep(1,nrow(data))` and use "lm_pred"
 
@@ -114,60 +119,66 @@ For a simple mean add intercept to data `rep(1,nrow(data))` and use "lm_pred"
 miceFast module usage:
 
 ```{r,echo=TRUE}
-library(miceFast)
 #install.packages("mice")
 
-data = cbind(as.matrix(mice::nhanes),1)
+data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
 
 model = new(miceFast)
 model$set_data(data) #providing data by a reference
 
-#test it if needed model$impute("lm_pred",2,5)
-model$impute_force("lm_pred",2,5) #permanent imputation at data and the object
+model$update_var(2,model$impute("lm_pred",2,5)$imputations)
 
-#OR
-#data[,2] = model$impute("lm_pred",2,5)$imputations #permanent imputation at data but not the object
-#data changes the address after imputations but we have to provide this info to object
+#OR not recommended
+#data[,2] = model$impute("lm_pred",2,5)$imputations
 #model$set_data(data) #Updating the object
-#gc() #a garbage collector should be invoked
 
-model$impute_force("lda",3,c(1,2)) #Permanent imputation at the object and data
-data[,4] = rowMeans(sapply(1:10,function(x) model$impute("lm_bayes",4,c(1,2,3))$imputations))
+model$update_var(3,model$impute("lda",3,c(1,2))$imputations) 
+model$update_var(4,rowMeans(sapply(1:10,function(x) 
+  model$impute("lm_bayes",4,c(1,2,3))$imputations))
+  )
 
-# Be careful with impute_force because of the permanent update at the object and data
-# That is why impute_force could be used only ones for a certain column
-# check which variables was updated - only inside the object
-model$which_updated() #column 4 was not updated at the object
+#When working with 'Big Data'
+#it is recommended to occasionally manually invoke a garbage collector `gc()`
 
-data
+# Be careful with `update_var` because of the permanent update at the object and data
+# That is why `update_var` could be used only ones for a certain column
+# check which variables was updated - inside the object
+model$which_updated()
+
+head(model$get_data())
 
 rm(model)
 ```
+
+\newpage
 
 ```{r,echo=TRUE}
 ###################################
 ###Model with additional parameters
 ###################################
 
-data = cbind(as.matrix(airquality[,-5]),1) # adding a intercept
+data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
 weights = rgamma(nrow(data),3,3) # positive numeric values
-groups = airquality[,5] # vector of integers
+#groups = airquality[,5] # vector of positive integers
+groups = sample(1:4,nrow(data),replace=T) # vector of positive integers
 
 model = new(miceFast)
-
 model$set_data(data) # providing data by a reference
 model$set_w(weights)
 model$set_g(groups)
 
+#if data is not sorted increasingly by g then it would be automatically done 
+#during a first imputation
+
 #impute adapt to provided parmaters like w or g
-#Simple mean - permanent imputation at the object
-#test it if needed model$impute("lm_pred",1,c(6))
-model$impute_force("lm_pred",1,c(6))
-data[,2] = rowMeans(
-  sapply(1:10,
-         function(x) model$impute("lm_bayes",2,c(1,3,4,5,6))$imputations
-         ))
-data = cbind(data,groups)
+#Simple mean - permanent imputation at the object and data
+model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
+
+model$update_var(2,rowMeans(sapply(1:10,function(x) 
+  model$impute("lm_bayes",2,c(1,3,4,5,6))$imputations))
+  )
+
+head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),])
 
 rm(model)
 ```
