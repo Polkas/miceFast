@@ -251,7 +251,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
   arma::colvec pred(N);
 
   for(int i =0;i<N;i++){
-    int pos = ceil(arma::index_max(dist_scale.row(i)));
+    int pos = arma::index_max(dist_scale.row(i));
     pred(i) = un(pos);
   }
 

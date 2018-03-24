@@ -22,18 +22,18 @@ miceFast::~miceFast(){
 };
 
 void miceFast::set_data(arma::mat & _x){
-  x = arma::mat(_x.begin(),_x.n_rows,_x.n_cols,false);
+  x = arma::mat(_x.begin(),_x.n_rows,_x.n_cols,false,false);
   index = arma::regspace<arma::uvec>(0,x.n_rows - 1) + 1;
 }
 
-void miceFast::set_g(arma::uvec & _g){
-  g =_g;
+void miceFast::set_g(arma::colvec & _g){
+  //g = arma::uvec(_g.begin(),_g.n_elem,false,false); - not work for uvec
+  g = arma::colvec(_g.begin(),_g.n_rows,false,false);
   sorted = g.is_sorted();
-
 }
 
 void miceFast::set_w(arma::colvec & _w){
-  w = arma::colvec(_w.begin(),_w.n_rows,false);;
+  w = arma::colvec(_w.begin(),_w.n_rows,false,false);
 }
 
 bool miceFast::is_sorted_byg(){
@@ -50,7 +50,7 @@ arma::colvec miceFast::get_w(){
   if(w.is_empty()){Rcpp::stop("There is no weighting variable provided");}
   return w;
 };
-arma::uvec miceFast::get_g(){
+arma::colvec miceFast::get_g(){
   if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
   return g;
 };
@@ -105,14 +105,28 @@ arma::uvec miceFast::get_index_NA(int posit_y, arma::uvec posit_x){
 
 void miceFast::sortData_byg(){
 
-  if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
+  if(g.is_empty()){Rcpp::stop("There is no a grouping variable provided");}
+  if(!sorted){
+
   Rcpp::warning("\n Data was sorted by the grouping variable - use `get_index()` to retrieve an order");
+
   arma::uvec order = arma::stable_sort_index(g);
-  x = x.rows(order);
-  g = g.elem(order);
+
+  arma::mat x_temp = x.rows(order);
+  x = x_temp;
+  x_temp.clear();
+
+  g.col(0) = g.rows(order);
+
   index = index.elem(order);
-  if(!w.is_empty()){w = w.elem(order);}
+
+  if(!w.is_empty()){
+    w.col(0) =  w.rows(order);
+    }
+
   sorted = true;
+
+  }
 
 }
 
@@ -305,9 +319,11 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
   if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
 
+  arma::uvec g_int = arma::conv_to<arma::uvec>::from(g);
+
   //grouping variable
 
-  arma::uvec un = arma::unique(g);
+  arma::uvec un = arma::unique(g_int);
 
   unsigned int group = un.n_elem;
 
@@ -321,8 +337,8 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
   arma::mat X_NA = X.rows(index_NA);
   arma::colvec Y_full = Y.rows(index_full);
 
-  arma::uvec g_full = g.elem(index_full);
-  arma::uvec g_NA = g.elem(index_NA);
+  arma::uvec g_full = g_int.elem(index_full);
+  arma::uvec g_NA = g_int.elem(index_NA);
 
   //predictions container
 
@@ -443,9 +459,11 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
   if(w.has_nan()){Rcpp::stop("There is NA values for weights variable");}
   if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
 
+  arma::uvec g_int = arma::conv_to<arma::uvec>::from(g);
+
   //grouping variable
 
-  arma::uvec un = arma::unique(g);
+  arma::uvec un = arma::unique(g_int);
   unsigned int group = un.n_elem;
 
   //quantitative model
@@ -459,8 +477,8 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
   arma::colvec Y_full = Y.rows(index_full);
   arma::colvec w_full = w.rows(index_full);
 
-  arma::uvec g_full = g.elem(index_full);
-  arma::uvec g_NA = g.elem(index_NA);
+  arma::uvec g_full = g_int.elem(index_full);
+  arma::uvec g_NA = g_int.elem(index_NA);
 
   //predictions container
 

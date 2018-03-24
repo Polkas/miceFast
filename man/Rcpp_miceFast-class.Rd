@@ -34,9 +34,9 @@ new(miceFast)
 \keyword{classes}
 \section{Methods}{
   \describe{
-    \item{\code{set_data(...)}:}{ providing the data by a reference }
-    \item{\code{set_g(...)}:}{ providing a grouping variable }
-    \item{\code{set_w(...)}:}{ providing a weightinh variable by a reference }
+    \item{\code{set_data(...)}:}{ providing data by a reference - a numeric matrix}
+    \item{\code{set_g(...)}:}{ providing a grouping variable by a reference - a numeric vector - positive values}
+    \item{\code{set_w(...)}:}{ providing a weightinh variable by a reference - a numeric vector - positive values}
     \item{\code{get_data(...)}:}{ retrieving the data }
     \item{\code{get_w(...)}:}{ retrieving the weighting variable }
     \item{\code{get_g(...)}:}{ retireiving the grouping variable }

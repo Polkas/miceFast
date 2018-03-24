@@ -1,6 +1,6 @@
 Package: miceFast
 Title: Fast Imputations Using 'Rcpp' and 'Armadillo'
-Version: 0.0.1
+Version: 0.0.3
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Description: 
   Fast imputations under the object-oriented programming paradigm.
@@ -8,6 +8,8 @@ Description:
 	The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
 Depends: R (>= 3.4.0)
 License: GPL (>= 2)
+URL: https://github.com/Polkas/miceFast
+BugReports: https://github.com/Polkas/miceFast/issues
 Encoding: UTF-8
 Imports:
 	methods, 
