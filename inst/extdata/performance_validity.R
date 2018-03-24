@@ -20,7 +20,7 @@ nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of varia
 
 grs = max(c(10**(power-3),10)) # grouping variable - number of groups
 
-iters = 10 # number of iterations for benchmarking
+iters = 100 # number of iterations for benchmarking
 
 ## generete example - data
 
@@ -148,6 +148,16 @@ pred_miceFast =  model$impute("lda",posit_y,posit_x)
 true_y = data_disc[index_sort,][index_NA[index_sort],posit_y]
 
 table(pred_miceFast$imputations[as.logical(pred_miceFast$index_imp)],true_y)
+# rotate = sample(1:nrow(data),nrow(data))
+#
+# model = new(miceFast)
+# model$set_data(data[rotate,])
+# model$set_g(g[rotate])
+# pred_miceFast =  model$impute("lda",posit_y,posit_x)
+#
+# true_y = data_disc[index_sort,][rotate,][index_NA[index_sort][rotate],posit_y]
+#
+# table(pred_miceFast$imputations[order(model$get_index())][as.logical(pred_miceFast$index_imputed[order(model$get_index())])],true_y)
 table(pred_dplyr,true_y)
 table(pred_Rbase,true_y)
 

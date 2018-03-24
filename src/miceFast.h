@@ -9,7 +9,7 @@
 class miceFast{
 
   arma::mat x;       //variables
-  arma::uvec g;    //grouping
+  arma::colvec g;    //grouping
   arma::colvec w;//weights
   std::vector<int> updated;
   bool sorted = false;
@@ -34,7 +34,7 @@ class miceFast{
 
   void sortData_byg();
   void set_data(arma::mat& _x);
-  void set_g(arma::uvec& _g);
+  void set_g(arma::colvec& _g);
   void set_w(arma::colvec& _w);
   void update_var(int posit_y,arma::vec impute);
 
@@ -42,7 +42,7 @@ class miceFast{
   bool is_sorted_byg();
   arma::mat get_data();
   arma::colvec get_w();
-  arma::uvec get_g();
+  arma::colvec get_g();
   arma::uvec get_index();
 
 };

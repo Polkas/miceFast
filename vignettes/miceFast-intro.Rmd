@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   rmarkdown::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{miceFast - Introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,7 +19,7 @@ Loading the package and setting a seed:
 
 ```{r,echo=TRUE}
 library(miceFast)
-set.seed(1234)
+set.seed(123456)
 ```
 
 ## Motivations
@@ -88,11 +88,11 @@ Available constructors:
 
 relevant class methods:
 
-- `set_data(x)` - providing the data
+- `set_data(x)` - providing the data by a reference - a numeric matrix
 - `get_data()` - retrieving the data
-- `set_g(g)` - providing the grouping variable
+- `set_g(g)` - providing the grouping variable by a reference - a numeric vector - positive values
 - `get_g()` - retrieving the grouping variable
-- `set_w(w)` - providing the weighting variable
+- `set_w(w)` - providing the weighting variable by a reference - a numeric vector - positive values
 - `get_w()` - retrieving the weighting variable
 - `get_index()` - getting the index
 - `impute("model",posit_y,posit_x)` - impute data under characterstics form object like a optional grouping or weighting variable
@@ -103,20 +103,20 @@ relevant class methods:
 - `sort_byg()` - sort data by the grouping variable 
 - `is_sorted_byg()` - is data sorted by the grouping variable
 `x` : numeric matrix - variables  
-`g` : vector of integers for grouping variable - you could build it form several discrete variables  
+`g` : numeric vector - you could build it form several discrete variables  
 `w`:  numeric vector with positive values - weights for weighted linear regressions  
 `model`: character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")  
 `posit_y`: integer - position of dependent variable  
 `posit_x`: integer vector - positions of independent variables  
 `imputations` : numeric vector - imputations
 
-For a simple mean add intercept to data `rep(1,nrow(data))` and use "lm_pred"
+For a simple mean add intercept to data and use "lm_pred"
 
 \newpage
 
 ###Imputations
 
-miceFast module usage:
+**miceFast module usage:**
 
 ```{r,echo=TRUE}
 #install.packages("mice")
@@ -148,37 +148,78 @@ model$which_updated()
 head(model$get_data())
 
 rm(model)
+
+head(mice::nhanes)
 ```
 
 \newpage
 
-```{r,echo=TRUE}
-###################################
-###Model with additional parameters
-###################################
+**Model with additional parameters:** - data sorted by the grouping variable
 
+```{r,echo=TRUE}
 data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
-weights = rgamma(nrow(data),3,3) # positive numeric values
-#groups = airquality[,5] # vector of positive integers
-groups = sample(1:4,nrow(data),replace=T) # vector of positive integers
+weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
+groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values - sorted increasingly
 
 model = new(miceFast)
 model$set_data(data) # providing data by a reference
 model$set_w(weights)
 model$set_g(groups)
-
-#if data is not sorted increasingly by g then it would be automatically done 
-#during a first imputation
-
 #impute adapt to provided parmaters like w or g
+#Warning - if data is not sorted increasingly by the g then it would be done automatically 
+#during a first imputation
 #Simple mean - permanent imputation at the object and data
 model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
 
 model$update_var(2,rowMeans(sapply(1:10,function(x) 
   model$impute("lm_bayes",2,c(1,3,4,5,6))$imputations))
   )
+#Printing data and retrieving an old order
+head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),],4)
 
-head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),])
+head(airquality,4)
+
+head(cbind(model$get_data(),model$get_g(),model$get_w()),4)
+
+head(cbind(data,groups,weights),4)
 
 rm(model)
+
 ```
+
+\newpage
+
+**Model with additional parameters:** - data not sorted by the grouping variable
+
+```{r,echo=TRUE}
+data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
+weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
+#groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values
+groups = as.numeric(sample(1:3,nrow(data),replace=T)) # a numeric vector not integers - positive values
+
+model = new(miceFast)
+model$set_data(data) # providing data by a reference
+model$set_w(weights)
+model$set_g(groups)
+#impute adapt to provided parmaters like w or g
+#Warning - if data is not sorted increasingly by the g then it would be done automatically 
+#during a first imputation
+#Simple mean - permanent imputation at the object and data
+model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
+
+model$update_var(2,rowMeans(sapply(1:10,function(x) 
+  model$impute("lm_bayes",2,c(1,3,4,5,6))$imputations))
+  )
+#Printing data and retrieving an old order
+head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),],4)
+
+head(airquality,4)
+
+head(cbind(model$get_data(),model$get_g(),model$get_w()),4) #is ordered by g
+
+head(cbind(data,groups,weights),4) #is sorted by g cause we provide data by a reference
+
+rm(model)
+
+```
+
