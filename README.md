@@ -59,40 +59,6 @@ rm(model)
 
 head(mice::nhanes)
 
-
-###################################
-###Model with additional parameters
-###################################
-
-data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality)) # adding a intercept
-weights = rgamma(nrow(data),3,3) # positive numeric values
-#groups = airquality[,5] # a numeric vector not integers
-groups = as.numeric(sample(1:3,nrow(data),replace=T)) # a numeric vector , not integers
-
-model = new(miceFast)
-
-model$set_data(data) # providing data by a reference
-model$set_w(weights)# providing weights by a reference
-model$set_g(groups)# providing grouping variable by a reference
-
-cbind(as.integer(model$get_g()),groups)
-
-#impute adapt to provided parmaters like w or g
-#Warning - if data is not sorted increasingly by the g then it would be done automatically during a first imputation
-model$update_var(1,model$impute("lm_pred",1,c(6))$imputations) #Simple mean - permanent imputation at the object and data
-
-model$update_var(2,rowMeans(sapply(1:10,function(x) model$impute("lm_bayes",2,c(1,3,4,5,6))$imputations)))
-
-head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),])
-
-head(airquality)
-
-head(cbind(model$get_data(),model$get_g(),model$get_w())) #is ordered by g
-
-head(cbind(data,groups,weights)) #is sorted  by g too because we provide data by reference
-
-rm(model)
-
 ########################################################################
 ###Model with additional parameters: - sorted by the grouping variable
 ########################################################################
