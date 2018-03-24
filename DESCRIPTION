@@ -1,6 +1,6 @@
 Package: miceFast
 Title: Fast Imputations Using 'Rcpp' and 'Armadillo'
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Description: 
   Fast imputations under the object-oriented programming paradigm.
