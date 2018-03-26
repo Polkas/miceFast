@@ -6,6 +6,9 @@ GitHub:  https://github.com/polkas/miceFast
 Travis badge - click on the image:
 
 [![Build Status](https://travis-ci.org/Polkas/miceFast.svg?branch=master)](https://travis-ci.org/Polkas/miceFast) 
+[![Downloads](http://cranlogs.r-pkg.org/badges/miceFast?color=brightgreen)](http://www.r-pkg.org/pkg/miceFast)
+[![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
+
 
 Object-oriented R programming by [Rcpp Module](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf)
 
