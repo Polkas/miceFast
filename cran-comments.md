@@ -4,7 +4,7 @@
 * win-builder: R-deve
 
 ## R CMD check results
-There were no ERRORs,WARNINGs and one NOTE.
+There were no ERRORs,WARNINGs and a one NOTE.
 
 I got a note only on travis-ci:
 checking installed package size ...NOTE installed size is  6.4Mb

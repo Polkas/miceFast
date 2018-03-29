@@ -38,7 +38,7 @@ data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
 
 model = new(miceFast)
 
-model$set_data(data) #providing data by a reference
+model$set_data(data) #providing by a reference
 
 model$update_var(2,model$impute("lm_pred",2,5)$imputations) #permanent imputation at the object and data
 
@@ -71,12 +71,11 @@ weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
 groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values - sorted increasingly
 
 model = new(miceFast)
-model$set_data(data) # providing data by a reference
-model$set_w(weights)
-model$set_g(groups)
+model$set_data(data) # providing by a reference
+model$set_w(weights) # providing by a reference
+model$set_g(groups)  # providing by a reference
+
 #impute adapt to provided parmaters like w or g
-#Warning - if data is not sorted increasingly by the g then it would be done automatically 
-#during a first imputation
 #Simple mean - permanent imputation at the object and data
 model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
 
@@ -104,9 +103,9 @@ weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
 groups = as.numeric(sample(1:3,nrow(data),replace=T)) # a numeric vector not integers - positive values
 
 model = new(miceFast)
-model$set_data(data) # providing data by a reference
-model$set_w(weights)
-model$set_g(groups)
+model$set_data(data) # providing by a reference
+model$set_w(weights) # providing by a reference
+model$set_g(groups)  # providing by a reference
 #impute adapt to provided parmaters like w or g
 #Warning - if data is not sorted increasingly by the g then it would be done automatically 
 #during a first imputation
