@@ -1,3 +1,37 @@
+
+/*-------------------------------------------------------------------------------
+
+This file is part of miceFast.
+
+miceFast is free software: you can redistribute it and/or modify
+
+it under the terms of the GNU General Public License as published by
+
+the Free Software Foundation, either version 3 of the License, or
+
+(at your option) any later version.
+
+
+miceFast is distributed in the hope that it will be useful,
+
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+
+GNU General Public License for more details.
+
+
+You should have received a copy of the GNU General Public License
+
+along with miceFast. If not, see <http://www.gnu.org/licenses/>.
+
+
+Written by:
+
+Maciej Nasinski
+
+#-------------------------------------------------------------------------------*/
+
 //[[Rcpp::depends(RcppArmadillo)]]
 //[[Rcpp::plugins(cpp11)]]
 
@@ -26,6 +60,7 @@ class miceFast{
   Rcpp::List imputeW(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List imputebyW(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List option_impute(std::string s,int posit_y,arma::uvec posit_x);
+  arma::vec vifs(int posit_y,arma::uvec posit_x);
 
   std::string get_models(int posit_y);
   std::string get_model(int posit_y);

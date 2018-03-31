@@ -21,7 +21,8 @@ Suggests:
     testthat,
     mice,
     dplyr,
-    broom
+    broom,
+    car
 VignetteBuilder: knitr
 LinkingTo: 
 	Rcpp,
