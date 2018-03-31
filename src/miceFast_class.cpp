@@ -138,6 +138,44 @@ std::vector<int> miceFast::which_updated(){
 
 }
 
+//eval vif
+arma::vec miceFast::vifs(int posit_y,arma::uvec posit_x){
+
+  arma::mat x_cols = x.cols(posit_x - 1);
+
+  arma::uvec full_rows = get_index_full(posit_y - 1,posit_x - 1);
+
+  arma::mat full_x = x_cols.rows(full_rows);
+
+  arma::mat col_means = arma::mean(full_x,0);
+
+  full_x.each_row() -= col_means;
+
+  arma::mat XXinv = arma::inv(full_x.t()*full_x);
+
+  int Ncol = full_x.n_cols;
+
+  arma::vec vifs(Ncol);
+
+  double det_XXinv = arma::det(XXinv);
+
+  for(int i=0;i<Ncol;i++){
+
+    arma::mat XXinv_small = XXinv;
+
+    XXinv_small.shed_row(i);
+
+    XXinv_small.shed_col(i);
+
+    vifs(i)= XXinv(i,i) * arma::det(XXinv_small)/det_XXinv;
+
+  }
+
+
+  return vifs;
+};
+
+
 //function for printing recommended prediction models
 
 std::string miceFast::get_models(int posit_y){
@@ -557,7 +595,7 @@ RCPP_MODULE(miceFast){
     .method("get_index", &miceFast::get_index)
     .method("is_sorted_byg", &miceFast::is_sorted_byg)
     .method("which_updated", &miceFast::which_updated)
-
+    .method("vifs", &miceFast::vifs)
     .method("impute", &miceFast::impute)
     .method("update_var", &miceFast::update_var)
     .method("get_models", &miceFast::get_models)

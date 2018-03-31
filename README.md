@@ -6,9 +6,8 @@ GitHub:  https://github.com/polkas/miceFast
 Travis badge - click on the image:
 
 [![Build Status](https://travis-ci.org/Polkas/miceFast.svg?branch=master)](https://travis-ci.org/Polkas/miceFast) 
-[![Downloads](http://cranlogs.r-pkg.org/badges/miceFast?color=brightgreen)](http://www.r-pkg.org/pkg/miceFast)
+[![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/miceFast?color=brightgreen)](http://www.r-pkg.org/pkg/miceFast)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
-
 
 Object-oriented R programming by [Rcpp Module](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf)
 
@@ -20,7 +19,7 @@ Another performance boost could be achieved for Linear Discriminant Analysis (x1
 Implemented classes:
 
 - `miceFast` (methods:`set_data`,`get_data`,`set_w`,`get_w`,`set_g`,`get_g`,`impute`,`update_var`,`which_updated`,`get_model`,
-                      `get_models`,`sort_byg`,`is_sorted_byg`,`get_index`,...)
+                      `get_models`,`sort_byg`,`is_sorted_byg`,`get_index`,`vifs`,...)
 - `corrData` (methods:`fill`)
 
 The first module offers capabilities of imputations models with a closed-form solution. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable.
@@ -28,39 +27,45 @@ The second module was made for purpose of presenting the miceFast usage and perf
 
 Performance benchmarks (check performance_validity.R file at extdata).
 
-## miceFast module usage:
+## Installation
 
 ```r
-library(miceFast)
+# install.packages("devtools")
+devtools::install_github("polkas/miceFast")
+```
+
+## miceFast module usage:
+
+Remeber that a matrix could be build only under a one data type so factor variables have to be melted
+use `model.matrix` to get numeric matrix from `data.frame`
+
+```r
 #install.packages("mice")
-set.seed(123456)
 data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
-
 model = new(miceFast)
+model$set_data(data) #providing data by a reference
 
-model$set_data(data) #providing by a reference
-
-model$update_var(2,model$impute("lm_pred",2,5)$imputations) #permanent imputation at the object and data
-
+model$update_var(2,model$impute("lm_pred",2,5)$imputations)
 #OR not recommended
-#data[,2] = model$impute("lm_pred",2,5)$imputations #permanent imputation at data but not the object
+#data[,2] = model$impute("lm_pred",2,5)$imputations
 #model$set_data(data) #Updating the object
 
-model$update_var(3,model$impute("lda",3,c(1,2))$imputations) #Permanent imputation at the object and data
-model$update_var(4,rowMeans(sapply(1:10,function(x) model$impute("lm_bayes",4,c(1,2,3))$imputations)))
+model$update_var(3,model$impute("lda",3,c(1,2))$imputations) 
+model$update_var(4,rowMeans(sapply(1:10,function(x) 
+  model$impute("lm_bayes",4,c(1,2,3))$imputations))
+  )
 
-#When working with 'Big Data' it is recommended to occasionally manually invoke a garbage collector `gc()`
+#When working with 'Big Data'
+#it is recommended to occasionally manually invoke a garbage collector `gc()`
 
 # Be careful with `update_var` because of the permanent update at the object and data
 # That is why `update_var` could be used only ones for a certain column
 # check which variables was updated - inside the object
 model$which_updated()
-
-head(model$get_data())
-
+head(model$get_data(),4)
+head(data,4)
+head(mice::nhanes,4)
 rm(model)
-
-head(mice::nhanes)
 
 ########################################################################
 ###Model with additional parameters: - sorted by the grouping variable
@@ -128,10 +133,36 @@ rm(model)
 
 ```
 
-## Installation
+## Tips
+
+**matrix from data.frame**
+
+Remeber that a matrix could be build only under a one data type so factor variables have to be melted
+use `model.matrix` to get numeric matrix from `data.frame`
 
 ```r
-# install.packages("devtools")
-devtools::install_github("polkas/miceFast")
+str(mtcars)
+
+mtcars$cyl= factor(mtcars$cyl)
+mtcars$gear= factor(mtcars$gear)
+mtcars_mat = model.matrix(~.,mtcars)
+
+str(mtcars_mat)
 ```
 
+**VIF**
+
+Variance inflation factors (VIF) measure how much the variance of the estimated regression coefficients are inflated. It helps to indentify when the predictor variables are linearly related. You have to decide which variable should be delete from regression independent variables.
+
+```r
+airquality2 = airquality
+airquality2$Temp2 = airquality2$Temp**2
+#install.packages("car")
+car::vif(lm(Ozone ~ ., data=airquality2))
+
+airquality2_mat = as.matrix(airquality2)
+model = new(miceFast)
+model$set_data(airquality2_mat)
+# close but not the same because of another NA policy
+as.vector(model$vifs(1,c(2,3,4,5,6,7)))
+```

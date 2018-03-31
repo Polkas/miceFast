@@ -26,6 +26,7 @@ class miceFast{
   Rcpp::List imputeW(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List imputebyW(std::string s, int posit_y,arma::uvec posit_x);
   Rcpp::List option_impute(std::string s,int posit_y,arma::uvec posit_x);
+  arma::vec vifs(int posit_y,arma::uvec posit_x);
 
   std::string get_models(int posit_y);
   std::string get_model(int posit_y);

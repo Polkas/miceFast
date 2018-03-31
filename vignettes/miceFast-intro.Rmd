@@ -62,14 +62,11 @@ Summing up, miceFast offer a relevant boost of calculations for LDA and all impl
 
 ```{r,echo=TRUE}
 #install.packages("mice")
-
 data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
-
 model = new(miceFast)
 model$set_data(data) #providing data by a reference
 
 model$update_var(2,model$impute("lm_pred",2,5)$imputations)
-
 #OR not recommended
 #data[,2] = model$impute("lm_pred",2,5)$imputations
 #model$set_data(data) #Updating the object
@@ -86,12 +83,10 @@ model$update_var(4,rowMeans(sapply(1:10,function(x)
 # That is why `update_var` could be used only ones for a certain column
 # check which variables was updated - inside the object
 model$which_updated()
-
-head(model$get_data())
-
+head(model$get_data(),4)
+head(data,4)
+head(mice::nhanes,4)
 rm(model)
-
-head(mice::nhanes)
 ```
 
 \newpage
@@ -166,6 +161,41 @@ rm(model)
 
 \newpage
 
+### Tips
+
+**matrix from data.frame**
+
+Remeber that a matrix could be build only under a one data type so factor/character variables have to be melted
+use `model.matrix` to get numeric matrix from `data.frame`
+
+```{r,echo=TRUE}
+str(mtcars)
+mtcars$cyl= factor(mtcars$cyl)
+mtcars$gear= factor(mtcars$gear)
+mtcars_mat = model.matrix(~.,mtcars)
+str(mtcars_mat)
+```
+
+**VIF**
+
+Variance inflation factors (VIF) measure how much the variance of the estimated regression coefficients are inflated. It helps to indentify when the predictor variables are linearly related. You have to decide which variable should be delete.
+
+```{r,echo=TRUE}
+airquality2 = airquality
+airquality2$Temp2 = airquality2$Temp**2
+#install.packages("car")
+car::vif(lm(Ozone ~ ., data=airquality2))
+
+airquality2_mat = as.matrix(airquality2)
+model = new(miceFast)
+model$set_data(airquality2_mat )
+#close but not the same because of another NA policy
+as.vector(model$vifs(c(2,3,4,5,6,7)))
+```
+
+
+\newpage
+
 ##Modules
 
 ###Genereting data with the corrData Module
@@ -211,6 +241,7 @@ relevant class methods:
 - `which_updated()` - which variables were modified by update_var at the object (and data)
 - `sort_byg()` - sort data by the grouping variable 
 - `is_sorted_byg()` - is data sorted by the grouping variable
+- `vifs(posit_y,posit_x)` - Variance inflation factors (VIF) - helps to check when the predictor variables are not linearly related. 
 `x` : numeric matrix - variables  
 `g` : numeric vector - you could build it form several discrete variables  
 `w`:  numeric vector with positive values - weights for weighted linear regressions  
