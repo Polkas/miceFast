@@ -163,6 +163,6 @@ car::vif(lm(Ozone ~ ., data=airquality2))
 airquality2_mat = as.matrix(airquality2)
 model = new(miceFast)
 model$set_data(airquality2_mat)
-# close but not the same because of another NA policy
+
 as.vector(model$vifs(1,c(2,3,4,5,6,7)))
 ```

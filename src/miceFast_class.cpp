@@ -12,12 +12,12 @@ miceFast::miceFast(){};
 
 miceFast::~miceFast(){
 
-  x.clear();
-  g.clear();
-  w.clear();
-  index.clear();
-  sorted=false;
-  updated.clear();
+//x.clear();
+//g.clear();
+//w.clear();
+//index.clear();
+//sorted=false;
+//updated.clear();
 
 };
 
