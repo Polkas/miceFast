@@ -137,7 +137,7 @@ rm(model)
 
 **matrix from data.frame**
 
-Remeber that a matrix could be build only under a one data type so factor variables have to be melted
+Remeber that a matrix could be build only under a one data type so factor/character variables have to be melted
 use `model.matrix` to get numeric matrix from `data.frame`
 
 ```r
@@ -158,7 +158,7 @@ Variance inflation factors (VIF) measure how much the variance of the estimated 
 airquality2 = airquality
 airquality2$Temp2 = airquality2$Temp**2
 #install.packages("car")
-car::vif(lm(Ozone ~ ., data=airquality2))
+#car::vif(lm(Ozone ~ ., data=airquality2))
 
 airquality2_mat = as.matrix(airquality2)
 model = new(miceFast)
