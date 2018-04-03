@@ -1,7 +1,7 @@
-context("miceFast-impute")
+context("miceFast-vif")
 
 
-test_that("impute",
+test_that("VIF",
           {
 
   collin_x = function(y,x){
