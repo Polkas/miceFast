@@ -282,14 +282,9 @@ Rcpp::List miceFast::impute_N(std::string s, int posit_y,arma::uvec posit_x,int 
 
   index_full_return.elem(index_full).fill(1);
 
-  Rcpp::LogicalVector index_NA_logical = Rcpp::wrap(index_NA_return);
-
-  Rcpp::LogicalVector  index_full_logical =  Rcpp::wrap(index_full_return);
-
-
   return Rcpp::List::create(Rcpp::Named("imputations") = pred_avg,
-                            Rcpp::Named("index_imputed") = index_NA_logical,
-                            Rcpp::Named("index_full") = index_full_logical);
+                            Rcpp::Named("index_imputed") = index_NA_return,
+                            Rcpp::Named("index_full") = index_full_return);
 
 }
 
@@ -314,14 +309,10 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
 
   index_full_return.elem(index_full).fill(1);
 
-  Rcpp::LogicalVector index_NA_logical = Rcpp::wrap(index_NA_return);
-
-  Rcpp::LogicalVector  index_full_logical =  Rcpp::wrap(index_full_return);
-
 
   return Rcpp::List::create(Rcpp::Named("imputations") = pred,
-                            Rcpp::Named("index_imputed") = index_NA_logical,
-                            Rcpp::Named("index_full") = index_full_logical);
+                            Rcpp::Named("index_imputed") = index_NA_return,
+                            Rcpp::Named("index_full") = index_full_return);
 
 }
 

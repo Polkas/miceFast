@@ -7,8 +7,8 @@ p_load(Rcpp,
        mice,
        tidyverse,
        ggthemes,
-       broom)#,
-       #miceFast)
+       broom,
+       miceFast)
 
 
 set.seed(1234)
