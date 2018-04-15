@@ -8,6 +8,5 @@ There were no ERRORs,WARNINGs and a one NOTE.
 
 I got a note only on travis-ci:
 checking installed package size ...NOTE installed size is  6.4Mb
-I checked it on my local Ubuntu 16.04 LTS, R 3.4.3 and this is a 
-problem of the size of compiled code.
+this is a problem of the size of compiled code.
 

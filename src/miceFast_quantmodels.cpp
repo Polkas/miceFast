@@ -1,36 +1,3 @@
-
-/*-------------------------------------------------------------------------------
-
- This file is part of miceFast.
-
- miceFast is free software: you can redistribute it and/or modify
-
- it under the terms of the GNU General Public License as published by
-
- the Free Software Foundation, either version 3 of the License, or
-
- (at your option) any later version.
-
-
- miceFast is distributed in the hope that it will be useful,
-
- but WITHOUT ANY WARRANTY; without even the implied warranty of
-
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-
- GNU General Public License for more details.
-
-
- You should have received a copy of the GNU General Public License
-
- along with miceFast. If not, see <http://www.gnu.org/licenses/>.
-
-
- Written by:
-
- Maciej Nasinski
-
-#-------------------------------------------------------------------------------*/
 //[[Rcpp::depends(RcppArmadillo)]]
 //[[Rcpp::plugins(cpp11)]]
 
@@ -39,7 +6,7 @@
 
 //weighted linear regression
 
-arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1) {
+arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1,int times) {
 
   int n = X.n_rows, k = X.n_cols;
 
@@ -58,7 +25,7 @@ arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma
 }
 
 //weighted linear regression - noise
-arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1) {
+arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int times) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -76,16 +43,23 @@ arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w
 
   double sigma = sqrt(arma::as_scalar(arma::trans(res)*res)/(N - C - 1));
 
-  arma::vec noise(N_NA);
-  noise.randn();
+  arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  return X1 * coef + noise * sigma;
+  for(int i=0;i<times;i++){
+
+    arma::vec noise(N_NA);
+    noise.randn();
+
+    pred_sum = pred_sum + (X1 * coef + noise * sigma);
+  }
+
+  return pred_sum/(double) times;
 
 }
 
 //weighted linear regression - bayes
 
-arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1) {
+arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int times) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -103,27 +77,31 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
 
   double df = N-C ;
 
-  arma::vec chi2 = Rcpp::rchisq(1, df);
-
-  double sigma_b = sqrt(arma::as_scalar(arma::trans(res)*res)/arma::as_scalar(chi2));
-
-  arma::vec noise(C);
-  noise.randn();
-
   arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
 
-  arma::colvec beta_b = coef + arma::trans(arma::chol(XX_inv)) * noise * sigma_b;
+  double res2 = arma::as_scalar(arma::trans(res)*res);
 
-  arma::vec noise2(N_NA);
-  noise2.randn();
+  arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  return X1 * coef + noise2 * sigma_b;
+  for(int i=0;i<times;i++){
+
+    double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
+
+    double sigma_b = sqrt(res2/chi2);
+
+    arma::vec noise2(N_NA);
+    noise2.randn();
+
+    pred_sum = pred_sum +( X1 * coef + noise2 * sigma_b);
+  }
+
+  return pred_sum/(double) times;
 
 }
 
 //linear regression - bayes
 
-arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1) {
+arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int times) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -131,28 +109,32 @@ arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1) {
 
   arma::colvec res = y - X*coef;
 
-  double df = N-C ;
-
-  arma::vec chi2 = Rcpp::rchisq(1, df);
-
-  double sigma_b = sqrt(arma::as_scalar(arma::trans(res)*res)/arma::as_scalar(chi2));
-
-  arma::vec noise(C);
-  noise.randn();
+  double df = N-C;
 
   arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
 
-  arma::colvec beta_b = coef + arma::trans(arma::chol(XX_inv)) * noise * sigma_b;
+  double res2 = arma::as_scalar(arma::trans(res)*res);
 
-  arma::vec noise2(N_NA);
-  noise2.randn();
+  arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  return X1 * coef + noise2 * sigma_b;
+  for(int i=0;i<times;i++){
+
+    double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
+
+    double sigma_b = sqrt(res2/chi2);
+
+    arma::vec noise2(N_NA);
+    noise2.randn();
+
+    pred_sum = pred_sum + (X1 * coef + noise2 * sigma_b);
+  }
+
+  return pred_sum/(double) times;
 
 }
 
 //Linear regression with noise
-arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1) {
+arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1,int times) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -162,16 +144,23 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1) {
 
   double sigma = sqrt(arma::as_scalar(arma::trans(res)*res)/(N - C - 1));
 
-  arma::vec noise(N_NA);
-  noise.randn();
+  arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  return X1 * coef + noise * sigma;
+  for(int i=0;i<times;i++){
+
+    arma::vec noise(N_NA);
+    noise.randn();
+
+    pred_sum = pred_sum + (X1 * coef + noise * sigma);
+  }
+
+  return pred_sum/(double) times;
 
 }
 
 //Simple linear regression
 
-arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1) {
+arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1,int times) {
 
   arma::colvec coef = arma::solve(X, y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
 
@@ -181,7 +170,7 @@ arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1) {
 
 //LDA prediction model
 
-arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
+arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) {
 
   arma::uvec vars = arma::find(arma::var(X)>0);
 
@@ -233,6 +222,8 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
 
   arma::svd( U, s, V, input);
 
+  s = arma::sqrt(s);
+
   arma::uvec proper = arma::find(s > tol);
 
   int rank = proper.n_elem;
@@ -254,6 +245,8 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
   X0 = arma::conv_to<arma::rowvec>::from(sqrt(((double) N * prior)*fac))* (group_means.each_row() - xb.t())  * scaling;
 
   arma::svd( U, s, V, X0.t()*X0 );
+
+  s = arma::sqrt(s);
 
   proper = arma::find(s > tol * s(0));
 
@@ -292,3 +285,6 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1) {
 
 
 }
+
+
+//QDA prediction model

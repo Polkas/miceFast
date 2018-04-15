@@ -42,6 +42,7 @@ new(miceFast)
     \item{\code{get_g(...)}:}{ retireiving the grouping variable }
     \item{\code{get_index(...)}:}{ getting the index }
     \item{\code{impute(...)}:}{ impute data under characterstics from the object like a optional grouping or weighting variable }
+    \item{\code{impute_N(...)}:}{ multiple imputations - impute data under characterstics from the object like a optional grouping or weighting variable }
     \item{\code{update_var(...)}:}{ permanently update the variable at the object and data. Use it only if you are sure about model parameters}
     \item{\code{get_models(...)}:}{  get possible quantitative models for a certain type of dependent variable }
     \item{\code{get_model(...)}:}{  get a recommended quantitative model for a certain type of dependent variable }

@@ -1,37 +1,3 @@
-
-/*-------------------------------------------------------------------------------
-
-This file is part of miceFast.
-
-miceFast is free software: you can redistribute it and/or modify
-
-it under the terms of the GNU General Public License as published by
-
-the Free Software Foundation, either version 3 of the License, or
-
-(at your option) any later version.
-
-
-miceFast is distributed in the hope that it will be useful,
-
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-
-GNU General Public License for more details.
-
-
-You should have received a copy of the GNU General Public License
-
-along with miceFast. If not, see <http://www.gnu.org/licenses/>.
-
-
-Written by:
-
-Maciej Nasinski
-
-#-------------------------------------------------------------------------------*/
-
 //[[Rcpp::depends(RcppArmadillo)]]
 //[[Rcpp::plugins(cpp11)]]
 
@@ -57,17 +23,24 @@ miceFast::~miceFast(){
 
 void miceFast::set_data(arma::mat & _x){
   x = arma::mat(_x.begin(),_x.n_rows,_x.n_cols,false,false);
-  index = arma::regspace<arma::uvec>(0,x.n_rows - 1) + 1;
+  N_rows = x.n_rows;
+  N_cols = x.n_cols;
+  index = arma::regspace<arma::uvec>(0,N_rows - 1) + 1;
 }
 
 void miceFast::set_g(arma::colvec & _g){
-  //g = arma::uvec(_g.begin(),_g.n_elem,false,false); - not work for uvec
-  g = arma::colvec(_g.begin(),_g.n_rows,false,false);
+  if(x.is_empty()){Rcpp::stop("There is no data provided");}
+  unsigned int n_elems = _g.n_rows;
+  if(N_rows!=n_elems){Rcpp::stop("Wrong number of elements");}
+  g = arma::colvec(_g.begin(),n_elems,false,false);  //g = arma::uvec(_g.begin(),_g.n_elem,false,false); - not work for uvec - unit not equal to int
   sorted = g.is_sorted();
 }
 
 void miceFast::set_w(arma::colvec & _w){
-  w = arma::colvec(_w.begin(),_w.n_rows,false,false);
+  if(x.is_empty()){Rcpp::stop("There is no data provided");}
+  unsigned int n_elems = _w.n_rows;
+  if(N_rows!=n_elems){Rcpp::stop("Wrong number of elements");}
+  w = arma::colvec(_w.begin(),n_elems,false,false);
 }
 
 bool miceFast::is_sorted_byg(){
@@ -121,11 +94,9 @@ arma::uvec miceFast::get_index_NA(int posit_y, arma::uvec posit_x){
 
   arma::uvec full_x = complete_cases_mat(x_cols);
 
-  int N_rows = x.n_rows;
-
   arma::uvec index(N_rows,arma::fill::zeros);
 
-  for(int i=0;i<N_rows;i++){
+  for(unsigned int i=0;i<N_rows;i++){
 
     if( (full_y(i)==0) && (full_x(i)==1) ){index(i) = 1;}
 
@@ -154,9 +125,7 @@ void miceFast::sortData_byg(){
 
   index = index.elem(order);
 
-  if(!w.is_empty()){
-    w.col(0) =  w.rows(order);
-    }
+  if(!w.is_empty()){w.col(0) =  w.rows(order);}
 
   sorted = true;
 
@@ -174,6 +143,10 @@ std::vector<int> miceFast::which_updated(){
 
 //eval vif
 arma::vec miceFast::vifs(int posit_y,arma::uvec posit_x){
+
+  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
+  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
+  if(x.is_empty()){Rcpp::stop("at least set the data");}
 
   arma::mat x_cols = x.cols(posit_x - 1);
 
@@ -205,7 +178,6 @@ arma::vec miceFast::vifs(int posit_y,arma::uvec posit_x){
 
   }
 
-
   return vifs;
 };
 
@@ -225,7 +197,6 @@ std::string miceFast::get_models(int posit_y){
   arma::colvec  Y = Y_raw.rows(index_full);
 
   arma::vec un = arma::unique(Y);
-
 
   int un_n =  un.n_elem;
   std::string type;
@@ -275,19 +246,11 @@ std::string miceFast::get_model(int posit_y){
   return type;
 }
 
-// map - implementing functions
-
-typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&);
-std::map<std::string, pfunc> funMap = {{"lda",fastLda},
-{"lm_pred",fastLm_pred},
-{"lm_noise",fastLm_noise},
-{"lm_bayes",fastLm_bayes}};
-
 
 void miceFast::update_var(int posit_y,arma::vec impute){
 
   if(x.is_empty()){Rcpp::stop("at least set the data");}
-  if( x.n_rows != impute.n_elem ){Rcpp::stop("wrong number of observations");}
+  if( N_rows != impute.n_elem ){Rcpp::stop("wrong number of observations");}
 
   posit_y = posit_y - 1;
 
@@ -297,6 +260,33 @@ void miceFast::update_var(int posit_y,arma::vec impute){
 
 }
 
+Rcpp::List miceFast::impute_N(std::string s, int posit_y,arma::uvec posit_x,int times){
+
+  if( !(s.compare("lm_bayes") == 0) && !(s.compare("lm_noise") == 0)){Rcpp::stop("Works only for `lm_bayes` and `lm_noise` models");}
+  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
+  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
+  if(x.is_empty()){Rcpp::stop("at least set the data");}
+
+  posit_x =  posit_x - 1;
+  posit_y = posit_y - 1;
+
+  arma::colvec pred_avg =  option_impute_multiple(s,posit_y,posit_x,times);
+
+  //index
+
+  arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
+
+  index_NA_return.elem(index_NA).fill(1);
+
+  arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
+
+  index_full_return.elem(index_full).fill(1);
+
+  return Rcpp::List::create(Rcpp::Named("imputations") = pred_avg,
+                            Rcpp::Named("index_imputed") = index_NA_return,
+                            Rcpp::Named("index_full") = index_full_return);
+
+}
 
 Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
 
@@ -307,45 +297,67 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
   posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
 
-  Rcpp::List pred =  option_impute(s,posit_y,posit_x);
+  arma::colvec pred =  option_impute_multiple(s,posit_y,posit_x,1);
 
-  return Rcpp::List::create(Rcpp::Named("imputations") = pred["imputations"],
-                            Rcpp::Named("index_imputed") = pred["index_NA"],
-                            Rcpp::Named("index_full") = pred["index_full"]);
+  //index
+
+  arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
+
+  index_NA_return.elem(index_NA).fill(1);
+
+  arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
+
+  index_full_return.elem(index_full).fill(1);
+
+
+  return Rcpp::List::create(Rcpp::Named("imputations") = pred,
+                            Rcpp::Named("index_imputed") = index_NA_return,
+                            Rcpp::Named("index_full") = index_full_return);
 
 }
 
-Rcpp::List miceFast::option_impute(std::string s,int posit_y,arma::uvec posit_x){
+// map - implementing functions
 
-  Rcpp::List pred;
+typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&,int);
+std::map<std::string, pfunc> funMap = {
+  {"lda",fastLda},
+  {"lm_pred",fastLm_pred},
+  {"lm_noise",fastLm_noise},
+  {"lm_bayes",fastLm_bayes}};
+
+
+arma::colvec miceFast::option_impute_multiple(std::string s,int posit_y,arma::uvec posit_x,int times){
+
+  arma::colvec pred;
 
   if(w.is_empty() && !g.is_empty())
   {
-    pred = miceFast::imputeby(s,posit_y,posit_x);
+    pred = miceFast::imputeby(s,posit_y,posit_x,times);
   }
   else if(w.is_empty() && g.is_empty())
   {
-    pred = miceFast::impute_raw(s,posit_y,posit_x);
+    pred = miceFast::impute_raw(s,posit_y,posit_x,times);
   }
   else if( !w.is_empty() && g.is_empty())
   {
-    if(s=="lda"){pred = miceFast::impute_raw(s,posit_y,posit_x);} else {pred = miceFast::imputeW(s,posit_y,posit_x);}
+    if(s=="lda"){pred = miceFast::impute_raw(s,posit_y,posit_x,times);} else {pred = miceFast::imputeW(s,posit_y,posit_x,times);}
   }
   else if(!w.is_empty() && !g.is_empty())
   {
-    if(s=="lda"){pred = miceFast::imputeby(s,posit_y,posit_x);} else {pred = miceFast::imputebyW(s,posit_y,posit_x);}
+    if(s=="lda"){pred = miceFast::imputeby(s,posit_y,posit_x,times);} else {pred = miceFast::imputebyW(s,posit_y,posit_x,times);}
   }
   return pred;
 
 }
 
-Rcpp::List miceFast::impute_raw(std::string s, int posit_y,arma::uvec posit_x){
 
-  arma::uvec index_full = miceFast::get_index_full(posit_y, posit_x);
-  arma::uvec index_NA = miceFast::get_index_NA(posit_y, posit_x);
+arma::colvec miceFast::impute_raw(std::string s, int posit_y,arma::uvec posit_x,int times){
 
   arma::mat X = x.cols(posit_x);
   arma::colvec Y = x.col(posit_y);
+
+  index_full = miceFast::get_index_full(posit_y, posit_x);
+  index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
   if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
 
@@ -354,37 +366,27 @@ Rcpp::List miceFast::impute_raw(std::string s, int posit_y,arma::uvec posit_x){
   arma::colvec Y_full = Y.rows(index_full);
 
   pfunc f = funMap[s];
-  arma::colvec pred = (*f)(Y_full,X_full,X_NA);
+  arma::colvec pred = (*f)(Y_full,X_full,X_NA,times);
 
   Y.rows(index_NA) = pred;
 
-  arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
-  index_NA_return.elem(index_NA).fill(1);
-
-  arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
-  index_full_return.elem(index_full).fill(1);
-
-  return Rcpp::List::create(Rcpp::Named("imputations") = Y,
-                            Rcpp::Named("index_NA") = index_NA_return,
-                            Rcpp::Named("index_full") = index_full_return);
+  return Y;
 }
 
 
 //Impute with grouping
 
-Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
+arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, int times){
 
   if(sorted == false){
     sortData_byg();
   }
 
-  //index
-
-  arma::uvec index_full = get_index_full(posit_y,posit_x);
-  arma::uvec index_NA = get_index_NA(posit_y,posit_x);
-
   arma::mat X = x.cols(posit_x);
   arma::colvec Y = x.col(posit_y);
+
+  index_full = miceFast::get_index_full(posit_y, posit_x);
+  index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
   //if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
 
@@ -444,7 +446,7 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
       arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
       arma::colvec Y_full_0 =  Y_full.rows(ss_full,ee_full);  // copying. It would be better to improve it to use reference
 
-      arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0);
+      arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0,times);
 
       end = start + pred.n_elem - 1;
 
@@ -457,33 +459,23 @@ Rcpp::List miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x){
 
   Y.rows(index_NA) = pred_all;
 
-  arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
-  index_NA_return.elem(index_NA).fill(1);
-
-  arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
-  index_full_return.elem(index_full).fill(1);
-
-  return Rcpp::List::create(Rcpp::Named("imputations") = Y,
-                            Rcpp::Named("index_NA") = index_NA_return,
-                            Rcpp::Named("index_full") = index_full_return);
+  return Y;
 }
 
 //WEIGHTED
 
-typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&);
+typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&,int);
 std::map<std::string, pfuncw> funMapw = {{"lm_pred",fastLm_weighted},
 {"lm_noise",fastLm_weighted_noise},
 {"lm_bayes",fastLm_weighted_bayes}};
 
-Rcpp::List miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x){
-
-  //index
-
-  arma::uvec index_full = get_index_full(posit_y,posit_x);
-  arma::uvec index_NA = get_index_NA(posit_y,posit_x);
+arma::colvec miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x,int times){
 
   arma::mat X = x.cols(posit_x);
   arma::colvec Y = x.col(posit_y);
+
+  index_full = miceFast::get_index_full(posit_y, posit_x);
+  index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
   if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(w.has_nan()){Rcpp::stop("There is NA values for weights");}
@@ -497,35 +489,26 @@ Rcpp::List miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x){
   arma::colvec w_full = w.elem(index_full);
 
   pfuncw f = funMapw[s];
-  arma::colvec pred = (*f)(Y_full,X_full,w_full,X_NA);
+  arma::colvec pred = (*f)(Y_full,X_full,w_full,X_NA,times);
 
   Y.rows(index_NA) = pred;
 
-  arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
-  index_NA_return.elem(index_NA).fill(1);
-
-  arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
-  index_full_return.elem(index_full).fill(1);
-
-  return Rcpp::List::create(Rcpp::Named("imputations") = Y,
-                            Rcpp::Named("index_NA") = index_NA_return,
-                            Rcpp::Named("index_full") = index_full_return);
+  return Y;
 }
 
 //Impute with grouping
 
-Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
+arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,int times){
 
   if(!sorted){
     sortData_byg();
   }
 
-  //index
-  arma::uvec index_full = get_index_full(posit_y,posit_x);
-  arma::uvec index_NA = get_index_NA(posit_y,posit_x);
-
   arma::mat X = x.cols(posit_x);
   arma::colvec Y = x.col(posit_y);
+
+  index_full = miceFast::get_index_full(posit_y, posit_x);
+  index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
   if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(w.has_nan()){Rcpp::stop("There is NA values for weights variable");}
@@ -588,7 +571,7 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
     arma::colvec Y_full_0 =  Y_full.rows(ss_full,ee_full);  // copying. It would be better to improve it to use reference
     arma::colvec w_full_0 =  w_full.rows(ss_full,ee_full); // copying. It would be better to improve it to use reference
 
-    arma::colvec pred =  (*fun)(Y_full_0,X_full_0,w_full_0,X_NA_0);
+    arma::colvec pred =  (*fun)(Y_full_0,X_full_0,w_full_0,X_NA_0,times);
 
     end = start + pred.n_elem - 1;
 
@@ -602,15 +585,7 @@ Rcpp::List miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x){
 
   Y.rows(index_NA) = pred_all;
 
-  arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
-  index_NA_return.elem(index_NA).fill(1);
-
-  arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
-  index_full_return.elem(index_full).fill(1);
-
-  return Rcpp::List::create(Rcpp::Named("imputations") = Y,
-                            Rcpp::Named("index_NA") = index_NA_return,
-                            Rcpp::Named("index_full") = index_full_return);
+  return Y;
 }
 
 RCPP_MODULE(miceFast){
@@ -631,6 +606,7 @@ RCPP_MODULE(miceFast){
     .method("which_updated", &miceFast::which_updated)
     .method("vifs", &miceFast::vifs)
     .method("impute", &miceFast::impute)
+    .method("impute_N", &miceFast::impute_N)
     .method("update_var", &miceFast::update_var)
     .method("get_models", &miceFast::get_models)
     .method("get_model", &miceFast::get_model)

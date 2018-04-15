@@ -1,37 +1,3 @@
-
-/*-------------------------------------------------------------------------------
-
-This file is part of miceFast.
-
-miceFast is free software: you can redistribute it and/or modify
-
-it under the terms of the GNU General Public License as published by
-
-the Free Software Foundation, either version 3 of the License, or
-
-(at your option) any later version.
-
-
-miceFast is distributed in the hope that it will be useful,
-
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-
-GNU General Public License for more details.
-
-
-You should have received a copy of the GNU General Public License
-
-along with miceFast. If not, see <http://www.gnu.org/licenses/>.
-
-
-Written by:
-
-Maciej Nasinski
-
-#-------------------------------------------------------------------------------*/
-
 //[[Rcpp::depends(RcppArmadillo)]]
 //[[Rcpp::plugins(cpp11)]]
 
@@ -47,7 +13,12 @@ class miceFast{
   arma::colvec w;//weights
   std::vector<int> updated;
   bool sorted = false;
+  unsigned int N_rows;
+  unsigned int N_cols;
+
   arma::uvec index;
+  arma::uvec index_NA;
+  arma::uvec index_full;
 
   public:
 
@@ -55,11 +26,12 @@ class miceFast{
   ~miceFast();
 
   Rcpp::List impute(std::string s, int posit_y,arma::uvec posit_x);
-  Rcpp::List impute_raw(std::string s, int posit_y,arma::uvec posit_x);
-  Rcpp::List imputeby(std::string s, int posit_y,arma::uvec posit_x);
-  Rcpp::List imputeW(std::string s, int posit_y,arma::uvec posit_x);
-  Rcpp::List imputebyW(std::string s, int posit_y,arma::uvec posit_x);
-  Rcpp::List option_impute(std::string s,int posit_y,arma::uvec posit_x);
+  Rcpp::List impute_N(std::string s, int posit_y,arma::uvec posit_x,int times);
+  arma::colvec impute_raw(std::string s, int posit_y,arma::uvec posit_x,int times);
+  arma::colvec imputeby(std::string s, int posit_y,arma::uvec posit_x,int times);
+  arma::colvec imputeW(std::string s, int posit_y,arma::uvec posit_x,int times);
+  arma::colvec imputebyW(std::string s, int posit_y,arma::uvec posit_x,int times);
+  arma::colvec option_impute_multiple(std::string s,int posit_y,arma::uvec posit_x,int times);
   arma::vec vifs(int posit_y,arma::uvec posit_x);
 
   std::string get_models(int posit_y);
@@ -87,25 +59,31 @@ class miceFast{
 //
 
 //Simple linear regression
-arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1);
+arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1, int times);
 
 //Weighted linear regression
-arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1);
+arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1, int times);
 
 //weighted linear regression - noise
-arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1);
+arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int times);
 
 //weighted linear regression - bayes
-arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1);
+arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1, int times);
 
 //linear regression - bayes
-arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1);
+arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1, int times);
 
 //Linear regression with noise
-arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1);
+arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1, int times);
 
 //LDA prediction model
-arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1);
+arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times);
+
+//LDA prediction model - noise
+//arma::colvec fastLda_noise( arma::colvec &y,  arma::mat &X, arma::mat &X1);
+
+//QDA prediction model
+//arma::colvec fastQda( arma::colvec &y,  arma::mat &X, arma::mat &X1);
 
 //
 //Additional functions

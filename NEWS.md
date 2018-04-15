@@ -1,7 +1,7 @@
 ### 0.1.0
 
-* 
-* 
+* add `impute_N` method - optimized multiple imputations
+* add `vif` method -  Variance inflation factors
 
 ### 0.0.3
 

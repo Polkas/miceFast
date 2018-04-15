@@ -10,11 +10,12 @@ p_load(Rcpp,
        broom,
        miceFast)
 
+
 set.seed(1234)
 
 #parameters
 
-power = 6 # power of 10 - number of observations - should be adjusted to a computer capabilities
+power = 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
 
 nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 
@@ -383,4 +384,61 @@ g7 = autoplot(m7,log=FALSE)+
   ggtitle("linear regression predict - with grouping")
 
 ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g7.png",g7)
+
+
+####
+####Multiple Imputations
+####
+
+
+
+mice.impute.norm.nob = rowMeans(sapply(1:10,function(x) mice.impute.norm.nob(data_con[,posit_y],!index_NA,data_con[,posit_x])))
+
+data = data_con_NA[,c(posit_y,posit_x)]
+
+model = new(miceFast)
+model$set_data(data)
+pred_miceFast =  model$impute_N("lm_noise",posit_y,posit_x,10)
+
+sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,posit_y])^2)
+sum((mice.impute.norm.nob - data_con[index_NA,posit_y])^2)
+
+m8 = microbenchmark::microbenchmark(R ={mice.impute.norm.nob = rowMeans(sapply(1:10,function(x) mice.impute.norm.nob(data_con[,posit_y],!index_NA,data_con[,posit_x])))},
+                                    miceFast={
+                                      model = new(miceFast)
+                                      model$set_data(data)
+                                      pred_miceFast =  model$impute_N("lm_noise",posit_y,posit_x,10)
+                                    },
+                                    times=iters)
+m8
+
+g8 = autoplot(m8,log=FALSE)+theme_economist()+ ggtitle("linear regression noise - without grouping - multiple 10")
+
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g8.png",g8)
+
+#####################Continous - LM Bayes
+
+mice.impute.norm.bayes = rowMeans(sapply(1:10,function(x) mice.impute.norm(data_con[,posit_y],!index_NA,data_con[,posit_x])))
+
+data = data_con_NA[,c(posit_y,posit_x)]
+
+model = new(miceFast)
+model$set_data(data)
+pred_miceFast =  model$impute_N("lm_bayes",posit_y,posit_x,10)
+
+sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,posit_y])^2)
+sum((mice.impute.norm.bayes - data_con[index_NA,posit_y])^2)
+
+m9 = microbenchmark::microbenchmark(R = {mice.impute.norm.bayes = rowMeans(sapply(1:10,function(x) mice.impute.norm(data_con[,posit_y],!index_NA,data_con[,posit_x])))},
+                                    miceFast={
+                                      model = new(miceFast)
+                                      model$set_data(data)
+                                      pred_miceFast =  model$impute_N("lm_bayes",posit_y,posit_x,10)
+                                    },
+                                    times=iters)
+m9
+
+g9 = autoplot(m9,log=FALSE)+theme_economist()+ ggtitle("linear regression bayes - without grouping - multiple 10")
+
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g9.png",g9)
 
