@@ -6,11 +6,58 @@
 
 using namespace Rcpp;
 
+// vifs
+arma::vec vifs(arma::mat& x, int posit_y, arma::uvec posit_x);
+RcppExport SEXP _miceFast_vifs(SEXP xSEXP, SEXP posit_ySEXP, SEXP posit_xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type posit_y(posit_ySEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type posit_x(posit_xSEXP);
+    rcpp_result_gen = Rcpp::wrap(vifs(x, posit_y, posit_x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// impute_N
+arma::colvec impute_N(arma::mat& x, std::string s, int posit_y, arma::uvec posit_x, int times, arma::colvec w);
+RcppExport SEXP _miceFast_impute_N(SEXP xSEXP, SEXP sSEXP, SEXP posit_ySEXP, SEXP posit_xSEXP, SEXP timesSEXP, SEXP wSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::string >::type s(sSEXP);
+    Rcpp::traits::input_parameter< int >::type posit_y(posit_ySEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type posit_x(posit_xSEXP);
+    Rcpp::traits::input_parameter< int >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(impute_N(x, s, posit_y, posit_x, times, w));
+    return rcpp_result_gen;
+END_RCPP
+}
+// impute
+arma::colvec impute(arma::mat& x, std::string s, int posit_y, arma::uvec posit_x, arma::colvec w);
+RcppExport SEXP _miceFast_impute(SEXP xSEXP, SEXP sSEXP, SEXP posit_ySEXP, SEXP posit_xSEXP, SEXP wSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::string >::type s(sSEXP);
+    Rcpp::traits::input_parameter< int >::type posit_y(posit_ySEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type posit_x(posit_xSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(impute(x, s, posit_y, posit_x, w));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_corrData();
 RcppExport SEXP _rcpp_module_boot_miceFast();
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_miceFast_vifs", (DL_FUNC) &_miceFast_vifs, 3},
+    {"_miceFast_impute_N", (DL_FUNC) &_miceFast_impute_N, 6},
+    {"_miceFast_impute", (DL_FUNC) &_miceFast_impute, 5},
     {"_rcpp_module_boot_corrData", (DL_FUNC) &_rcpp_module_boot_corrData, 0},
     {"_rcpp_module_boot_miceFast", (DL_FUNC) &_rcpp_module_boot_miceFast, 0},
     {NULL, NULL, 0}

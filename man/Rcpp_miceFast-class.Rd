@@ -22,6 +22,8 @@ See the documentation for RcppArmadillo and Rcpp for more details of how this cl
 This is only frame for building C++ object which could be used to implement certain methods.
 Check the vignette for more details of implementing these methods.
 
+Vigniette:
+\url{https://cran.r-project.org/web/packages/miceFast/index.html}
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

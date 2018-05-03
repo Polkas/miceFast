@@ -6,9 +6,6 @@
 #    loadRcppModules()
 #}
 
-
-
-
 loadModule("miceFast", TRUE)
 loadModule("corrData", TRUE)
 

@@ -1,6 +1,6 @@
 #library(devtools)
 #install_github("Rcpp","RcppCore")
-#install.packages("pacman)
+#install.packages("pacman")
 library(pacman)
 
 p_load(Rcpp,
@@ -8,7 +8,8 @@ p_load(Rcpp,
        tidyverse,
        ggthemes,
        broom,
-       miceFast)
+       miceFast,
+       data.table)
 
 
 set.seed(1234)
@@ -21,7 +22,7 @@ nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of varia
 
 grs = max(c(10**(power-3),10)) # grouping variable - number of groups
 
-iters = 100 # number of iterations for benchmarking
+iters = 3 # number of iterations for benchmarking
 
 ## generete example - data
 
@@ -114,7 +115,7 @@ m1
 
 g1 = autoplot(m1,log=FALSE)+theme_economist()+ ggtitle("LDA discrete - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g1.png",g1)
+#ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g1.png",g1)
 
 ### grouping variable
 
@@ -124,6 +125,8 @@ index_rev = sort(sort(data_disc_NA[,posit_grs],index.return=TRUE)$ix,index.retur
 
 data_disc_NA_sort = data_disc_NA[index_sort,]
 
+data_disc_NA_sort_DF = as.data.frame(data_disc_NA_sort)
+
 pred_Rbase = NULL
 for(i in unique(data_disc_NA_sort[,posit_grs])){
     sub = data_disc_NA_sort[,posit_grs]==i
@@ -132,11 +135,14 @@ for(i in unique(data_disc_NA_sort[,posit_grs])){
     pred_Rbase = c(pred_Rbase,as.numeric(pred))
 }
 
-pred_dplyr = data_disc_NA_sort %>%
-  as.data.frame() %>%
+pred_dplyr = data_disc_NA_sort_DF %>%
   group_by(group) %>%
   do(im = mice.impute.lda(as.matrix(.[,posit_y]),!.$index_NA,as.matrix(.[,posit_x]))) %>%
-  tidy(im) %>%  arrange(group) %>% ungroup()%>% select(x) %>% unlist() %>% as.numeric()
+  tidy(im) %>%  arrange(group) %>% ungroup()%>% select(x) %>% unlist()
+
+data_disc_NA_sort_DT = data.table(data_disc_NA_sort)
+
+pred_datatable = data_disc_NA_sort_DT[,{im=mice.impute.lda(as.matrix(.SD[,1]),!index_NA,as.matrix(.SD[,c(2,3,4,5)]))},by=.(group)]
 
 data = data_disc_NA_sort[,c(posit_y,posit_x)]
 g = data_disc_NA_sort[,posit_grs]
@@ -149,6 +155,8 @@ pred_miceFast =  model$impute("lda",posit_y,posit_x)
 true_y = data_disc[index_sort,][index_NA[index_sort],posit_y]
 
 table(pred_miceFast$imputations[as.logical(pred_miceFast$index_imp)],true_y)
+#table(pred_miceFast$imputations[as.logical(pred_miceFast$index_imp)],true_y)
+
 # rotate = sample(1:nrow(data),nrow(data))
 #
 # model = new(miceFast)
@@ -161,20 +169,19 @@ table(pred_miceFast$imputations[as.logical(pred_miceFast$index_imp)],true_y)
 # table(pred_miceFast$imputations[order(model$get_index())][as.logical(pred_miceFast$index_imputed[order(model$get_index())])],true_y)
 table(pred_dplyr,true_y)
 table(pred_Rbase,true_y)
-
+table(pred_datatable[['V1']],true_y)
 ##Performance
 
 m2 = microbenchmark::microbenchmark(
   dplyr={
-  pred_dplyr = data_disc_NA_sort %>%
-    as.data.frame() %>%
+  pred_dplyr = data_disc_NA_sort_DF %>%
     group_by(group) %>%
     do(im = mice.impute.lda(as.matrix(.[,posit_y]),!.$index_NA,as.matrix(.[,posit_x]))) %>%
     tidy(im)  %>%
     ungroup()%>%
     select(x) %>%
-    unlist() %>%
-    as.numeric()},
+    unlist() },
+  DT={pred_datatable= data_disc_NA_sort_DT[,{im=mice.impute.lda(as.matrix(.SD[,1]),!index_NA,as.matrix(.SD[,c(2,3,4,5)]))},by=.(group)]},
   R_base={
       pred_all = NULL
       for(i in unique(data_disc_NA_sort[,nr_var])){
@@ -194,7 +201,7 @@ m2
 
 g2 = autoplot(m2,log=FALSE)+theme_economist()+ ggtitle("LDA discrete - with grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g2.png",g2)
+#ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g2.png",g2)
 
 
 #######################Binom
@@ -286,11 +293,11 @@ ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g5.png
 
 mice.impute.norm.pred = mice.impute.norm.predict(data_con[,posit_y],!index_NA,data_con[,posit_x])
 
-data = data_con_NA[,c(posit_y,posit_x)]
+data = cbind(data_con_NA[,c(posit_y,posit_x)],1)
 
 model = new(miceFast)
 model$set_data(data)
-pred_miceFast =  model$impute("lm_pred",posit_y,posit_x)
+pred_miceFast =  model$impute("lm_pred",posit_y,c(posit_x,max(posit_x)+1))
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,posit_y])^2)
 sum((mice.impute.norm.pred - data_con[index_NA,posit_y])^2)
@@ -333,6 +340,10 @@ pred_dplyr = data_con_NA_sort %>%
     do(im = mice.impute.norm.predict(as.matrix(.[,posit_y]),!.$index_NA,as.matrix(.[,posit_x]))) %>%
     tidy(im)  %>% ungroup()%>% select(x) %>% unlist() %>% as.numeric()
 
+data_con_NA_sort_DT = data.table(data_con_NA_sort)
+
+pred_datatable = data_con_NA_sort_DT[,{im=mice.impute.norm.predict(as.matrix(.SD[,1]),!index_NA,as.matrix(.SD[,c(2,3,4,5)]))},by=.(group)]
+
 data = cbind(data_con_NA_sort[,c(posit_y,posit_x)],1)
 g = data_con_NA_sort[,posit_grs]
 
@@ -346,6 +357,7 @@ true_y = data_con[index_sort,][index_NA[index_sort],posit_y]
 sum((pred_miceFast$imputations[as.logical(pred_miceFast$index_imputed)]-true_y)^2)
 sum((pred_dplyr-true_y)^2)
 sum((pred_Rbase-true_y)^2)
+sum((pred_datatable$V1-true_y)^2)
 
 ##Performance
 
@@ -375,7 +387,9 @@ m7 = microbenchmark::microbenchmark(
     model$set_data(data)
     model$set_g(g)
     pred_miceFast =  model$impute("lm_pred",posit_y,posit_x)},
-  times=iters)
+  times=iters,
+  DT={pred_datatable= data_disc_NA_sort_DT[,{im=mice.impute.norm.predict(as.matrix(.SD[,1]),!index_NA,as.matrix(.SD[,c(2,3,4,5)]))},by=.(group)]}
+)
 
 m7
 

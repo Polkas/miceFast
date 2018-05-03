@@ -39,7 +39,7 @@ devtools::install_github("polkas/miceFast")
 
 ## miceFast module usage:
 
-Remeber that a matrix could be build only under a one data type so factor variables have to be melted
+Remember that a matrix could be build only under a one data type so factor variables have to be melted
 use `model.matrix` to get numeric matrix from `data.frame`
 
 ```r
@@ -150,7 +150,7 @@ str(mtcars)
 
 mtcars$cyl= factor(mtcars$cyl)
 mtcars$gear= factor(mtcars$gear)
-mtcars_mat = model.matrix(~.,mtcars)
+mtcars_mat = model.matrix.lm(~.,mtcars,na.action="na.pass")
 
 str(mtcars_mat)
 ```

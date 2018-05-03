@@ -2,7 +2,7 @@
 \alias{miceFast-package}
 \docType{package}
 \title{
-miceFast package for foast multiple imputations.
+miceFast package for fast multiple imputations.
 }
 \description{
 Fast imputations under the object-oriented programming paradigm.

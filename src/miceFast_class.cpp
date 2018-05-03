@@ -416,7 +416,7 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
   //predictions container
 
-  arma::colvec pred_all(index_NA.n_elem);
+  arma::colvec pred_all(index_NA.n_elem,arma::fill::none);
 
   //iter
 
@@ -430,8 +430,8 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
   arma::uvec starts_NA = arma::shift(ends_NA,1) + 1;
   starts_NA(0) = 0;
 
-  unsigned int start = 0;
-  unsigned int end = 0;
+  //unsigned int start = 0;
+  //unsigned int end = 0;
 
   for(unsigned int  a=0;a<group;a++){
 
@@ -440,7 +440,7 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
     int ss_full = starts_full(a);
     int ee_full = ends_full(a);
 
-    if((ss_NA < ee_NA) && (ss_full <= ee_full)){
+    if((ss_NA <= ee_NA) && (ss_full <= ee_full)){
 
       arma::mat X_full_0 = X_full.rows(ss_full,ee_full) ;  // copying. It would be better to improve it to use reference
       arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
@@ -448,11 +448,11 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
       arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0,times);
 
-      end = start + pred.n_elem - 1;
+      //end = start + pred.n_elem - 1;
 
-      pred_all.rows(start,end) = pred;
+      pred_all.rows(ss_NA,ee_NA) = pred;
 
-      start = end + 1;
+      //start = end + 1;
 
     }
   }
@@ -537,7 +537,7 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
 
   //predictions container
 
-  arma::colvec pred_all(index_NA.n_elem);
+  arma::colvec pred_all(index_NA.n_elem,arma::fill::none);
 
   // start end
 
@@ -554,8 +554,8 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
   starts_NA(0) = 0;
 
 
-  unsigned int start = 0;
-  unsigned int end = 0;
+  //unsigned int start = 0;
+  //unsigned int end = 0;
 
   for(unsigned int  a=0;a<group;a++){
 
@@ -564,7 +564,7 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
     int ss_full = starts_full(a);
     int ee_full = ends_full(a);
 
-    if((ss_NA < ee_NA) && (ss_full <= ee_full)){
+    if((ss_NA <= ee_NA) && (ss_full <= ee_full)){
 
     arma::mat X_full_0 = X_full.rows(ss_full,ee_full) ;  // copying. It would be better to improve it to use reference
     arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
@@ -573,11 +573,11 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
 
     arma::colvec pred =  (*fun)(Y_full_0,X_full_0,w_full_0,X_NA_0,times);
 
-    end = start + pred.n_elem - 1;
+    //end = start + pred.n_elem - 1;
 
-    pred_all.rows(start,end) = pred;
+    pred_all.rows(ss_NA,ee_NA) = pred;
 
-    start = end + 1;
+    //start = end + 1;
 
     }
 
@@ -598,6 +598,7 @@ RCPP_MODULE(miceFast){
     //.field("w",&miceFast::w)
     //.field("updated",&miceFast::updated)
     //.field("sorted",&miceFast::sorted)
+
     .method("get_data", &miceFast::get_data)
     .method("get_w", &miceFast::get_w)
     .method("get_g", &miceFast::get_g)

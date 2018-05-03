@@ -19,6 +19,8 @@ Loading the package and setting a seed:
 
 ```{r,echo=TRUE}
 library(miceFast)
+library(data.table)
+library(magrittr)
 set.seed(123456)
 ```
 
@@ -28,7 +30,7 @@ miceFast was compared[^Enviroment] with the mice package. For grouping option th
 Summing up, miceFast offer a relevant boost of calculations for:  
 
 - Linear Discriminant Analysis around **(x10)**
-- where a grouping variable have to be used **(around x50 depending on data dimensions and number of groups and even more than x1000)** because data is sorted by grouping variable*
+- where a grouping variable have to be used **(around x50 depending on data dimensions and number of groups and even more than x1000 although compared to data.table only a few times faster or even the same)** because data is sorted by grouping variable*
 - multiple imputatiotions is faster around **x(a number of multiple imputatition)** because the core of a model is evaluated only ones.
 
 If you are interested about the procedure of testing performance check performance_validity.R file at extdata folder.
@@ -52,6 +54,38 @@ Missing data is a common problem. The easiest solution is to delete observations
 The presented miceFast package was built under Rcpp packages and the C++ library Armadillo.
 The Rcpp package offers functionality of exporting full C++ capabilities to the R environment.
 More precisely miceFast and corrData are offered. The first module offers capabilities of imputations models with a closed-form solution. Thus package is based on linear algebra operations. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable and functions enhancement by C++ capabilities. The second module was made for purpose of presenting the miceFast usage and performance. It provides functionality of generating correlated data with a discrete, binomial or continuous dependent variable and continuous independent variables. 
+
+\newpage
+
+Introduction for data.table users - using additional functions from miceFast:
+
+```{r}
+data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
+data_DT = data.table(data)
+
+data_DT[,bmi_imp:=impute(x=as.matrix(.SD),s="lm_bayes",2,5)] %>%
+  .[,hyp_imp:=impute(x=as.matrix(.SD),s="lda",3,c(1,7)),] %>% # 7 is a new variable - bmi_imp
+  .[,chl_imp:=impute_N(x=as.matrix(.SD),s="lm_noise",4,c(1,7,8),10),]
+
+```
+
+**Model with additional parameters:** - data sorted by the grouping variable
+
+```{r}
+
+data = cbind(as.matrix(airquality[,-5]),
+             intercept=1,
+             groups = as.numeric(airquality[,5]), # a numeric vector not integers - positive values - sorted increasingly
+             weights = rgamma(nrow(airquality),3,3), # a numeric vector - positive values 
+             index=1:nrow(airquality))
+
+data_DT = data.table(data)
+
+data_DT[,Ozone_imp:=impute(as.matrix(.SD),"lm_pred",1,c(6),w=.SD[['weights']]),by=.(groups)] %>%
+  .[,Solar.R_imp:=impute_N(as.matrix(.SD),s="lm_bayes",2,c(3,4,5,6,10),w=.SD[['weights']],times=10),by=.(groups)]
+```
+
+**Model with additional parameters:** - data not sorted by the grouping variable
 
 \newpage
 
@@ -103,8 +137,8 @@ relevant class methods:
 `x` : numeric matrix - variables  
 `g` : numeric vector - you could build it form several discrete variables  
 `w`:  numeric vector with positive values - weights for weighted linear regressions  
-`model`: character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")  
-`posit_y`: integer - position of dependent variable  
+`model`: character - a posibble options ("lda","lm_pred","lm_bayes","lm_noise")  
+`posit_y`: integer - a position of dependent variable  
 `posit_x`: integer vector - positions of independent variables  
 `imputations` : numeric vector - imputations  
 `times` : integer - number of multiple imputations 
@@ -229,7 +263,7 @@ Sb could use `model.matrix` to get numeric matrix from a `data.frame`:
 #str(mtcars)
 mtcars$cyl= factor(mtcars$cyl)
 mtcars$gear= factor(mtcars$gear)
-mtcars_mat = model.matrix(~.,mtcars)
+mtcars_mat = model.matrix.lm(~.,mtcars,na.action="na.pass")
 #str(mtcars_mat)
 ```
 

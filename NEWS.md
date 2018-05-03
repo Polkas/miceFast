@@ -1,3 +1,9 @@
+## 0.2.0
+
+* fix imputations with a grouping variable
+* add data.table to benchmarks - model with a grouping variable
+* add two R functions which could be used by a data.table user
+
 ### 0.1.0
 
 * add `impute_N` method - optimized multiple imputations
