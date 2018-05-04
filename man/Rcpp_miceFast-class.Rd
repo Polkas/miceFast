@@ -23,7 +23,7 @@ This is only frame for building C++ object which could be used to implement cert
 Check the vignette for more details of implementing these methods.
 
 Vigniette:
-\url{https://cran.r-project.org/web/packages/miceFast/index.html}
+\url{https://CRAN.R-project.org/package=miceFast}
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

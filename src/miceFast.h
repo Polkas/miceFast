@@ -98,3 +98,22 @@ arma::uvec histFast(arma::uvec &gg);
 bool different_y_and_x(int posit_y, arma::uvec posit_x);
 
 bool different_x(arma::uvec posit_x);
+
+
+//
+//R interface
+//
+
+arma::uvec get_index_full_R(arma::mat &x,int posit_y, arma::uvec posit_x);
+
+arma::uvec get_index_NA_R(arma::mat &x,int posit_y, arma::uvec posit_x);
+
+arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec posit_x,int times);
+
+arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x,arma::colvec w,int times);
+
+arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x);
+
+arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w,int times);
+
+arma::colvec fill_NA(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w);

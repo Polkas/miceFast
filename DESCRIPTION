@@ -7,7 +7,7 @@ Description:
 	There was used quantitative models with a closed-form solution. Thus package is based on linear algebra operations.
 	The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
 	A single evaluation of a quantitative model for the multiple imputations is another major enhancement.
-	Moreover there are offered a few functions built to work with the data.table package.
+	Moreover there are offered a few functions built to work with popular R packages such as 'data.table'.
 Depends: R (>= 3.4.0)
 License: GPL (>= 2)
 URL: https://github.com/Polkas/miceFast
@@ -17,6 +17,7 @@ Imports:
 	methods, 
 	Rcpp (>= 0.12.12)
 Suggests:
+    data.table,
 	  knitr,
     rmarkdown,
     pacman,
@@ -25,7 +26,7 @@ Suggests:
     dplyr,
     broom,
     car,
-    data.table
+    magrittr
 VignetteBuilder: knitr
 LinkingTo: 
 	Rcpp,

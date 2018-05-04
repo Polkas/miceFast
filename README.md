@@ -13,22 +13,26 @@ Object-oriented R programming by [Rcpp Module](http://dirk.eddelbuettel.com/code
 
 R package was built under Rcpp and Armadillo for the purpose of fast imputations in the face of **Big Data World** (but still fitting into the RAM).
 There was used quantitative models with closed-form solution. Thus package is based on linear algebra operations.
-Summing up, miceFast offer a relevant boost of calculations for:
+Summing up, miceFast offer a relevant reduction of a calculations time for:
 
 - Linear Discriminant Analysis **(x10)**
-- where a grouping variable have to be used **(around x50 depending on data dimensions and number of groups and even more than x1000)** because data is sorted by grouping variable
-- multiple imputatiotions is faster around **x(number of multiple imputatition)** because the core of a model is evaluated only ones.
+- where a grouping variable have to be used **(around x50 depending on data dimensions and number of groups and even more than x1000 although compared to data.table only a few times faster or even the same)** because data is sorted by grouping variable*
+- multiple imputations is faster around **x(number of multiple imputatition)** because the core of a model is evaluated only ones.
+
+Environment: MRO 3.4.4 Intel MKL - i7 6700HQ and 24GB DDR4 2133. MRO (Microsoft R Open) provide to R a sophisticated library for linear algebra operations so remember about that when reading a performance comparison. 
 
 Implemented classes:
 
 - `miceFast` (methods:`set_data`,`get_data`,`set_w`,`get_w`,`set_g`,`get_g`,`impute`,`impute_N`,`update_var`,`which_updated`,`get_model`,
-                      `get_models`,`sort_byg`,`is_sorted_byg`,`get_index`,`vifs`,...)
+`get_models`,`sort_byg`,`is_sorted_byg`,`get_index`,`vifs`,...)
 - `corrData` (methods:`fill`)
 
 The first module offers capabilities of imputations models with a closed-form solution. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable.
 The second module was made for purpose of presenting the miceFast usage and performance. It provides functionality of generating correlated data with a discrete, binomial or continuous dependent variable and continuous independent variables.
 
 Performance benchmarks (check performance_validity.R file at extdata).
+
+Moreover there are offered a few functions (`fill_NA`, `fill_NA_N` and `VIF`) built to work with the popular R packages such as 'data.table'.
 
 ## Installation
 
@@ -37,10 +41,73 @@ Performance benchmarks (check performance_validity.R file at extdata).
 devtools::install_github("polkas/miceFast")
 ```
 
+## Introduction for data.table users - using additional functions from miceFast:
+
+Usage of `fill_NA` and `fill_NA_N`  functions from miceFast
+
+```r
+library(miceFast)
+library(data.table)
+library(magrittr)
+```
+
+```r
+data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
+data_DT = data.table(data)
+
+# simple mean imputation - intercept at position 5
+data_DT[,bmi_imp:=fill_NA(x=as.matrix(.SD),
+                         model="lm_bayes",
+                         posit_y=2,
+                         posit_x=5)] %>% 
+# there is a new variable at position 7 - bmi_imp
+  .[,hyp_imp:=fill_NA(x=as.matrix(.SD),
+                     model="lda",
+                     posit_y=3,
+                     posit_x=c(1,7)),] %>% 
+  .[,chl_imp:=fill_NA_N(x=as.matrix(.SD),
+                       model="lm_noise",
+                       posit_y=4,
+                       posit_x=c(1,7,8),
+                       times=10),]
+
+head(data_DT,3)
+```
+
+**Model with additional parameters:** - data with the grouping variable
+
+```r
+data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality),
+             # a numeric vector - positive values 
+             weights = round(rgamma(nrow(airquality),3,3),1),
+             # as.numeric is needed only for miceFast - see on next pages
+             groups = airquality[,5])
+data_DT = data.table(data)
+
+# simple mean imputation - intercept at position 6
+data_DT[,Ozone_imp:=fill_NA(x=as.matrix(.SD), 
+                           model="lm_pred",
+                           posit_y=1,
+                           posit_x=c(6),w=.SD[['weights']]),by=.(groups)] %>% 
+# avg of 10 multiple imputations - last posit_x equal to 9 not 10 
+# because the groups variable is not included in .SD
+  .[,Solar_R_imp:=fill_NA_N(as.matrix(.SD),
+                           model="lm_bayes",
+                           posit_y=2,
+                           posit_x=c(3,4,5,6,9),w=.SD[['weights']],times=10),by=.(groups)]
+head(data_DT,10)
+```
+
 ## miceFast module usage:
 
+```r
+library(miceFast)
+library(data.table)
+library(magrittr)
+```
+
 Remember that a matrix could be build only under a one data type so factor variables have to be melted
-use `model.matrix` to get numeric matrix from `data.frame`
+use `model.matrix` to get numeric matrix from `data.frame` - see Tips in this document
 
 ```r
 #install.packages("mice")
@@ -142,7 +209,7 @@ rm(model)
 
 **matrix from data.frame**
 
-Remeber that a matrix could be build only under a one data type so factor/character variables have to be melted
+Remember that a matrix could be build only under a one data type so factor/character variables have to be melted
 use `model.matrix` to get numeric matrix from `data.frame`
 
 ```r
@@ -157,7 +224,7 @@ str(mtcars_mat)
 
 **VIF**
 
-Variance inflation factors (VIF) measure how much the variance of the estimated regression coefficients are inflated. It helps to indentify when the predictor variables are linearly related. You have to decide which variable should be delete from regression independent variables.
+Variance inflation factors (VIF) measure how much the variance of the estimated regression coefficients are inflated. It helps to identify when the predictor variables are linearly related. You have to decide which variable should be delete from regression independent variables.
 
 ```r
 airquality2 = airquality

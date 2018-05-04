@@ -1,8 +1,8 @@
 ## 0.2.0
 
-* fix imputations with a grouping variable
+* fix imputations with a grouping variable - error if there is precisly one NA at any group
 * add data.table to benchmarks - model with a grouping variable
-* add two R functions which could be used by a data.table user
+* add R functions (`fill_NA_N`,`fill_NA`,`VIF`) which could be used by a data.table user
 
 ### 0.1.0
 

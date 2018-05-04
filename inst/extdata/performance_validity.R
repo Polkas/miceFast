@@ -16,13 +16,13 @@ set.seed(1234)
 
 #parameters
 
-power = 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
+power = 6 # power of 10 - number of observations - should be adjusted to a computer capabilities
 
 nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 
 grs = max(c(10**(power-3),10)) # grouping variable - number of groups
 
-iters = 3 # number of iterations for benchmarking
+iters = 10 # number of iterations for benchmarking
 
 ## generete example - data
 
@@ -66,7 +66,7 @@ posit_NA = n_vars+1
 
 index_NA = 1:nrow(data_con) %in% sample(1:nrow(data_con),10^(power-1))
 
-fill_NA = function(v,index_NA){
+fill_by_NA = function(v,index_NA){
 
   v[index_NA] = NA
 
@@ -83,9 +83,9 @@ w_d = abs(data_disc[,posit_w])
 w_c = abs(data_con[,posit_w])
 w_b = abs(data_bin[,posit_w])
 
-data_disc_NA = cbind(fill_NA(data_disc[,posit_y],index_NA),data_disc[,posit_x],w_d,group_d,index_NA)
-data_con_NA = cbind(fill_NA(data_con[,posit_y],index_NA),data_con[,posit_x],w_c,group_c,index_NA)
-data_bin_NA = cbind(fill_NA(data_bin[,posit_y],index_NA),data_bin[,posit_x],w_b,group_b,index_NA)
+data_disc_NA = cbind(fill_by_NA(data_disc[,posit_y],index_NA),data_disc[,posit_x],w_d,group_d,index_NA)
+data_con_NA = cbind(fill_by_NA(data_con[,posit_y],index_NA),data_con[,posit_x],w_c,group_c,index_NA)
+data_bin_NA = cbind(fill_by_NA(data_bin[,posit_y],index_NA),data_bin[,posit_x],w_b,group_b,index_NA)
 
 colnames(data_bin_NA) = c("y",paste0("x",posit_x),"weights","group","index_NA")
 colnames(data_disc_NA) = c("y",paste0("x",posit_x),"weights","group","index_NA")
@@ -115,7 +115,7 @@ m1
 
 g1 = autoplot(m1,log=FALSE)+theme_economist()+ ggtitle("LDA discrete - without grouping")
 
-#ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g1.png",g1)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g1.png",g1)
 
 ### grouping variable
 
@@ -201,7 +201,7 @@ m2
 
 g2 = autoplot(m2,log=FALSE)+theme_economist()+ ggtitle("LDA discrete - with grouping")
 
-#ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g2.png",g2)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g2.png",g2)
 
 
 #######################Binom
@@ -229,7 +229,7 @@ m3
 
 g3 = autoplot(m3,log=FALSE)+theme_economist()+ ggtitle("LDA binom - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g3.png",g3)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g3.png",g3)
 
 
 #####################Continous - LM Noise
@@ -257,7 +257,7 @@ m4
 
 g4 = autoplot(m4,log=FALSE)+theme_economist()+ ggtitle("linear regression noise - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g4.png",g4)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g4.png",g4)
 
 
 
@@ -286,7 +286,7 @@ m5
 
 g5 = autoplot(m5,log=FALSE)+theme_economist()+ ggtitle("linear regression bayes - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g5.png",g5)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g5.png",g5)
 
 #####################Continous - LM Predict
 
@@ -315,7 +315,7 @@ m6
 
 g6 = autoplot(m6,log=FALSE)+theme_economist()+ ggtitle("linear regression predict - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g6.png",g6)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g6.png",g6)
 
 
 ## grouping variable
@@ -397,7 +397,7 @@ g7 = autoplot(m7,log=FALSE)+
   theme_economist()+
   ggtitle("linear regression predict - with grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g7.png",g7)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g7.png",g7)
 
 
 ####
@@ -428,7 +428,7 @@ m8
 
 g8 = autoplot(m8,log=FALSE)+theme_economist()+ ggtitle("linear regression noise - without grouping - multiple 10")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g8.png",g8)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g8.png",g8)
 
 #####################Continous - LM Bayes
 
@@ -454,5 +454,5 @@ m9
 
 g9 = autoplot(m9,log=FALSE)+theme_economist()+ ggtitle("linear regression bayes - without grouping - multiple 10")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g9.png",g9)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata//images/g9.png",g9)
 
