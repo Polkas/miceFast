@@ -69,7 +69,7 @@ More precisely miceFast and corrData are offered. The first module offers capabi
 
 Usage of `fill_NA` and `fill_NA_N` functions from miceFast
 
-```{r,echo=TRUE}
+```r
 data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
 data_DT = data.table(data)
 
@@ -94,7 +94,7 @@ head(data_DT,2)
 
 **Model with additional parameters:** - data with the grouping/weighting variable
 
-```{r,echo=TRUE}
+```r
 data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality),
              # a numeric vector - positive values 
              weights = round(rgamma(nrow(airquality),3,3),1),
