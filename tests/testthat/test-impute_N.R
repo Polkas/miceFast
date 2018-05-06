@@ -1,3 +1,4 @@
+
 context("miceFast-impute_N")
 
 
@@ -21,6 +22,8 @@ test_that("impute_N",
 
             imp_miceFast = model$impute_N("lm_bayes",2,c(3,4,5,6),10000)$imputations
             imp_miceFast_pred = model$impute("lm_pred",2,c(3,4,5,6))$imputations
+
+            rm(model)
 
             expect_true(mean((imp_miceFast-imp_miceFast_pred)**2)<1)
 

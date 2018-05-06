@@ -1,3 +1,8 @@
+# 0.2.1-2
+
+* data.table problem - jump to R 3.5.0
+* valgrind -  a lot of optimizations - problem with arma::exp and arma::randn
+
 ## 0.2.0
 
 * fix imputations with a grouping variable - error if there is precisly one NA at any group

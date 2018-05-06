@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{VIF}
 \alias{VIF}
-\title{\code{VIF} function for assessing VIF which helps to identify a collinearity problem}
+\title{\code{VIF} function for assessing VIF.}
 \usage{
 VIF(x, posit_y, posit_x)
 }
@@ -17,7 +17,9 @@ VIF(x, posit_y, posit_x)
 load a numeric vector with VIF for all variables provided by posit_x
 }
 \description{
-\code{VIF} function for assessing VIF which helps to identify a collinearity problem
+VIF measure how much the variance of the estimated regression coefficients are inflated.
+It helps to identify when the predictor variables are linearly related.
+You have to decide which variable should be delete. Values higher than 10 signal a potential collinearity problem.
 }
 \examples{
 \dontrun{

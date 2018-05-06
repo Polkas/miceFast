@@ -297,7 +297,9 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
   posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
 
-  arma::colvec pred =  option_impute_multiple(s,posit_y,posit_x,1);
+  const int times = 1;
+
+  arma::colvec pred =  option_impute_multiple(s,posit_y,posit_x,times);
 
   //index
 
@@ -382,18 +384,20 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
     sortData_byg();
   }
 
-  arma::mat X = x.cols(posit_x);
-  arma::colvec Y = x.col(posit_y);
+  arma::uvec posit_y_uvec(1);
+  posit_y_uvec(0) = posit_y;
 
   index_full = miceFast::get_index_full(posit_y, posit_x);
   index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
   //if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
 
-  if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
 
-  arma::uvec g_int = arma::conv_to<arma::uvec>::from(g);
+  arma::uvec g_int(N_rows);
+
+  g_int = arma::conv_to<arma::uvec>::from(g);
 
   //grouping variable
 
@@ -406,10 +410,6 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
   pfunc fun = funMap[s];
 
   //dividing data to NA and full
-
-  arma::mat X_full = X.rows(index_full);
-  arma::mat X_NA = X.rows(index_NA);
-  arma::colvec Y_full = Y.rows(index_full);
 
   arma::uvec g_full = g_int.elem(index_full);
   arma::uvec g_NA = g_int.elem(index_NA);
@@ -435,16 +435,16 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
   for(unsigned int  a=0;a<group;a++){
 
-    int ss_NA = starts_NA(a);
-    int ee_NA = ends_NA(a);
-    int ss_full = starts_full(a);
-    int ee_full = ends_full(a);
+    unsigned int ss_NA = starts_NA(a);
+    unsigned int ee_NA = ends_NA(a);
+    unsigned int ss_full = starts_full(a);
+    unsigned int ee_full = ends_full(a);
 
     if((ss_NA <= ee_NA) && (ss_full <= ee_full)){
 
-      arma::mat X_full_0 = X_full.rows(ss_full,ee_full) ;  // copying. It would be better to improve it to use reference
-      arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
-      arma::colvec Y_full_0 =  Y_full.rows(ss_full,ee_full);  // copying. It would be better to improve it to use reference
+      arma::mat X_full_0 = x(index_full.subvec(ss_full,ee_full),posit_x) ;
+      arma::mat X_NA_0 = x(index_NA.subvec(ss_NA,ee_NA),posit_x);
+      arma::colvec Y_full_0 =  x(index_full.subvec(ss_full,ee_full),posit_y_uvec) ;
 
       arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0,times);
 
@@ -456,6 +456,8 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
     }
   }
+
+  arma::colvec Y = x.col(posit_y);
 
   Y.rows(index_NA) = pred_all;
 
@@ -504,17 +506,19 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
     sortData_byg();
   }
 
-  arma::mat X = x.cols(posit_x);
-  arma::colvec Y = x.col(posit_y);
+  arma::uvec posit_y_uvec(1);
+  posit_y_uvec(0) = posit_y;
 
   index_full = miceFast::get_index_full(posit_y, posit_x);
   index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
-  if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(w.has_nan()){Rcpp::stop("There is NA values for weights variable");}
   if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
 
-  arma::uvec g_int = arma::conv_to<arma::uvec>::from(g);
+  arma::uvec g_int(N_rows);
+
+  g_int = arma::conv_to<arma::uvec>::from(g);
 
   //grouping variable
 
@@ -526,11 +530,6 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
   pfuncw fun = funMapw[s];
 
   //dividing data to NA and full
-
-  arma::mat X_full = X.rows(index_full);
-  arma::mat X_NA = X.rows(index_NA);
-  arma::colvec Y_full = Y.rows(index_full);
-  arma::colvec w_full = w.rows(index_full);
 
   arma::uvec g_full = g_int.elem(index_full);
   arma::uvec g_NA = g_int.elem(index_NA);
@@ -559,17 +558,17 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
 
   for(unsigned int  a=0;a<group;a++){
 
-    int ss_NA = starts_NA(a);
-    int ee_NA = ends_NA(a);
-    int ss_full = starts_full(a);
-    int ee_full = ends_full(a);
+    unsigned int ss_NA = starts_NA(a);
+    unsigned int ee_NA = ends_NA(a);
+    unsigned int ss_full = starts_full(a);
+    unsigned int ee_full = ends_full(a);
 
     if((ss_NA <= ee_NA) && (ss_full <= ee_full)){
 
-    arma::mat X_full_0 = X_full.rows(ss_full,ee_full) ;  // copying. It would be better to improve it to use reference
-    arma::mat X_NA_0 = X_NA.rows(ss_NA,ee_NA);  // copying. It would be better to improve it to use reference
-    arma::colvec Y_full_0 =  Y_full.rows(ss_full,ee_full);  // copying. It would be better to improve it to use reference
-    arma::colvec w_full_0 =  w_full.rows(ss_full,ee_full); // copying. It would be better to improve it to use reference
+    arma::mat X_full_0 = x(index_full.subvec(ss_full,ee_full),posit_x) ;
+    arma::mat X_NA_0 = x(index_NA.subvec(ss_NA,ee_NA),posit_x);
+    arma::colvec Y_full_0 =  x(index_full.subvec(ss_full,ee_full),posit_y_uvec) ;
+    arma::colvec w_full_0 =  w(index_full.subvec(ss_full,ee_full));
 
     arma::colvec pred =  (*fun)(Y_full_0,X_full_0,w_full_0,X_NA_0,times);
 
@@ -582,6 +581,8 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
     }
 
   }
+
+  arma::colvec Y = x.col(posit_y);
 
   Y.rows(index_NA) = pred_all;
 

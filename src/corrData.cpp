@@ -40,14 +40,21 @@ std::map<std::string, int> types = {
 
 arma::mat corrData::fill(std::string type){
 
-  arma::mat X(n_row, n_col, arma::fill::randn);
+  arma::mat X(n_row, n_col);
 
-  arma::mat X_new;
+  std::mt19937 engine;  // Mersenne twister random number engine
+
+  std::normal_distribution<double> distr(0.0, 1.0);
+
+  X.imbue( [&]() { return distr(engine); } );
+
+  arma::mat X_new(n_row, n_col);
 
   switch(types[type]){
 
   case 1:
       {
+
     X_new = X * arma::chol(cors);
 
     arma::colvec col0 = X_new.col(0);

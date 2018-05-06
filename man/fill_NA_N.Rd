@@ -2,9 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{fill_NA_N}
 \alias{fill_NA_N}
-\title{\code{fill_NA_N} function for an multiple imputations purpose. Multiple imputations to fill the missing data.
-Non missing independent variables are used to approximate a missing observations for a dependent variable.
-Quantitative models were built under Rcpp packages and the C++ library Armadillo.}
+\title{\code{fill_NA_N} function for the multiple imputations purpose.}
 \usage{
 fill_NA_N(x, model, posit_y, posit_x, w = 0L, times = 10L)
 }
@@ -22,10 +20,10 @@ fill_NA_N(x, model, posit_y, posit_x, w = 0L, times = 10L)
 \item{times}{an integer - a number of multiple imputations - default 10}
 }
 \value{
-load average of N imputations in a numeric vector format
+load variable at position y with additional average of N imputations in a numeric vector format
 }
 \description{
-\code{fill_NA_N} function for an multiple imputations purpose. Multiple imputations to fill the missing data.
+Multiple imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
 Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 }

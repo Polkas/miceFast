@@ -110,7 +110,11 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
 
 //eval vifs
 
-//' \code{VIF} function for assessing VIF which helps to identify a collinearity problem
+//' \code{VIF} function for assessing VIF.
+//'
+//' @description VIF measure how much the variance of the estimated regression coefficients are inflated.
+//' It helps to identify when the predictor variables are linearly related.
+//' You have to decide which variable should be delete. Values higher than 10 signal a potential collinearity problem.
 //'
 //' @param x a numeric matrix - a numeric matrix with variables
 //' @param posit_y an integer - a position of dependent variable
@@ -191,7 +195,9 @@ arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x){
 };
 
 
-//' \code{fill_NA_N} function for an multiple imputations purpose. Multiple imputations to fill the missing data.
+//' \code{fill_NA_N} function for the multiple imputations purpose.
+//'
+//' @description Multiple imputations to fill the missing data.
 //' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 //' Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 //'
@@ -202,7 +208,7 @@ arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x){
 //' @param w  a numeric vector - a weighting variable - only positive values
 //' @param times an integer - a number of multiple imputations - default 10
 //'
-//' @return load average of N imputations in a numeric vector format
+//' @return load variable at position y with additional average of N imputations in a numeric vector format
 //'
 //' @seealso \code{\link{fill_NA}} \code{\link{VIF}}
 //'
@@ -288,7 +294,9 @@ arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec p
   return pred_avg;
 }
 
-//' \code{fill_NA} function for an imputations purpose. Regular imputations to fill the missing data.
+//' \code{fill_NA} function for the imputations purpose.
+//'
+//' @description Regular imputations to fill the missing data.
 //' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 //' Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 //'
@@ -298,7 +306,7 @@ arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec p
 //' @param posit_x an integer vector - positions of independent variables
 //' @param w  a numeric vector - a weighting variable - only positive values
 //'
-//' @return load imputations in a numeric vector format
+//' @return load variable at position y with additional imputations in a numeric vector format
 //'
 //' @seealso \code{\link{fill_NA_N}}  \code{\link{VIF}}
 //'

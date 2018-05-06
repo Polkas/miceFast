@@ -1,3 +1,4 @@
+
 context("miceFast-impute")
 
 
@@ -47,6 +48,9 @@ test_that("impute",
             data_disc = model$fill("discrete")
             data_con = model$fill("contin")
 
+
+            rm(model)
+
             n_vars = ncol(cors)
 
             posit_y = 1
@@ -59,7 +63,7 @@ test_that("impute",
 
             index_NA = 1:nrow(data_con) %in% sample(1:nrow(data_con),10^(power-1))
 
-            fill_NA = function(v,index_NA){
+            fill_by_NA = function(v,index_NA){
 
               v[index_NA] = NA
 
@@ -76,9 +80,9 @@ test_that("impute",
             w_c = abs(data_con[,posit_w])
             w_b = abs(data_bin[,posit_w])
 
-            data_disc_NA = cbind(fill_NA(data_disc[,posit_y],index_NA),data_disc[,posit_x],w_d,group_d,index_NA)
-            data_con_NA = cbind(fill_NA(data_con[,posit_y],index_NA),data_con[,posit_x],w_c,group_c,index_NA)
-            data_bin_NA = cbind(fill_NA(data_bin[,posit_y],index_NA),data_bin[,posit_x],w_b,group_b,index_NA)
+            data_disc_NA = cbind(fill_by_NA(data_disc[,posit_y],index_NA),data_disc[,posit_x],w_d,group_d,index_NA)
+            data_con_NA = cbind(fill_by_NA(data_con[,posit_y],index_NA),data_con[,posit_x],w_c,group_c,index_NA)
+            data_bin_NA = cbind(fill_by_NA(data_bin[,posit_y],index_NA),data_bin[,posit_x],w_b,group_b,index_NA)
 
             colnames(data_bin_NA) = c("y",paste0("x",posit_x),"weights","group","index_NA")
             colnames(data_disc_NA) = c("y",paste0("x",posit_x),"weights","group","index_NA")
@@ -93,6 +97,8 @@ test_that("impute",
             data = data_disc_NA[,c(posit_y,posit_x)]
             model$set_data(data)
             pred_miceFast =  model$impute("lda",posit_y,posit_x)
+
+            rm(model)
 
             a = table(pred_miceFast$imputations[index_NA] ,data_disc[index_NA,posit_y])
             #b = table(as.numeric(mice.impute.lda),data_disc[index_NA,posit_y])
@@ -134,6 +140,8 @@ test_that("impute",
             model$set_g(g)
             pred_miceFast =  model$impute("lda",posit_y,posit_x)
 
+            rm(model)
+
             true_y = data_disc[index_sort,][index_NA[index_sort],posit_y]
 
             a = table(pred_miceFast$imputations[as.logical(pred_miceFast$index_imp)],true_y)
@@ -158,6 +166,8 @@ test_that("impute",
             model$set_data(data)
             pred_miceFast =  model$impute("lda",posit_y,posit_x)
 
+            rm(model)
+
             a = table(pred_miceFast$imputations[index_NA] ,data_bin[index_NA,posit_y])
             #b = table(mice.impute.lda,data_bin[index_NA,posit_y])
 
@@ -179,6 +189,8 @@ test_that("impute",
             model$set_data(data)
             pred_miceFast =  model$impute("lm_noise",posit_y,posit_x)
 
+            rm(model)
+
             a = sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,posit_y])^2)
             #b = sum((mice.impute.norm.nob - data_con[index_NA,posit_y])^2)
 
@@ -196,6 +208,8 @@ test_that("impute",
             model$set_data(data)
             pred_miceFast =  model$impute("lm_bayes",posit_y,posit_x)
 
+            rm(model)
+
             a=sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,posit_y])^2)
             #b=sum((mice.impute.norm.bayes - data_con[index_NA,posit_y])^2)
 
@@ -212,6 +226,8 @@ test_that("impute",
             model = new(miceFast)
             model$set_data(data)
             pred_miceFast =  model$impute("lm_pred",posit_y,posit_x)
+
+            rm(model)
 
             a=sum((pred_miceFast$imputations[index_NA] - data_con[index_NA,posit_y])^2)
             #b=sum((mice.impute.norm.pred - data_con[index_NA,posit_y])^2)
@@ -248,6 +264,8 @@ test_that("impute",
             model$set_data(data)
             model$set_g(g)
             pred_miceFast =  model$impute("lm_pred",posit_y,c(posit_x,max(posit_x)+1))
+
+            rm(model)
 
             true_y = data_con[index_sort,][index_NA[index_sort],posit_y]
 

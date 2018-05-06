@@ -1,3 +1,4 @@
+
 context("miceFast-imputes_funcs")
 
 
@@ -43,6 +44,8 @@ test_that("imputes",
             data_bin = model$fill("binom")
             data_disc = model$fill("discrete")
             data_con = model$fill("contin")
+
+            rm(model)
 
             n_vars = ncol(cors)
 

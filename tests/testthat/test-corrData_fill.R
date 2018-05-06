@@ -1,4 +1,5 @@
 
+
 context("corrData-fill")
 
 
@@ -45,6 +46,8 @@ test_that("fill-data",
             data_bin = model$fill("binom")
             data_disc = model$fill("discrete")
             data_con = model$fill("contin")
+
+            rm(model)
 
             cor_b=cor(data_bin)
             cor_d=cor(data_disc)
