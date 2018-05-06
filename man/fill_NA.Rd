@@ -25,6 +25,10 @@ Regular imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
 Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 }
+\note{
+The lda model is assessed only if there are more than 15 complete observations
+and for the lms models if number of independent variables is smaller than number of observations.
+}
 \examples{
 \dontrun{
 library(miceFast)

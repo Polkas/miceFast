@@ -39,7 +39,11 @@ Summing up, miceFast offer a relevant reduction of a calculations time for:
 - where a grouping variable have to be used **(around x50 depending on data dimensions and number of groups and even more than x1000 although compared to data.table only a few times faster or even the same)** because data is sorted by grouping variable
 - multiple imputations is faster around **x(a number of multiple imputatition)** because the core of a model is evaluated only ones.
 
-If you are interested about the procedure of testing performance check performance_validity.R file at extdata folder.
+Example:
+
+![Performance Summary](../inst/extdata/images/g_summary.png)
+
+If you are interested about the procedure of testing performance check performance_validity.R file at the extdata folder.
 
 ```{r,eval=FALSE,echo=TRUE}
 system.file("extdata","performance_validity.R",package = "miceFast")
@@ -67,7 +71,7 @@ More precisely miceFast and corrData are offered. The first module offers capabi
 
 ## Introduction for data.table users - using additional functions from miceFast:
 
-Usage of `fill_NA` and `fill_NA_N` functions from miceFast
+Usage of `fill_NA` and `fill_NA_N` functions from miceFast - this functions should be resistant to glitches from an user activity perspective and a data structure.
 
 ```r
 data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
@@ -137,7 +141,7 @@ where:
 
 relevant class methods:
 
-- `fill("type")` : generating data
+- `fill("type")` : generating data [return a numeric matrix] - data with correlated variables where first variable is of binomial,discrete or continuous type.
 
 `type`:character - possible options ("contin","binom","discrete")
 
@@ -149,22 +153,22 @@ Available constructors:
 
 relevant class methods:
 
-- `set_data(x)` - providing the data by a reference - a numeric matrix
-- `get_data()` - retrieving the data
-- `set_g(g)` - providing the grouping variable by a reference - a numeric vector - positive values
-- `get_g()` - retrieving the grouping variable
+- `set_data(x)` - providing the data by a reference - a numeric matrix [void]
+- `get_data()` - retrieving the data [return a numeric matrix] - the same values as provided by reference x, recommended to use x directly
+- `set_g(g)` - providing the grouping variable by a reference - a numeric vector - positive values [void]
+- `get_g()` - retrieving the grouping variable [return a numeric vector] - the same values as provided by reference g, recommended to use g directly
 - `set_w(w)` - providing the weighting variable by a reference - a numeric vector - positive values
-- `get_w()` - retrieving the weighting variable
-- `get_index()` - getting the index
-- `impute("model",posit_y,posit_x)` - impute data under characteristics form object like a optional grouping or weighting variable
-- `impute_N("model",posit_y,posit_x,times)` - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for ("lm_bayes","lm_noise")
-- `update_var(posit_y,imputations)` - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters.
-- `get_models()` - possible quantitative models for a certain type of dependent variable
-- `get_model()` - a recommended quantitative model for a certain type of dependent variable
-- `which_updated()` - which variables were modified by update_var at the object (and data)
-- `sort_byg()` - sort data by the grouping variable 
-- `is_sorted_byg()` - is data sorted by the grouping variable
-- `vifs(posit_y,posit_x)` - Variance inflation factors (VIF)  
+- `get_w()` - retrieving the weighting variable [return a numeric vector] - the same values as provided by reference w, recommended to use w directly
+- `get_index()` - getting the index [return a integer vector] - useful after automatic sorting procedure
+- `impute("model",posit_y,posit_x)` - impute data under characteristics form object like a optional grouping or weighting variable [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
+- `impute_N("model2",posit_y,posit_x,times)` - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for ("lm_bayes","lm_noise") - [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values by average of N results, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
+- `update_var(posit_y,imputations)` - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters. [void]
+- `get_models()` - possible quantitative models for a certain type of dependent variable [return a character vector: recommended models for impute and impute_N methods] 
+- `get_model()` - a recommended quantitative model for a certain type of dependent variable [return a character: recommended model for impute and impute_N methods] - useful while looping
+- `which_updated()` - which variables were modified by update_var at the object (and data) [return a integer vector: positions at provided data at which variables were update by update_var method] 
+- `sort_byg()` - sort data by the grouping variable [void]
+- `is_sorted_byg()` - is data sorted by the grouping variable [void]
+- `vifs(posit_y,posit_x)` - Variance inflation factors (VIF) [return a numeric vector: VIF for all variables provided by posit_x]
 `x` : numeric matrix - variables  
 `g` : numeric vector - you could build it form several discrete variables  
 `w`:  numeric vector with positive values - weights for weighted linear regressions  
@@ -174,7 +178,8 @@ relevant class methods:
 `imputations` : numeric vector - imputations  
 `times` : integer - number of multiple imputations 
 
-*For a simple mean imputations add intercept to data and use "lm_pred"*
+*For a simple mean imputations add intercept to data and use "lm_pred"*  
+*The lda model is assessed only if there are more than 15 complete observations and for the lms models if the number of independent variables is smaller than the number of observations.*
 
 \newpage
 

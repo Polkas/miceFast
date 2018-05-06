@@ -50,24 +50,27 @@ arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec pos
     {"lm_noise",fastLm_noise},
     {"lm_bayes",fastLm_bayes}};
 
-  arma::mat X = x.cols(posit_x);
-  arma::colvec Y = x.col(posit_y);
+  arma::uvec posit_y_uvec(1);
+  posit_y_uvec(0) = posit_y;
 
   arma::uvec index_full = get_index_full_R(x,posit_y, posit_x);
   arma::uvec index_NA = get_index_NA_R(x,posit_y, posit_x);
 
-  if(!(index_NA.n_elem==0)){
+  arma::colvec pred = x(index_NA,posit_y_uvec);
 
-  arma::mat X_full = X.rows(index_full);
-  arma::mat X_NA = X.rows(index_NA);
-  arma::colvec Y_full = Y.rows(index_full);
+  if(!(index_NA.n_elem==0) && ((index_full.n_elem>15 && s=="lda")|| (index_full.n_elem>posit_x.n_elem && s!="lda"))){
+
+  arma::mat X_full = x(index_full,posit_x);
+  arma::mat X_NA = x(index_NA,posit_x);
+  arma::colvec Y_full = x(index_full,posit_y_uvec);
 
   pfunc f = funMap[s];
-  arma::colvec pred = (*f)(Y_full,X_full,X_NA,times);
-
-  Y.rows(index_NA) = pred;
+  pred = (*f)(Y_full,X_full,X_NA,times);
 
   }
+
+  arma::colvec Y = x.col(posit_y);
+  Y.rows(index_NA) = pred;
 
   return Y;
 }
@@ -80,8 +83,8 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
   {"lm_noise",fastLm_weighted_noise},
   {"lm_bayes",fastLm_weighted_bayes}};
 
-  arma::mat X = x.cols(posit_x);
-  arma::colvec Y = x.col(posit_y);
+  arma::uvec posit_y_uvec(1);
+  posit_y_uvec(0) = posit_y;
 
   arma::uvec index_full = get_index_full_R(x,posit_y, posit_x);
   arma::uvec index_NA = get_index_NA_R(x,posit_y, posit_x);
@@ -89,21 +92,25 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
   if(w.has_nan()){Rcpp::stop("There is NA values for weights");}
   if(arma::any(w<0)){Rcpp::stop("There are negative values for the weights variable");}
 
-  if(!(index_NA.n_elem==0)){
+  arma::colvec pred = x(index_NA,posit_y_uvec);
+
+  if(!(index_NA.n_elem==0) && ((index_full.n_elem>15 && s=="lda")|| (index_full.n_elem>posit_x.n_elem && s!="lda"))){
 
   //dividing data to NA and full
 
-  arma::mat X_full = X.rows(index_full);
-  arma::mat X_NA = X.rows(index_NA);
-  arma::colvec Y_full = Y.elem(index_full);
+  arma::mat X_full = x(index_full,posit_x);
+  arma::mat X_NA = x(index_NA,posit_x);
+  arma::colvec Y_full = x(index_full,posit_y_uvec);
   arma::colvec w_full = w.elem(index_full);
 
   pfuncw f = funMapw[s];
-  arma::colvec pred = (*f)(Y_full,X_full,w_full,X_NA,times);
+  pred  = (*f)(Y_full,X_full,w_full,X_NA,times);
 
-  Y.rows(index_NA) = pred;
 
   }
+
+  arma::colvec Y = x.col(posit_y);
+  Y.rows(index_NA) = pred;
 
   return Y;
 }
@@ -159,7 +166,7 @@ arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x){
 
   if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
   if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
-  if(x.is_empty()){Rcpp::stop("at least set the data");}
+  if(arma::any(arma::find(arma::var(x)==0))){Rcpp::stop("Do not include an intercept");}
 
   arma::mat x_cols = x.cols(posit_x - 1);
 
@@ -209,6 +216,9 @@ arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x){
 //' @param times an integer - a number of multiple imputations - default 10
 //'
 //' @return load variable at position y with additional average of N imputations in a numeric vector format
+//'
+//' @note The lda model is assessed only if there are more than 15 complete observations
+//' and for the lms models if number of variables is smaller than number of observations.
 //'
 //' @seealso \code{\link{fill_NA}} \code{\link{VIF}}
 //'
@@ -307,6 +317,9 @@ arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec p
 //' @param w  a numeric vector - a weighting variable - only positive values
 //'
 //' @return load variable at position y with additional imputations in a numeric vector format
+//'
+//' @note The lda model is assessed only if there are more than 15 complete observations
+//' and for the lms models if number of independent variables is smaller than number of observations.
 //'
 //' @seealso \code{\link{fill_NA_N}}  \code{\link{VIF}}
 //'

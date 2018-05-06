@@ -355,21 +355,28 @@ arma::colvec miceFast::option_impute_multiple(std::string s,int posit_y,arma::uv
 
 arma::colvec miceFast::impute_raw(std::string s, int posit_y,arma::uvec posit_x,int times){
 
-  arma::mat X = x.cols(posit_x);
-  arma::colvec Y = x.col(posit_y);
+  arma::uvec posit_y_uvec(1);
+  posit_y_uvec(0) = posit_y;
 
   index_full = miceFast::get_index_full(posit_y, posit_x);
   index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
-  if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
 
-  arma::mat X_full = X.rows(index_full);
-  arma::mat X_NA = X.rows(index_NA);
-  arma::colvec Y_full = Y.rows(index_full);
+  arma::mat X_full = x(index_full,posit_x);
+  arma::mat X_NA = x(index_NA,posit_x);
+  arma::colvec Y_full = x(index_full,posit_y_uvec);
+
+  arma::colvec pred = x(index_NA,posit_y_uvec);
+
+  if(!(index_NA.n_elem==0) && ((index_full.n_elem>15 && s=="lda")|| (index_full.n_elem>posit_x.n_elem && s!="lda"))){
 
   pfunc f = funMap[s];
-  arma::colvec pred = (*f)(Y_full,X_full,X_NA,times);
+  pred = (*f)(Y_full,X_full,X_NA,times);
 
+  }
+
+  arma::colvec Y = x.col(posit_y);
   Y.rows(index_NA) = pred;
 
   return Y;
@@ -416,35 +423,39 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
   //predictions container
 
-  arma::colvec pred_all(index_NA.n_elem,arma::fill::none);
+  arma::colvec pred_all =  x(index_NA,posit_y_uvec) ;
 
   //iter
 
   arma::uvec his_full = arma::hist(g_full,un);
-  arma::uvec ends_full = arma::cumsum(his_full)-1;
+  arma::uvec ends_full = arma::cumsum(his_full);
   arma::uvec starts_full = arma::shift(ends_full,1) + 1;
-  starts_full(0) = 0;
+  starts_full(0) = 1;
 
   arma::uvec his_NA = arma::hist(g_NA,un);
-  arma::uvec ends_NA = arma::cumsum(his_NA)-1;
+  arma::uvec ends_NA = arma::cumsum(his_NA);
   arma::uvec starts_NA = arma::shift(ends_NA,1) + 1;
-  starts_NA(0) = 0;
+  starts_NA(0) = 1;
 
   //unsigned int start = 0;
   //unsigned int end = 0;
 
   for(unsigned int  a=0;a<group;a++){
 
-    unsigned int ss_NA = starts_NA(a);
-    unsigned int ee_NA = ends_NA(a);
-    unsigned int ss_full = starts_full(a);
-    unsigned int ee_full = ends_full(a);
+    int ss_NA = (int)starts_NA(a) - 1L;
+    int ee_NA = (int)ends_NA(a) - 1L;
+    int ss_full = (int)starts_full(a) - 1L;
+    int ee_full = (int)ends_full(a) - 1L;
 
     if((ss_NA <= ee_NA) && (ss_full <= ee_full)){
 
       arma::mat X_full_0 = x(index_full.subvec(ss_full,ee_full),posit_x) ;
       arma::mat X_NA_0 = x(index_NA.subvec(ss_NA,ee_NA),posit_x);
       arma::colvec Y_full_0 =  x(index_full.subvec(ss_full,ee_full),posit_y_uvec) ;
+
+      unsigned int N_obs_chunk = X_full_0.n_rows;
+
+      if((N_obs_chunk<=15 && s=="lda")|| (N_obs_chunk<posit_x.n_elem && s!="lda")){ continue ;}
 
       arma::colvec pred =  (*fun)(Y_full_0,X_full_0,X_NA_0,times);
 
@@ -473,26 +484,33 @@ std::map<std::string, pfuncw> funMapw = {{"lm_pred",fastLm_weighted},
 
 arma::colvec miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x,int times){
 
-  arma::mat X = x.cols(posit_x);
-  arma::colvec Y = x.col(posit_y);
+  arma::uvec posit_y_uvec(1);
+  posit_y_uvec(0) = posit_y;
 
   index_full = miceFast::get_index_full(posit_y, posit_x);
   index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
-  if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
   if(w.has_nan()){Rcpp::stop("There is NA values for weights");}
   if(arma::any(w<0)){Rcpp::stop("There are ngative values for the weights variable");}
 
   //dividing data to NA and full
 
-  arma::mat X_full = X.rows(index_full);
-  arma::mat X_NA = X.rows(index_NA);
-  arma::colvec Y_full = Y.elem(index_full);
+  arma::mat X_full = x(index_full,posit_x);
+  arma::mat X_NA = x(index_NA,posit_x);
+  arma::colvec Y_full = x(index_full,posit_y_uvec);
   arma::colvec w_full = w.elem(index_full);
 
-  pfuncw f = funMapw[s];
-  arma::colvec pred = (*f)(Y_full,X_full,w_full,X_NA,times);
+  arma::colvec pred = x(index_NA,posit_y_uvec);
 
+  if(!(index_NA.n_elem==0) && ((X_full.n_rows>15 && s=="lda")|| (index_full.n_elem>posit_x.n_elem && s!="lda"))){
+
+  pfuncw f = funMapw[s];
+  pred = (*f)(Y_full,X_full,w_full,X_NA,times);
+
+  }
+
+  arma::colvec Y = x.col(posit_y);
   Y.rows(index_NA) = pred;
 
   return Y;
@@ -536,21 +554,21 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
 
   //predictions container
 
-  arma::colvec pred_all(index_NA.n_elem,arma::fill::none);
+  arma::colvec pred_all =  x(index_NA,posit_y_uvec) ;
 
   // start end
 
   //iter
 
   arma::uvec his_full = arma::hist(g_full,un);
-  arma::uvec ends_full = arma::cumsum(his_full)-1;
+  arma::uvec ends_full = arma::cumsum(his_full);
   arma::uvec starts_full = arma::shift(ends_full,1) + 1;
-  starts_full(0) = 0;
+  starts_full(0) = 1;
 
   arma::uvec his_NA = arma::hist(g_NA,un);
-  arma::uvec ends_NA = arma::cumsum(his_NA) - 1;
+  arma::uvec ends_NA = arma::cumsum(his_NA);
   arma::uvec starts_NA = arma::shift(ends_NA,1) + 1;
-  starts_NA(0) = 0;
+  starts_NA(0) = 1;
 
 
   //unsigned int start = 0;
@@ -558,10 +576,10 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
 
   for(unsigned int  a=0;a<group;a++){
 
-    unsigned int ss_NA = starts_NA(a);
-    unsigned int ee_NA = ends_NA(a);
-    unsigned int ss_full = starts_full(a);
-    unsigned int ee_full = ends_full(a);
+    int ss_NA = (int)starts_NA(a) - 1L;
+    int ee_NA = (int)ends_NA(a) - 1L;
+    int ss_full = (int)starts_full(a) - 1L;
+    int ee_full = (int)ends_full(a) - 1L;
 
     if((ss_NA <= ee_NA) && (ss_full <= ee_full)){
 
@@ -569,6 +587,10 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
     arma::mat X_NA_0 = x(index_NA.subvec(ss_NA,ee_NA),posit_x);
     arma::colvec Y_full_0 =  x(index_full.subvec(ss_full,ee_full),posit_y_uvec) ;
     arma::colvec w_full_0 =  w(index_full.subvec(ss_full,ee_full));
+
+    unsigned int N_obs_chunk = X_full_0.n_rows;
+
+    if((N_obs_chunk<=15 && s=="lda")|| (N_obs_chunk<posit_x.n_elem && s!="lda")){ continue ;}
 
     arma::colvec pred =  (*fun)(Y_full_0,X_full_0,w_full_0,X_NA_0,times);
 

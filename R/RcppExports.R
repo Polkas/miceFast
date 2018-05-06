@@ -64,6 +64,9 @@ VIF <- function(x, posit_y, posit_x) {
 #'
 #' @return load variable at position y with additional average of N imputations in a numeric vector format
 #'
+#' @note The lda model is assessed only if there are more than 15 complete observations
+#' and for the lms models if number of variables is smaller than number of observations.
+#'
 #' @seealso \code{\link{fill_NA}} \code{\link{VIF}}
 #'
 #' @examples
@@ -143,6 +146,9 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = 0L, times = 10L) {
 #' @param w  a numeric vector - a weighting variable - only positive values
 #'
 #' @return load variable at position y with additional imputations in a numeric vector format
+#'
+#' @note The lda model is assessed only if there are more than 15 complete observations
+#' and for the lms models if number of independent variables is smaller than number of observations.
 #'
 #' @seealso \code{\link{fill_NA_N}}  \code{\link{VIF}}
 #'

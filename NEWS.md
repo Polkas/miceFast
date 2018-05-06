@@ -1,7 +1,9 @@
-# 0.2.1-2
+# 0.2.1-3
 
 * data.table problem - jump to R 3.5.0
 * valgrind -  a lot of optimizations - problem with arma::exp and arma::randn
+* optimize a lot of code
+* methods/functions  resistant to glitches
 
 ## 0.2.0
 

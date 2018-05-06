@@ -21,6 +21,10 @@ Summing up, miceFast offer a relevant reduction of a calculations time for:
 
 Environment: MRO 3.4.4 Intel MKL - i7 6700HQ and 24GB DDR4 2133. MRO (Microsoft R Open) provide to R a sophisticated library for linear algebra operations so remember about that when reading a performance comparison. 
 
+Example:
+
+![Performance Summary](./inst/extdata/images/g_summary.png)
+
 Implemented classes:
 
 - `miceFast` (methods:`set_data`,`get_data`,`set_w`,`get_w`,`set_g`,`get_g`,`impute`,`impute_N`,`update_var`,`which_updated`,`get_model`,
@@ -33,6 +37,7 @@ The second module was made for purpose of presenting the miceFast usage and perf
 Performance benchmarks (check performance_validity.R file at extdata).
 
 Moreover there are offered a few functions (`fill_NA`, `fill_NA_N` and `VIF`) built to work with the popular R packages such as 'data.table'.
+This functions should be resistant to glitches from an user activity perspective and a data structure.
 
 ## Installation
 
