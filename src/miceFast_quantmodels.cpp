@@ -7,7 +7,7 @@
 #define UNUSED(expr) (void)(expr)
 
 //weighted linear regression
-
+.
 arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1,int times) {
 
   UNUSED(times);
@@ -302,3 +302,9 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
 
 
 //QDA prediction model
+
+//PCA prediction model
+
+//Ridge prediction model
+
+

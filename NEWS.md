@@ -1,3 +1,8 @@
+# 0.3.0
+
+* add miceFast_sparse
+* upgrade corrData module - more precise correleted data
+
 # 0.2.1-3
 
 * data.table problem - jump to R 3.5.0

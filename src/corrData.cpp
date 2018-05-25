@@ -55,7 +55,7 @@ arma::mat corrData::fill(std::string type){
   case 1:
       {
 
-    X_new = X * arma::chol(cors);
+    X_new = X * arma::inv(arma::chol(arma::cor(X))) * arma::chol(cors);
 
     arma::colvec col0 = X_new.col(0);
     for(int i=0;i<n_row;i++){
@@ -68,7 +68,7 @@ arma::mat corrData::fill(std::string type){
 
   case 2:
       {
-    X_new = X * arma::chol(cors);
+    X_new = X * arma::inv(arma::chol(arma::cor(X))) * arma::chol(cors);
 
     arma::colvec col0 = X_new.col(0);
     for(int i=0;i<n_row;i++){
@@ -81,8 +81,8 @@ arma::mat corrData::fill(std::string type){
 
   case 3:
       {
-    X_new = X * arma::chol(cors);
-    break;
+        X_new = X * arma::inv(arma::chol(arma::cor(X))) * arma::chol(cors);
+        break;
     }
 
   default: {

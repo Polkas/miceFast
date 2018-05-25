@@ -44,6 +44,8 @@ cors[lower.tri(cors)] = t(cors)[lower.tri(cors)]
 
 #cors = apply(cors,1:2,mean)/(nr_var+10)
 
+#diag(cors) = 1
+
 #cors
 
 ##
