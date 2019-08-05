@@ -105,3 +105,5 @@ RCPP_MODULE(corrData){
     .method("fill", &corrData::fill)
 
   ;}
+
+

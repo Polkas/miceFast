@@ -28,6 +28,13 @@ void miceFast::set_data(arma::mat & _x){
   index = arma::regspace<arma::uvec>(0,N_rows - 1) + 1;
 }
 
+void miceFast::set_data_sparse(arma::sp_mat & _x){
+  x_sp = _x;
+  N_rows = x_sp.n_rows;
+  N_cols = x_sp.n_cols;
+  index = arma::regspace<arma::uvec>(0,N_rows - 1) + 1;
+}
+
 void miceFast::set_g(arma::colvec & _g){
   if(x.is_empty()){Rcpp::stop("There is no data provided");}
   unsigned int n_elems = _g.n_rows;
@@ -635,6 +642,7 @@ RCPP_MODULE(miceFast){
     .method("get_models", &miceFast::get_models)
     .method("get_model", &miceFast::get_model)
     .method("set_data", &miceFast::set_data)
+    .method("set_data_sparse", &miceFast::set_data_sparse)
     .method("set_g", &miceFast::set_g)
     .method("set_w", &miceFast::set_w)
     .method("sort_byg",&miceFast::sortData_byg)

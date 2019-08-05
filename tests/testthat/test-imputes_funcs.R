@@ -7,35 +7,25 @@ test_that("imputes",
 
             set.seed(1234)
 
-            power = 4 # power of 10 - number of observations - should be adjusted to a computer capabilities
+            power = 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
 
             nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 
             grs = max(c(10**(power-3),10)) # grouping variable - number of groups
 
-            iters = 10 # number of iterations for benchmarking
-
             ## generete example - data
 
             ##positive-defined correlation matrix
 
-            cors = matrix(c(1,0.6,0.7,0.4,0.4,0.5,0.35,
-                            NA,1,0.2,0.05,0.1,0.12,0.15,
-                            NA,NA,1,0.15,0.15,0.1,0.08,
-                            NA,NA,NA,1,0.12,0.15,0.1,
-                            NA,NA,NA,NA,1,0.15,0.2,
-                            NA,NA,NA,NA,NA,1,0.15,
+            cors = matrix(c(1,0.76, 0.60, 0.44, 0.45, 0.45, 0.37,
+                            NA,1, 0.25, 0.09, 0.13, 0.15, 0.17,
+                            NA,NA,1,0.17, 0.17, 0.12, 0.09,
+                            NA,NA,NA,1,0.13, 0.16, 0.11,
+                            NA,NA,NA,NA,1,0.16, 0.21,
+                            NA,NA,NA,NA,NA,1,0.16,
                             NA,NA,NA,NA,NA,NA,1),7,7,byrow = T)
 
             cors[lower.tri(cors)] = t(cors)[lower.tri(cors)]
-
-            # automatic corr matrix - close to diagonal
-
-            #cors = stats::rWishart(100,nr_var+10,diag(nr_var))
-
-            #cors = apply(cors,1:2,mean)/(nr_var+10)
-
-            #cors
 
             ##
 
@@ -127,6 +117,136 @@ test_that("imputes",
           test3 = cor(cbind(vifs,collin_x(data_con_NA[,1]*5,data_con_NA[,c(2,3,4)]*5)[[1]]))[1,1] > 0.9
 
 
-            expect_true(all(c(test0,test1,test2,test3)))
+          data = cbind(y_true = data_con[,1],data_con_NA,Intercept=1,index=1:nrow(data_con))
+
+          data_df = data.frame(data)
+          data_df$y_chac = as.character(round(pnorm(data_df$y)*10))
+          data_df$y_fac = as.factor(round(pnorm(data_df$y)*10))
+          data_df$x2 = as.character(round(pnorm(data_df$x2)*5))
+          data_df$x3 = as.character(round(pnorm(data_df$x3)*5))
+
+
+          data_DT = data.table(data_df)
+          #fill_NA
+          #chracter/factor/numeric
+
+          data_DT[,y_imp:=fill_NA(x=.SD,
+                                  model="lm_pred",
+                                  posit_y='y',
+                                  posit_x=c('Intercept','x2','x3','x4'),w=.SD[['weights']]),by=.(group)] %>%
+            .[,y_imp2:=fill_NA_N(x=.SD,
+                                 model="lm_bayes",
+                                 posit_y='y',
+                                 posit_x=c('Intercept','x2','x3','x4'),w=.SD[['weights']],times=10),by=.(group)]%>%
+            .[,y_imp3:=fill_NA(x=.SD,
+                                 model="lm_pred",
+                                 posit_y='y',
+                                 posit_x=c('Intercept'),w=.SD[['weights']]),by=.(group)]%>%
+            .[,y_imp4:=fill_NA(x=.SD,
+                                 model="lm_pred",
+                                 posit_y='y',
+                                 posit_x=c('Intercept')),by=.(group)]  %>%
+            .[,y_imp5:=fill_NA_N(x=.SD,
+                                 model="lm_noise",
+                                 posit_y='y',
+                                 posit_x=c('Intercept','x2','x3','x4'),w=.SD[['weights']],times=10),by=.(group)] %>%
+            .[,y_imp6:=fill_NA_N(x=.SD,
+                                 model="lm_bayes",
+                                 posit_y='y',
+                                 posit_x=c('Intercept','x2','x3','x4'),times=10),by=.(group)]  %>%
+            .[,y_imp7:=fill_NA_N(x=.SD,
+                                 model="lm_bayes",
+                                 posit_y='y',
+                                 posit_x=c('Intercept','x2','x3','x4'),times=10)]%>%
+            .[,y_imp8:=fill_NA(x=.SD,
+                               model="lm_bayes",
+                               posit_y='y',
+                               posit_x=c('Intercept','x2','x3','x4'),w=.SD[['weights']]),by=.(group)]  %>%
+            .[,y_imp9:=fill_NA(x=.SD,
+                               model="lm_pred",
+                               posit_y='y',
+                               posit_x=c('Intercept','x2','x3','x4'),w=.SD[['weights']])]  %>%
+            .[,y_imp10:=fill_NA(x=.SD,
+                               model="lm_bayes",
+                               posit_y='y',
+                               posit_x=c('Intercept','x2','x3','x4'),w=.SD[['weights']])]  %>%
+            .[,y_imp11:=fill_NA(x=.SD,
+                               model="lm_pred",
+                               posit_y='y',
+                               posit_x=c('Intercept','x2','x3','x4'))] %>%
+            .[,y_imp12:=fill_NA(x=.SD,
+                               model="lm_noise",
+                               posit_y='y',
+                               posit_x=c('Intercept','x2','x3','x4'))]
+
+          test4 = all(cor(data_DT[index_NA,c('y_true',
+                                             'y_imp',
+                                             'y_imp2',
+                                             'y_imp3',
+                                             'y_imp4',
+                                             'y_imp5',
+                                             'y_imp6',
+                                             'y_imp7',
+                                             'y_imp8',
+                                             'y_imp9',
+                                             'y_imp10',
+                                             'y_imp11',
+                                             'y_imp12')])[,1]>0.3)
+
+          data = cbind(y_true = data_disc[,1],data_disc_NA,Intercept=1,index=1:nrow(data_disc))
+
+          data_df = data.frame(data)
+          data_df$y_chac = as.character(data_df$y)
+          data_df$y_fac = as.factor(data_df$y)
+          data_df$x2 = as.factor(round(pnorm(data_df$x2)*10))
+          data_df$x3 = as.character(round(pnorm(data_df$x3)*10))
+
+          data_DT = data.table(data_df)
+
+          data_DT[,y_imp:=fill_NA(x=.SD,
+                                  model="lda",
+                                  posit_y='y_fac',
+                                  posit_x=c('x2','x3','x4','x5')),by=.(group)] %>%
+            .[,y_imp2:=fill_NA(x=.SD,
+                                 model="lda",
+                                 posit_y='y_fac',
+                                 posit_x=c('x2','x3','x4','x5'))]  %>%
+            .[,y_imp3:=fill_NA(x=.SD,
+                                 model="lda",
+                                 posit_y='y_chac',
+                                 posit_x=c('x2','x3','x4','x5')),by=.(group)] %>%
+            .[,y_imp4:=fill_NA(x=.SD,
+                                 model="lda",
+                                 posit_y='y_chac',
+                                 posit_x=c('x2','x3','x4','x5'))]%>%
+            .[,y_imp5:=fill_NA(x=.SD,
+                               model="lm_pred",
+                               posit_y='y_chac',
+                               posit_x=c('x2','x3','x4','x5')),by=.(group)]
+
+          #Better than naive
+          test5 = all(data_DT[index_NA,c('y_true','y_imp','y_imp2','y_imp3','y_imp4','y_imp5')] %>% .[,lapply(.SD,function(x) 100*mean(y_true==x))]>10)
+
+          data = cbind(y_true = data_con[,1],data_con_NA,Intercept=1,index=1:nrow(data_con))
+
+          data_df = data.frame(data)
+          data_df$x2 = round(pnorm(data_df$x2)*10)
+          data_df$x22 = data_df$x2**2
+          data_df$x23 = data_df$x2**3
+
+          data_DT = data.table(data_df)
+
+          vi1 = data_DT[,.(VIF(x=.SD,
+                         posit_y='y',
+                         posit_x=c('x2','x3','x4','x22','x23'),correct=FALSE))][['V1']]
+
+          vi2 = data_DT[,.(VIF(x=.SD,
+                         posit_y='y',
+                         posit_x=c('x2','x3','x4','x22','x23'),correct=TRUE))][['V1']]
+
+          test6=(all(vi1>vi2))&&(any(vi1>7))
+
+          #VIF
+          test_all=expect_true(all(c(test0,test1,test2,test3,test4,test5,test6)))
 
           })

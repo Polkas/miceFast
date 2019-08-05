@@ -7,7 +7,6 @@
 #define UNUSED(expr) (void)(expr)
 
 //weighted linear regression
-.
 arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1,int times) {
 
   UNUSED(times);
@@ -22,7 +21,7 @@ arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma
     X2.col(h)=wq%X.col(h);
   }
 
-  arma::colvec coef = arma::solve(X2, y2);
+  arma::colvec coef = arma::inv(X2.t()*X2)*X2.t()*y2; //arma::solve(X2, y2,arma::solve_opts::fast);
 
   return X1*coef;
 
@@ -41,7 +40,7 @@ arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w
     X2.col(h)=wq%X.col(h);
   }
 
-  arma::colvec coef = arma::solve(X2, y2);
+  arma::colvec coef = arma::inv(X2.t()*X2)*X2.t()*y2; // arma::solve(X2, y2,arma::solve_opts::fast);
 
   arma::colvec res = y - X*coef;
 
@@ -75,13 +74,13 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
     X2.col(h)=wq%X.col(h);
   }
 
-  arma::colvec coef = arma::solve(X2, y2);
+  arma::colvec coef = arma::inv(X2.t()*X2)*X2.t()*y2;//arma::solve(X2, y2,arma::solve_opts::fast);
 
   arma::colvec res = y - X*coef;
 
   double df = N-C ;
 
-  arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
+  //arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
 
   double res2 = arma::as_scalar(arma::trans(res)*res);
 
@@ -109,13 +108,13 @@ arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int times
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-  arma::colvec coef = arma::solve(X,y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
+  arma::colvec coef = arma::inv(X.t()*X)*X.t()*y; // arma::solve(X,y);
 
   arma::colvec res = y - X*coef;
 
   double df = N-C;
 
-  arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
+  //arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
 
   double res2 = arma::as_scalar(arma::trans(res)*res);
 
@@ -142,7 +141,7 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1,int times)
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-  arma::colvec coef = arma::solve(X,y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
+  arma::colvec coef = arma::inv(X.t()*X)*X.t()*y; // arma::solve(X,y,arma::solve_opts::fast);
 
   arma::colvec res = y - X*coef;
 
@@ -168,7 +167,7 @@ arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1,int times)
 
   UNUSED(times);
 
-  arma::colvec coef = arma::solve(X, y);//,arma::solve_opts::fast);//arma::inv(X.t()*X)*X.t()*y;
+  arma::colvec coef = arma::inv(X.t()*X)*X.t()*y; //arma::solve(X, y,arma::solve_opts::fast);
 
   return X1*coef;
 
@@ -207,7 +206,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
   for(int i=0;i<group;i++){
 
     arma::uvec index = arma::find(y == un(i));
-    group_means.row(i) = arma::mean(X.rows(index),0);
+    group_means.row(i) = arma::mean(X_vol.rows(index),0);
 
   }
 

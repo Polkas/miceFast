@@ -1,7 +1,10 @@
-# 0.3.0
+# 0.5.0
 
-* add miceFast_sparse
-* upgrade corrData module - more precise correleted data
+* providing a more comfortable environment for data.table/dplyr users
+* expand vignette and documentation
+* solving linear system replaced with closed equation - faster but a little less stable
+* updated performance benchmarks
+* fix a glitch - e.g. lda model dont work with zero variance variables
 
 # 0.2.1-3
 

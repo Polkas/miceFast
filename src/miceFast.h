@@ -9,6 +9,7 @@
 class miceFast{
 
   arma::mat x;       //variables
+  arma::sp_mat x_sp;
   arma::colvec g;    //grouping
   arma::colvec w;//weights
   std::vector<int> updated;
@@ -41,6 +42,7 @@ class miceFast{
 
   void sortData_byg();
   void set_data(arma::mat& _x);
+  void set_data_sparse(arma::sp_mat & _x);
   void set_g(arma::colvec& _g);
   void set_w(arma::colvec& _w);
   void update_var(int posit_y,arma::vec impute);

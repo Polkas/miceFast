@@ -15,11 +15,11 @@ R package was built under Rcpp and Armadillo for the purpose of fast imputations
 There was used quantitative models with closed-form solution. Thus package is based on linear algebra operations.
 Summing up, miceFast offer a relevant reduction of a calculations time for:
 
-- Linear Discriminant Analysis **(x10)**
-- where a grouping variable have to be used **(around x50 depending on data dimensions and number of groups and even more than x1000 although compared to data.table only a few times faster or even the same)** because data is sorted by grouping variable*
-- multiple imputations is faster around **x(number of multiple imputatition)** because the core of a model is evaluated only ones.
+- Linear Discriminant Analysis **(x5)**
+- where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few times faster or even the same)** because data is sorted by grouping variable
+- multiple imputations is faster around **x(number of multiple imputations)** because the core of a model is evaluated only ones.
 
-Environment: MRO 3.4.4 Intel MKL - i7 6700HQ and 24GB DDR4 2133. MRO (Microsoft R Open) provide to R a sophisticated library for linear algebra operations so remember about that when reading a performance comparison. 
+Environment: MRO 3.5.3 Intel MKL - i7 6700HQ and 24GB DDR4 2133. MRO (Microsoft R Open) provide to R a sophisticated library for linear algebra operations so remember about that when reading a performance comparison - Date 2019-08-07. 
 
 Example:
 
@@ -46,186 +46,157 @@ This functions should be resistant to glitches from an user activity perspective
 devtools::install_github("polkas/miceFast")
 ```
 
-## Introduction for data.table users - using additional functions from miceFast:
+## Introduction for data.table/dplyr users - using additional functions from miceFast:
 
-Usage of `fill_NA` and `fill_NA_N`  functions from miceFast
-
-```r
-library(miceFast)
-library(data.table)
-library(magrittr)
+```
+#install.packages('pacman')
+pacman::p_load(miceFast,data.table,magrittr,mice,car,dplyr)
 ```
 
-```r
+Usage of `fill_NA` and `fill_NA_N` functions from miceFast - this functions should be resistant to glitches from an user activity perspective and a data structure.
+
+### Intro:data.table
+
+#### Working with names
+
+```{r,echo=TRUE}
 data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
+data = do.call(rbind,replicate(10,data,simplify = F))
+data_df = as.data.frame(data)
 data_DT = data.table(data)
 
-# simple mean imputation - intercept at position 5
-data_DT[,bmi_imp:=fill_NA(x=as.matrix(.SD),
-                         model="lm_bayes",
+data_DT[,bmi_imp:=fill_NA(x=.SD,
+                         model="lm_pred",
+                         posit_y='bmi',
+                         posit_x='intercept')] %>% 
+  .[,hyp_imp:=fill_NA(x=.SD,
+                     model="lda",
+                     posit_y='hyp',
+                     posit_x=c('age','bmi_imp')),] %>% 
+  .[,chl_imp:=fill_NA_N(x=.SD,
+                       model="lm_noise",
+                       posit_y='chl',
+                       posit_x=c('age','bmi_imp','hyp_imp'),
+                       times=10),]
+
+head(data_DT,2)
+```
+
+#### Working with positions
+
+```{r,echo=TRUE}
+data_DT[,bmi_imp:=fill_NA(x=.SD,
+                         model="lm_pred",
                          posit_y=2,
                          posit_x=5)] %>% 
 # there is a new variable at position 7 - bmi_imp
-  .[,hyp_imp:=fill_NA(x=as.matrix(.SD),
+  .[,hyp_imp:=fill_NA(x=.SD,
                      model="lda",
                      posit_y=3,
                      posit_x=c(1,7)),] %>% 
-  .[,chl_imp:=fill_NA_N(x=as.matrix(.SD),
+  .[,chl_imp:=fill_NA_N(x=.SD,
                        model="lm_noise",
                        posit_y=4,
                        posit_x=c(1,7,8),
                        times=10),]
 
-head(data_DT,3)
+head(data_DT,2)
 ```
 
-**Model with additional parameters:** - data with the grouping variable
+### Intro:dplyr
 
-```r
-data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality),
+#### Working with names
+
+```{r,echo=TRUE}
+data_df = data_df %>% mutate(bmi_imp=fill_NA(x=.,
+                         model="lm_pred",
+                         posit_y='bmi',
+                         posit_x='intercept')) %>% 
+  mutate(hyp_imp=fill_NA(x=.,
+                     model="lda",
+                     posit_y='hyp',
+                     posit_x=c('age','bmi_imp'))) %>% 
+  mutate(chl_imp=fill_NA_N(x=.,
+                       model="lm_noise",
+                       posit_y='chl',
+                       posit_x=c('age','bmi_imp','hyp_imp'),
+                       times=10))
+
+head(data_df,2)
+```
+
+
+#### Working with positions
+
+```{r,echo=TRUE}
+data_df = data_df %>% mutate(bmi_imp=fill_NA(x=.,
+                         model="lm_pred",
+                         posit_y=2,
+                         posit_x=5)) %>% 
+# there is a new variable at position 7 - bmi_imp
+  mutate(hyp_imp=fill_NA(x=.,
+                     model="lda",
+                     posit_y=3,
+                     posit_x=c(1,7))) %>% 
+  mutate(chl_imp=fill_NA_N(x=.,
+                       model="lm_noise",
+                       posit_y=4,
+                       posit_x=c(1,7,8),
+                       times=10))
+
+head(data_df,2)
+```
+
+**Model with additional parameters:** - data with the grouping/weighting variable - data.table recommended
+
+```{r,echo=TRUE}
+data = cbind(as.matrix(airquality[,-5]),Intercept=1,index=1:nrow(airquality),
              # a numeric vector - positive values 
              weights = round(rgamma(nrow(airquality),3,3),1),
-             # as.numeric is needed only for miceFast - see on next pages
              groups = airquality[,5])
-data_DT = data.table(data)
 
+data = do.call(rbind,replicate(10,data,simplify = F))
+data_DT = data.table(data)
+```
+
+#### Working with names
+
+```{r,echo=TRUE}
+data_DT[,Ozone_imp:=fill_NA(x=.SD, 
+                           model="lm_pred",
+                           posit_y='Ozone',
+                           posit_x='Intercept',w=.SD[['weights']]),by=.(groups)] %>% 
+  .[,Solar_R_imp:=fill_NA_N(.SD,
+                           model="lm_bayes",
+                           posit_y='Solar.R',
+                           posit_x=c('Wind','Temp','Day','Intercept','Ozone_imp'),
+                           w=.SD[['weights']],
+                           times=10),by=.(groups)]
+
+data_DT[which(is.na(data_DT[,1]))[1],]
+```
+
+#### Working with positions
+
+```{r,echo=TRUE}
 # simple mean imputation - intercept at position 6
-data_DT[,Ozone_imp:=fill_NA(x=as.matrix(.SD), 
+data_DT[,Ozone_imp:=fill_NA(x=.SD, 
                            model="lm_pred",
                            posit_y=1,
                            posit_x=c(6),w=.SD[['weights']]),by=.(groups)] %>% 
 # avg of 10 multiple imputations - last posit_x equal to 9 not 10 
 # because the groups variable is not included in .SD
-  .[,Solar_R_imp:=fill_NA_N(as.matrix(.SD),
+  .[,Solar_R_imp:=fill_NA_N(.SD,
                            model="lm_bayes",
                            posit_y=2,
-                           posit_x=c(3,4,5,6,9),w=.SD[['weights']],times=10),by=.(groups)]
-head(data_DT,10)
-```
+                           posit_x=c(3,4,5,6,9),
+                           w=.SD[['weights']],
+                           times=10),by=.(groups)]
 
-## miceFast module usage:
-
-```r
-library(miceFast)
-library(data.table)
-library(magrittr)
-```
-
-Remember that a matrix could be build only under a one data type so factor variables have to be melted
-use `model.matrix` to get numeric matrix from `data.frame` - see Tips in this document
-
-```r
-#install.packages("mice")
-data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
-model = new(miceFast)
-model$set_data(data) #providing data by a reference
-
-model$update_var(2,model$impute("lm_pred",2,5)$imputations)
-#OR not recommended
-#data[,2] = model$impute("lm_pred",2,5)$imputations
-#model$set_data(data) #Updating the object
-
-model$update_var(3,model$impute("lda",3,c(1,2))$imputations) 
-
-#Old slow syntax
-#model$update_var(4,rowMeans(sapply(1:10,function(x) 
-#  model$impute("lm_bayes",4,c(1,2,3))$imputations))
-#  )
-
-model$update_var(4,model$impute_N("lm_bayes",4,c(1,2,3),10)$imputations)
-
-#When working with 'Big Data'
-#it is recommended to occasionally manually invoke a garbage collector `gc()`
-
-# Be careful with `update_var` because of the permanent update at the object and data
-# That is why `update_var` could be used only ones for a certain column
-# check which variables was updated - inside the object
-model$which_updated()
-head(model$get_data(),4)
-head(data,4)
-head(mice::nhanes,4)
-rm(model)
-
-########################################################################
-###Model with additional parameters: - sorted by the grouping variable
-########################################################################
-
-data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
-weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
-groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values - sorted increasingly
-
-model = new(miceFast)
-model$set_data(data) # providing by a reference
-model$set_w(weights) # providing by a reference
-model$set_g(groups)  # providing by a reference
-
-#impute adapt to provided parmaters like w or g
-#Simple mean - permanent imputation at the object and data
-model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
-
-model$update_var(2,model$impute_N("lm_bayes",2,c(1,3,4,5,6),10)$imputations)
-
-#Printing data and retrieving an old order
-head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),],4)
-
-head(airquality,4)
-
-head(cbind(model$get_data(),model$get_g(),model$get_w()),4)
-
-head(cbind(data,groups,weights),4)
-
-rm(model)
-
-############################################################################
-###Model with additional parameters:** - data not sorted by the grouping variable
-############################################################################
-
-data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
-weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
-#groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values
-groups = as.numeric(sample(1:3,nrow(data),replace=T)) # a numeric vector not integers - positive values
-
-model = new(miceFast)
-model$set_data(data) # providing by a reference
-model$set_w(weights) # providing by a reference
-model$set_g(groups)  # providing by a reference
-#impute adapt to provided parmaters like w or g
-#Warning - if data is not sorted increasingly by the g then it would be done automatically 
-#during a first imputation
-#Simple mean - permanent imputation at the object and data
-model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
-
-model$update_var(2,model$impute_N("lm_bayes",2,c(1,3,4,5,6),10)$imputations)
-
-#Printing data and retrieving an old order
-head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),],4)
-
-head(airquality,4)
-
-head(cbind(model$get_data(),model$get_g(),model$get_w()),4) #is ordered by g
-
-head(cbind(data,groups,weights),4) #is sorted by g cause we provide data by a reference
-
-rm(model)
+data_DT[which(is.na(data_DT[,1]))[1],]
 
 ```
 
-## Tips
-
-**matrix from data.frame**
-
-Remember that a matrix could be build only under a one data type so factor/character variables have to be melted
-use `model.matrix` to get numeric matrix from `data.frame`
-
-```r
-str(mtcars)
-
-mtcars$cyl= factor(mtcars$cyl)
-mtcars$gear= factor(mtcars$gear)
-mtcars_mat = model.matrix.lm(~.,mtcars,na.action="na.pass")
-
-str(mtcars_mat)
-```
 
 **VIF**
 
@@ -234,12 +205,18 @@ Variance inflation factors (VIF) measure how much the variance of the estimated 
 ```r
 airquality2 = airquality
 airquality2$Temp2 = airquality2$Temp**2
-#install.packages("car")
-#car::vif(lm(Ozone ~ ., data=airquality2))
+airquality2$Month = factor(airquality2$Month)
 
-airquality2_mat = as.matrix(airquality2)
-model = new(miceFast)
-model$set_data(airquality2_mat)
+car::vif(lm(Ozone ~ ., data=airquality2))
+```
 
-as.vector(model$vifs(1,c(2,3,4,5,6,7)))
+```{echo=TRUE}
+data_DT = data.table(airquality2)
+data_DT[,.(vifs=VIF(x=.SD,
+                posit_y='Ozone',
+                posit_x=c('Solar.R','Wind','Temp','Month','Day','Temp2'),correct=FALSE))][['vifs']]
+
+data_DT[,.(vifs=VIF(x=.SD,
+                posit_y=1,
+                posit_x=c(2,3,4,5,6,7),correct = TRUE))][['vifs']]
 ```
