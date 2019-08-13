@@ -10,9 +10,11 @@
 #' @param posit_x an integer/character vector - positions/names of independent variables
 #' @param w  a numeric vector - a weighting variable - only positive values
 #'
-#' @return load imputations in a numeric/factor (depend on an input type) vector format
+#' @return load imputations in a numeric/character/factor (similar to the input type) vector format
 #'
 #' @note
+#' There is assumed that users add the intercept by their own.
+#' data.table and numeric matrix data type provide the most efficient environment.
 #' The lda model is assessed only if there are more than 15 complete observations
 #' and for the lms models if number of independent variables is smaller than number of observations.
 #'
@@ -162,7 +164,7 @@
 #'
 #' @export
 
-fill_NA <- function(x, model, posit_y, posit_x, w = 0L) {
+fill_NA <- function(x, model, posit_y, posit_x, w = NULL) {
 
   UseMethod('fill_NA')
 
@@ -170,52 +172,68 @@ fill_NA <- function(x, model, posit_y, posit_x, w = 0L) {
 
 #' @rdname fill_NA
 
-fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = 0L) {
-
-  cols = colnames(x)
-  # posit as character vector
-  if(is.character(posit_x)) {
-    posit_x = pmatch(posit_x,cols)
-    posit_x = posit_x[!is.na(posit_x)]
-    if(length(posit_x)==0) stop('posit_x is empty')
-  }
-
-  if(is.character(posit_y)){
-    posit_y = pmatch(posit_y,cols)
-    if(length(posit_y)==0) stop('posit_y is empty')
-  }
+fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL) {
 
   if(inherits(x,'data.frame')){
 
-    x_small = subset(x,select=posit_x)
+    is_DT = inherits(x,'data.table')
+
+    if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
+    model = match.arg(model,c('lm_pred','lda','lm_bayes','lm_noise'))
+
+
+    cols = colnames(x)
+    # posit as character vector
+    if(is.character(posit_x)) {
+      posit_x = pmatch(posit_x,cols)
+      posit_x = posit_x[!is.na(posit_x)]
+      if(length(posit_x)==0) stop('posit_x is empty')
+    }
+
+    if(is.character(posit_y)){
+      posit_y = pmatch(posit_y,cols)
+      if(length(posit_y)==0) stop('posit_y is empty')
+    }
+
+
+
+    yy = x[[posit_y]]
+
+    ww = if(is.null(w)) vector() else w
+
+
+    x_small = if(is_DT) x[,posit_x,with=FALSE] else x[,posit_x]
+
+    #if(kappa(x_small)>1e+6) return(yy)
 
     types = lapply(x_small,class)
 
     x_ncols = length(posit_x)
 
-    contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
+    #contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
 
     p_x_factor_character = which(unlist(lapply(types,function(i) !all(is.na(match(c('factor','character'),i))))))
 
     len_p_x_factor_character = length(p_x_factor_character)
 
-    yy = x[[posit_y]]
-
     xx = vector('list',2)
 
     if(len_p_x_factor_character>0){
 
-      x_fc = subset(x,select=posit_x[p_x_factor_character])
-      x_fc = model.matrix.lm(~.,x_fc,na.action="na.pass")
+      posit_fc = posit_x[p_x_factor_character]
+      x_fc = if(is_DT) x[,posit_fc,with=FALSE] else x[,posit_fc]
+      x_fc = model.matrix.lm(~.,x_fc,na.action="na.pass")[,-1]
 
-      if(contains_intercept) x_fc = x_fc[,-1]
+      #if(contains_intercept) x_fc = x_fc[,-1]
 
       xx[[1]] = x_fc
 
     }
 
     if(x_ncols>len_p_x_factor_character){
-      x_ni = as.matrix(subset(x,select=setdiff(posit_x,posit_x[p_x_factor_character])))
+
+      posit_ni = setdiff(posit_x,posit_x[p_x_factor_character])
+      x_ni = if(is_DT) as.matrix(x[,posit_ni,with=FALSE]) else as.matrix(x[,posit_ni])
       xx[[2]] = x_ni
     }
 
@@ -226,7 +244,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = 0L) {
       l=levels(yy)
       yy = as.numeric(yy)
 
-      f = round(fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), w))
+      f = round(fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww))
 
       f[f<=0] = 1
       f[f>length(l)] = length(l)
@@ -238,15 +256,15 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = 0L) {
       l=levels(yy)
       yy = as.numeric(yy)
 
-      f = round(fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), w))
+      f = round(fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww))
 
       f[f<=0] = 1
       f[f>length(l)] = length(l)
-      ff = factor(l[f])
+      ff = l[f]
 
     } else {
 
-      ff = fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), w)
+      ff = fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww)
     }
   } else {stop("wrong data type - it should be data.frame")}
 
@@ -260,7 +278,12 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = 0L) {
 
 #' @rdname fill_NA
 
-fill_NA.matrix <- function(x, model, posit_y, posit_x, w = 0L) {
+fill_NA.matrix <- function(x, model, posit_y, posit_x, w=NULL) {
+
+  if(is.matrix(x)){
+
+  if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
+  model = match.arg(model,c('lm_pred','lda','lm_bayes','lm_noise'))
 
   cols = colnames(x)
   # posit as character vector
@@ -275,9 +298,14 @@ fill_NA.matrix <- function(x, model, posit_y, posit_x, w = 0L) {
     if(length(posit_y)==0) stop('posit_y is empty')
   }
 
-  if(is.matrix(x)){
 
-  ff = fill_NA_(x, model, posit_y, posit_x, w)} else {stop("wrong data type - it should be data.frame or matrix")}
+  ww = if(is.null(w)) vector() else w
+
+  #x_small = x[,posit_x]
+
+  #if(kappa(x_small)>1e+6) return(x[[posit_y]])
+
+  ff = fill_NA_(x, model, posit_y, posit_x, ww)} else {stop("wrong data type - it should be data.frame or matrix")}
 
   attr(ff,'dim') = attributes(ff)$dim[1]
 

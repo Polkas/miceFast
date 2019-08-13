@@ -26,7 +26,8 @@ Suggests:
     mice,
     broom,
     car,
-    magrittr
+    magrittr,
+    ggplot2
 VignetteBuilder: knitr
 LinkingTo: 
 	Rcpp,

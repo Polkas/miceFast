@@ -118,30 +118,25 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
 
 //eval vifs
 
-double fLmVar(const arma::mat & X, const arma::colvec & y) {
-  // fit model y ~ X, extract residuals
-  arma::colvec coef =  arma::inv(X.t()*X)*X.t()*y;//arma::solve(X.t()*X, X.t()*y);
-  arma::colvec res  = y - X*coef;
-
-  return arma::sum(res.t() * res);
-}
 
 arma::mat cov2cor(arma::mat & X){
-  arma::mat XX = arma::diagmat(1/arma::sqrt(X.diag())) * X * arma::diagmat(1/arma::sqrt(X.diag()));
-  return XX;
+  arma::mat corr = arma::diagmat(1/arma::sqrt(X.diag())) * X * arma::diagmat(1/arma::sqrt(X.diag()));
+  return corr;
 }
 
 
 // [[Rcpp::export]]
 arma::vec VIF_(arma::mat &x,int posit_y,arma::uvec posit_x,arma::uvec posit_x_var,bool correct){
 
-  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
-  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
-  if(arma::any(arma::find(arma::var(x)==0))){Rcpp::stop("Do not include an intercept");}
-
   arma::mat x_cols = x.cols(posit_x - 1);
 
   arma::colvec y_cols = x.col(posit_y - 1);
+
+  arma::uvec Nvar_x_o = arma::unique(posit_x_var);
+  int Nvar_o = Nvar_x_o.n_elem;
+
+  arma::vec vifs(Nvar_o,arma::fill::none);
+
 
   arma::uvec full_rows = get_index_full_R(x,posit_y - 1,posit_x - 1);
 
@@ -149,46 +144,55 @@ arma::vec VIF_(arma::mat &x,int posit_y,arma::uvec posit_x,arma::uvec posit_x_va
 
   arma::mat full_y = y_cols.rows(full_rows);
 
-  arma::mat col_means = arma::mean(full_x,0);
 
-  full_x.each_row() -= col_means;
+  arma::uvec vols = arma::find(arma::var(full_x)>0);
 
-  int Ncol = posit_x.n_elem;
+  int vols_n = vols.n_elem;
 
-  arma::uvec Nvar_x = arma::unique(posit_x_var);
+
+  arma::mat x_vols = full_x.cols(vols);
+
+
+  if(vols_n<Nvar_o){Rcpp::warning("There is at least a one zero variance variable");return vifs;}
+
+
+  arma::uvec posit_x_v = posit_x.elem(vols);
+
+  arma::uvec posit_x_var_v = posit_x_var.elem(vols);
+
+  arma::mat col_means = arma::mean(x_vols,0);
+
+  x_vols.each_row() -= col_means;
+
+
+  int Ncol = posit_x_v.n_elem;
+
+  arma::uvec Nvar_x = arma::unique(posit_x_var_v);
   int Nvar = Nvar_x.n_elem;
 
-  arma::vec vifs(Nvar);
 
-  arma::mat XXinv;
+  arma::mat xtx = x_vols.t()*x_vols;
 
-  if(Nvar<Ncol){
+  arma::mat XXinv = arma::inv_sympd(xtx);
 
-  double s2 = fLmVar(full_x,full_y);
 
-  arma::mat covv = s2 * arma::inv(full_x.t()*full_x);
-
-  XXinv = arma::inv(cov2cor(covv));
-
-  } else {
-    XXinv = arma::inv(full_x.t()*full_x);
-    }
-
+  if(Nvar<Ncol){ XXinv = cov2cor(XXinv) ;}
 
 
   double det_XXinv = arma::det(XXinv);
 
+
   arma::vec dfs(Nvar);
+
+  arma::uvec pp = arma::linspace<arma::uvec>(0, Ncol-1, Ncol);
 
   for(int i=0;i<(Nvar);i++){
 
-    int a = i + 2;
+    int a = Nvar_x(i);
 
     arma::mat XXinv_small = XXinv;
 
-    arma::uvec pp = posit_x - 2;
-
-    arma::uvec ii = pp.elem(arma::find(posit_x_var==a));
+    arma::uvec ii = pp.elem(arma::find(posit_x_var_v==a));
 
     int ii_len = ii.n_elem;
 
@@ -202,7 +206,10 @@ arma::vec VIF_(arma::mat &x,int posit_y,arma::uvec posit_x,arma::uvec posit_x_va
 
     XXinv_small.shed_cols(ii_first,ii_last);
 
-    vifs(i)= arma::as_scalar(arma::det(XXinv(ii,ii)) * arma::det(XXinv_small)/det_XXinv);
+    double vif = arma::as_scalar(arma::det(XXinv(ii,ii)) * arma::det(XXinv_small)/det_XXinv);
+
+    vifs(i) = vif;
+
   }
 
   if(correct){
@@ -216,20 +223,17 @@ arma::vec VIF_(arma::mat &x,int posit_y,arma::uvec posit_x,arma::uvec posit_x_va
 };
 
 
-// [[Rcpp::export]]
-arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w=0,int times=10){
 
-  if( !(model.compare("lm_bayes") == 0) && !(model.compare("lm_noise") == 0)){Rcpp::stop("Works only for `lm_bayes` and `lm_noise` models");}
-  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
-  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
-  if((model!="lm_pred") & (model!="lm_bayes") & (model!="lm_noise") & (model!="lda") ){Rcpp::stop("model a character - posibble options ('lda','lm_pred','lm_bayes','lm_noise')");}
+// [[Rcpp::export]]
+arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w,int times=10){
+
 
   posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
 
   arma::colvec pred_avg;
 
-  if(w(0)==0 || (model.compare("lda") == 0)){
+  if(w.is_empty() || (model.compare("lda") == 0)){
     pred_avg = impute_raw_R(x,model,posit_y,posit_x,times);
   } else{
     pred_avg = imputeW_R(x,model,posit_y,posit_x,w,times);
@@ -241,18 +245,14 @@ arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec 
 
 
 // [[Rcpp::export]]
-arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w=0){
-
-  if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
-  if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
-  if((model!="lm_pred") & (model!="lm_bayes") & (model!="lm_noise") & (model!="lda") ){Rcpp::stop("model a character - posibble options ('lda','lm_pred','lm_bayes','lm_noise')");}
+arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w){
 
   posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
 
   arma::colvec pred_avg;
 
-  if(w(0)==0 || (model.compare("lda") == 0)){
+  if(w.is_empty() || (model.compare("lda") == 0)){
     pred_avg = impute_raw_R(x,model,posit_y,posit_x,1);
   } else {
     pred_avg = imputeW_R(x,model,posit_y,posit_x,w,1);

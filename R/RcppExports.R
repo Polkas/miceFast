@@ -5,11 +5,11 @@ VIF_ <- function(x, posit_y, posit_x, posit_x_var, correct) {
     .Call(`_miceFast_VIF_`, x, posit_y, posit_x, posit_x_var, correct)
 }
 
-fill_NA_N_ <- function(x, model, posit_y, posit_x, w = 0L, times = 10L) {
+fill_NA_N_ <- function(x, model, posit_y, posit_x, w, times = 10L) {
     .Call(`_miceFast_fill_NA_N_`, x, model, posit_y, posit_x, w, times)
 }
 
-fill_NA_ <- function(x, model, posit_y, posit_x, w = 0L) {
+fill_NA_ <- function(x, model, posit_y, posit_x, w) {
     .Call(`_miceFast_fill_NA_`, x, model, posit_y, posit_x, w)
 }
 

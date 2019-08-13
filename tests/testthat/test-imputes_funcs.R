@@ -7,11 +7,11 @@ test_that("imputes",
 
             set.seed(1234)
 
-            power = 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
+            power = 4 # power of 10 - number of observations - should be adjusted to a computer capabilities
 
             nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 
-            grs = max(c(10**(power-3),10)) # grouping variable - number of groups
+            grs = max(c(10**(power-2),10)) # grouping variable - number of groups
 
             ## generete example - data
 
@@ -122,7 +122,7 @@ test_that("imputes",
           data_df = data.frame(data)
           data_df$y_chac = as.character(round(pnorm(data_df$y)*10))
           data_df$y_fac = as.factor(round(pnorm(data_df$y)*10))
-          data_df$x2 = as.character(round(pnorm(data_df$x2)*5))
+          data_df$x2 = as.factor(round(pnorm(data_df$x2)*5))
           data_df$x3 = as.character(round(pnorm(data_df$x3)*5))
 
 
@@ -198,8 +198,8 @@ test_that("imputes",
           data_df = data.frame(data)
           data_df$y_chac = as.character(data_df$y)
           data_df$y_fac = as.factor(data_df$y)
-          data_df$x2 = as.factor(round(pnorm(data_df$x2)*10))
-          data_df$x3 = as.character(round(pnorm(data_df$x3)*10))
+          data_df$x2 = as.factor(round(pnorm(data_df$x2)*3))
+          data_df$x3 = as.character(round(pnorm(data_df$x3)*3))
 
           data_DT = data.table(data_df)
 
@@ -218,14 +218,24 @@ test_that("imputes",
             .[,y_imp4:=fill_NA(x=.SD,
                                  model="lda",
                                  posit_y='y_chac',
-                                 posit_x=c('x2','x3','x4','x5'))]%>%
+                                 posit_x=c('x2','x3','x4','x5'))] %>%
             .[,y_imp5:=fill_NA(x=.SD,
                                model="lm_pred",
                                posit_y='y_chac',
-                               posit_x=c('x2','x3','x4','x5')),by=.(group)]
+                               posit_x=c('x2','x3','x4','x5')),by=.(group)] %>%
+            .[,y_imp6:=fill_NA(x=.SD,
+                               model="lm_pred",
+                               posit_y='y_chac',
+                               posit_x=c('x2','x3')),by=.(group)]
 
           #Better than naive
-          test5 = all(data_DT[index_NA,c('y_true','y_imp','y_imp2','y_imp3','y_imp4','y_imp5')] %>% .[,lapply(.SD,function(x) 100*mean(y_true==x))]>10)
+          test5 = all(data_DT[index_NA,c('y_true',
+                                         'y_imp',
+                                         'y_imp2',
+                                         'y_imp3',
+                                         'y_imp4',
+                                         'y_imp5',
+                                         'y_imp6')] %>% .[,lapply(.SD,function(x) 100*mean(y_true==x))]>10)
 
           data = cbind(y_true = data_con[,1],data_con_NA,Intercept=1,index=1:nrow(data_con))
 
@@ -238,7 +248,8 @@ test_that("imputes",
 
           vi1 = data_DT[,.(VIF(x=.SD,
                          posit_y='y',
-                         posit_x=c('x2','x3','x4','x22','x23'),correct=FALSE))][['V1']]
+                         posit_x=c('x2','x3','x4','x22','x23'),correct=FALSE))]
+
 
           vi2 = data_DT[,.(VIF(x=.SD,
                          posit_y='y',

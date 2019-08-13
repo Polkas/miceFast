@@ -2,9 +2,8 @@
 
 * providing a more comfortable environment for data.table/dplyr users
 * expand vignette and documentation
-* solving linear system replaced with closed equation - faster but a little less stable
 * updated performance benchmarks
-* fix a glitch - e.g. lda model dont work with zero variance variables
+* fix a glitch - e.g. lack of correct warning for a lda model with zero variance variables
 
 # 0.2.1-3
 

@@ -6,11 +6,11 @@
 \alias{fill_NA.matrix}
 \title{\code{fill_NA} function for the imputations purpose.}
 \usage{
-fill_NA(x, model, posit_y, posit_x, w = 0L)
+fill_NA(x, model, posit_y, posit_x, w = NULL)
 
-\method{fill_NA}{data.frame}(x, model, posit_y, posit_x, w = 0L)
+\method{fill_NA}{data.frame}(x, model, posit_y, posit_x, w = NULL)
 
-\method{fill_NA}{matrix}(x, model, posit_y, posit_x, w = 0L)
+\method{fill_NA}{matrix}(x, model, posit_y, posit_x, w = NULL)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric)  - variables}
@@ -24,7 +24,7 @@ fill_NA(x, model, posit_y, posit_x, w = 0L)
 \item{w}{a numeric vector - a weighting variable - only positive values}
 }
 \value{
-load imputations in a numeric/factor (depend on an input type) vector format
+load imputations in a numeric/character/factor (similar to the input type) vector format
 }
 \description{
 Regular imputations to fill the missing data.
@@ -32,6 +32,8 @@ Non missing independent variables are used to approximate a missing observations
 Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 }
 \note{
+There is assumed that users add the intercept by their own.
+data.table and numeric matrix data type provide the most efficient environment.
 The lda model is assessed only if there are more than 15 complete observations
 and for the lms models if number of independent variables is smaller than number of observations.
 }

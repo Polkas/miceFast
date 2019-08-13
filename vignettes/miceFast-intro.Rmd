@@ -41,8 +41,9 @@ Summing up, miceFast offer a relevant reduction of a calculations time for:
 - Linear Discriminant Analysis around **(x5)**
 - where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few times faster or even the same)** because of pre-sorting by grouping variable
 - multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
+- Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
 
-Example:
+Example (2019-08-07):
 
 ![Performance Summary](../inst/extdata/images/g_summary.png)
 
@@ -81,7 +82,7 @@ Usage of `fill_NA` and `fill_NA_N` functions from miceFast - this functions shou
 #### Working with names
 
 ```{r,echo=TRUE}
-data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
+data = cbind(as.matrix(mice::nhanes),Intercept=1,index=1:nrow(mice::nhanes))
 data = do.call(rbind,replicate(10,data,simplify = F))
 data_df = as.data.frame(data)
 data_DT = data.table(data)
@@ -89,7 +90,7 @@ data_DT = data.table(data)
 data_DT[,bmi_imp:=fill_NA(x=.SD,
                          model="lm_pred",
                          posit_y='bmi',
-                         posit_x='intercept')] %>% 
+                         posit_x='Intercept')] %>% 
   .[,hyp_imp:=fill_NA(x=.SD,
                      model="lda",
                      posit_y='hyp',
@@ -132,7 +133,7 @@ head(data_DT,2)
 data_df = data_df %>% mutate(bmi_imp=fill_NA(x=.,
                          model="lm_pred",
                          posit_y='bmi',
-                         posit_x='intercept')) %>% 
+                         posit_x='Intercept')) %>% 
   mutate(hyp_imp=fill_NA(x=.,
                      model="lda",
                      posit_y='hyp',
@@ -169,46 +170,6 @@ head(data_df,2)
 
 
 ```
-
-**Works with dependent variable as factor/character**:
-
-```{r,echo=TRUE}
-data_DT = data.table(mice::nhanes)
-
-data_DT$hyp = as.factor(data_DT$hyp)
-
-data_DT[,{Species_imp:=fill_NA(x=.SD,
-                      model="lda",
-                      posit_y="hyp",
-                      posit_x=c('age', 'bmi', 'chl' ))}]
-
-data_DT[,{Species_imp2:=fill_NA(x=.SD,
-                         model="lda",
-                         posit_y=3,
-                         posit_x=c(1,2,4))}]
-
-head(data_DT,2)
-```
-
-
-```{r,echo=TRUE}
-data_DT = data.table(mice::nhanes)
-
-data_DT$hyp = as.character(data_DT$hyp)
-
-data_DT[,{Species_imp:=fill_NA(x=.SD,
-                      model="lda",
-                      posit_y="hyp",
-                      posit_x=c('age', 'bmi', 'chl' ))}]
-
-data_DT[,{Species_imp2:=fill_NA(x=.SD,
-                         model="lda",
-                         posit_y=3,
-                         posit_x=c(1,2,4))}]
-
-head(data_DT,2)
-```
-
 
 **Model with additional parameters:** - data with the grouping/weighting variable - data.table recommended
 

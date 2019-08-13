@@ -43,13 +43,24 @@
 #' @export
 
 VIF = function(x, posit_y, posit_x, correct = FALSE){
-  UseMethod('VIF')
+UseMethod('VIF')
 }
 
 
 #' @rdname VIF
 
 VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE ) {
+
+
+if(inherits(x,'data.frame')){
+
+  is_DT = inherits(x,'data.table')
+
+  if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
+
+
+  #contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
+  #if(contains_intercept){stop("Do not include an intercept");}
 
 
   cols = colnames(x)
@@ -69,44 +80,61 @@ VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE ) {
   }
 
 
-  if(is.data.frame(x)){
 
-        x[[posit_y]] = as.numeric( x[[posit_y]] )
+      x_small = if(is_DT) x[,c(posit_y,posit_x),with=FALSE] else x[,c(posit_y,posit_x)]
 
-        x = model.matrix.lm(~.-1,subset(x,select=c(posit_y,posit_x)))
+      x_small[[1]] = as.numeric( x_small[[1]] )
 
-        ll = 2:ncol(x)
+      xx = model.matrix.lm(~.,x_small,na.action="na.pass")
 
-        VIF_(x, 1 , ll,attributes(x)$assign[ll],correct)
+      aa = attributes(xx)$assign
 
-  }
+      ll = 3:ncol(xx)
+
+      VIF_(xx, 2 , ll,aa[ll],correct)
+
+}
 }
 
 #' @rdname VIF
 
 VIF.matrix <- function(x, posit_y, posit_x, correct = FALSE ) {
 
-  cols = colnames(x)
-  # posit as character vector
-  if(is.character(posit_x)) {
-    posit_x = match(posit_x,cols)
-    posit_x = posit_x[!is.na(posit_x)]
-    if(length(posit_x)==0) stop('posit_x is empty')
-  }
+if(inherits(x,'matrix')){
 
-  if(length(posit_x)<2) stop("at least two independent variables should be provided")
 
-  if(is.character(posit_y)){
-    posit_y = match(posit_y,cols)
-    if(length(posit_y)==0) stop('posit_y is empty')
-  }
+if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
 
-      x = subset(x,select=c(posit_y,posit_x))
+#contains_intercept = any(unlist(apply(x[,posit_x],2,function(i) all(duplicated(i)[-1L]))))
 
-      ncol_x = ncol(x)
+#if(contains_intercept){stop("Do not include an intercept");}
 
-      VIF_(x, 1 , 2:ncol_x,2:ncol_x,correct)
 
-    }
+cols = colnames(x)
+# posit as character vector
+if(is.character(posit_x)) {
+  posit_x = match(posit_x,cols)
+  posit_x = posit_x[!is.na(posit_x)]
+  if(length(posit_x)==0) stop('posit_x is empty')
+}
+
+if(length(posit_x)<2) stop("at least two independent variables should be provided")
+
+if(is.character(posit_y)){
+  posit_y = match(posit_y,cols)
+  if(length(posit_y)==0) stop('posit_y is empty')
+}
+
+x_small = x[,c(posit_y,posit_x)]
+
+    ncol_x = ncol(x_small)
+
+    VIF_(x_small, 1 , 2:ncol_x,2:ncol_x,correct)
+
+} else {stop("wrong data type - it should be data.frame or matrix")}
+
+
+}
+
 
 
