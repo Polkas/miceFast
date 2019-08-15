@@ -2,17 +2,10 @@
 % Please edit documentation in R/fill_NA_N.R
 \name{fill_NA_N}
 \alias{fill_NA_N}
-\alias{fill_NA_N.data.frame}
-\alias{fill_NA_N.matrix}
 \title{\code{fill_NA_N} function for the multiple imputations purpose.}
 \usage{
-fill_NA_N(x, model, posit_y, posit_x, w = NULL, times = 1)
-
-\method{fill_NA_N}{data.frame}(x, model, posit_y, posit_x, w = NULL,
-  times = 1)
-
-\method{fill_NA_N}{matrix}(x, model, posit_y, posit_x, w = NULL,
-  times = 1)
+fill_NA_N(x, model, posit_y, posit_x, w = NULL, logreg = FALSE,
+  times = 10)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric) - variables}
@@ -23,9 +16,11 @@ fill_NA_N(x, model, posit_y, posit_x, w = NULL, times = 1)
 
 \item{posit_x}{an integer/character vector - positions/names of independent variables}
 
-\item{w}{a numeric vector - a weighting variable - only positive values}
+\item{w}{a numeric vector - a weighting variable - only positive values, Default: NULL}
 
-\item{times}{an integer - a number of multiple imputations - default 10}
+\item{logreg}{a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE}
+
+\item{times}{an integer - a number of multiple imputations, Default:10}
 }
 \value{
 load imputations in a numeric/character/factor (similar to the input type) vector format
@@ -37,7 +32,7 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
 }
 \note{
 There is assumed that users add the intercept by their own.
-data.table and numeric matrix data type provide the most efficient environment.
+The miceFast module provides the most efficient environment, the second option is to use data.table and the numeric matrix data type.
 The lda model is assessed only if there are more than 15 complete observations
 and for the lms models if number of variables is smaller than number of observations.
 }

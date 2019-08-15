@@ -9,14 +9,15 @@
 #' @param model a character - posibble options ("lm_bayes","lm_noise")
 #' @param posit_y an integer/character - a position/name of dependent variable
 #' @param posit_x an integer/character vector - positions/names of independent variables
-#' @param w  a numeric vector - a weighting variable - only positive values
-#' @param times an integer - a number of multiple imputations - default 10
+#' @param w  a numeric vector - a weighting variable - only positive values, Default: NULL
+#' @param times an integer - a number of multiple imputations, Default:10
+#' @param logreg a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE
 #'
 #' @return load imputations in a numeric/character/factor (similar to the input type) vector format
 #'
 #' @note
 #' There is assumed that users add the intercept by their own.
-#' data.table and numeric matrix data type provide the most efficient environment.
+#' The miceFast module provides the most efficient environment, the second option is to use data.table and the numeric matrix data type.
 #' The lda model is assessed only if there are more than 15 complete observations
 #' and for the lms models if number of variables is smaller than number of observations.
 #'
@@ -164,27 +165,26 @@
 #'
 #' @export
 
-fill_NA_N <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
+fill_NA_N <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, times=10) {
 
   UseMethod('fill_NA_N')
 
 }
 
-#' @rdname fill_NA_N
+#' @describeIn fill_NA_N
 
-fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
+fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, times=10) {
 
 
   if(inherits(x,'data.frame')){
 
     is_DT = inherits(x,'data.table')
-
+    ww = if(is.null(w)) vector() else w
     if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
-
     model = match.arg(model,c('lm_bayes','lm_noise'))
 
     cols = colnames(x)
-    # posit as character vector
+
     if(is.character(posit_x)) {
       posit_x = pmatch(posit_x,cols)
       posit_x = posit_x[!is.na(posit_x)]
@@ -196,42 +196,39 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
       if(length(posit_y)==0) stop('posit_y is empty')
     }
 
-
-    x_small = if(is_DT) x[,posit_x,with=FALSE] else x[,posit_x]
-
     yy = x[[posit_y]]
 
-    ww = if(is.null(w)) vector() else w
+    yy_class = class(yy)
 
-    #if(kappa(x_small)>1e+6) return(yy)
+    is_factor_y =  yy_class == 'factor'
+    is_character_y = yy_class == 'character'
+    is_numeric_y = (yy_class == 'numeric') || (yy_class == 'integer')
 
+    all_pos_y = FALSE
+    if(is_numeric_y){all_pos_y = !any(yy<0,na.rm=TRUE)}
+
+    if((is_character_y || is_factor_y || (model=='lda')) && logreg){
+      stop('logreg works only for a non-negative numeric dependent variable and lm models')
+    } else if(all_pos_y && logreg){
+        yy = log(yy+1e-8)
+        }
+
+    x_small = if(is_DT) x[,posit_x,with=FALSE] else x[,posit_x]
     types = lapply(x_small,class)
-
     x_ncols = length(posit_x)
-
-    #contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
-
     p_x_factor_character = which(unlist(lapply(types,function(i) !all(is.na(match(c('factor','character'),i))))))
-
     len_p_x_factor_character = length(p_x_factor_character)
-
 
     xx = vector('list',2)
 
     if(len_p_x_factor_character>0){
-
       posit_fc = posit_x[p_x_factor_character]
       x_fc = if(is_DT) x[,posit_fc,with=FALSE] else x[,posit_fc]
       x_fc = model.matrix.lm(~.,x_fc,na.action="na.pass")[,-1]
-
-      #if(contains_intercept) x_fc = x_fc[,-1]
-
       xx[[1]] = x_fc
-
     }
 
     if(x_ncols>len_p_x_factor_character){
-
       posit_ni = setdiff(posit_x,posit_x[p_x_factor_character])
       x_ni = if(is_DT) as.matrix(x[,posit_ni,with=FALSE]) else as.matrix(x[,posit_ni])
       xx[[2]] = x_ni
@@ -239,32 +236,25 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
 
     xx = do.call(cbind,xx[!is.null(xx)])
 
-
-    if(is.factor(yy)){
-
+    if(is_factor_y){
       l=levels(yy)
       yy = as.numeric(yy)
-
       f = round(fill_NA_N_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww,times))
-
       f[f<=0] = 1
       f[f>length(l)] = length(l)
       ff = factor(l[f])
-
-    } else if(is.character(yy)){
-
+    } else if(is_character_y){
       yy = factor(yy)
       l=levels(yy)
       yy = as.numeric(yy)
       yy = yy
-
       f = round(fill_NA_N_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww,times))
       f[f<=0] = 1
       f[f>length(l)] = length(l)
       ff = l[f]
-
-    } else {
+    } else if(is_numeric_y){
       ff = fill_NA_N_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww,times)
+      if(logreg && (model!='lda')){ ff = exp(ff) }
     }
   } else {stop("wrong data type - it should be data.frame")}
 
@@ -275,19 +265,18 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
 
 }
 
-#' @rdname fill_NA_N
+#' @describeIn fill_NA_N
 
-fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
-
+fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, times=10) {
 
   if(inherits(x,'matrix')){
 
+    ww = if(is.null(w)) vector() else w
     if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
-
     model = match.arg(model,c('lm_bayes','lm_noise'))
 
     cols = colnames(x)
-    # posit as character vector
+
     if(is.character(posit_x)) {
       posit_x = pmatch(posit_x,cols)
       posit_x = posit_x[!is.na(posit_x)]
@@ -299,12 +288,12 @@ fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w=NULL, times=1) {
       if(length(posit_y)==0) stop('posit_y is empty')
     }
 
-  ww = if(is.null(w)) vector() else w
-  #x_small = x[,posit_x]
+  all_pos_y = !any(x[[posit_y]]<0,na.rm=TRUE)
+  logreg_con = logreg && all_pos_y && (model!='lda')
 
-  #if(kappa(x_small)>1e+6) return(x[[posit_y]])
-
+  if(logreg_con){x[[posit_y]] = log(x[[posit_y]]+1e-8)}
   ff = fill_NA_N_(x, model, posit_y, posit_x, ww,times)
+  if(logreg_con){ ff = exp(ff) }
 
   } else {stop("wrong data type - it should be data.frame or matrix")}
 

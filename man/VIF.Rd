@@ -19,7 +19,7 @@ VIF(x, posit_y, posit_x, correct = FALSE)
 
 \item{posit_x}{an integer/character vector - positions/names of independent variables}
 
-\item{correct}{a boolean - basic or corrected - default basic FALSE}
+\item{correct}{a boolean - basic or corrected - Default: FALSE}
 }
 \value{
 load a numeric vector with VIF for all variables provided by posit_x
@@ -29,6 +29,13 @@ VIF measure how much the variance of the estimated regression coefficients are i
 It helps to identify when the predictor variables are linearly related.
 You have to decide which variable should be delete. Values higher than 10 signal a potential collinearity problem.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{data.frame}: 
+
+\item \code{matrix}: 
+}}
+
 \note{
 vif_corrected = vif_basic^{(1/(2*df))}
 }

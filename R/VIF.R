@@ -7,7 +7,7 @@
 #' @param x a numeric matrix or data.frame/data.table (factor/character/numeric) - variables
 #' @param posit_y an integer/character - a position/name of dependent variable
 #' @param posit_x an integer/character vector - positions/names of independent variables
-#' @param correct a boolean - basic or corrected - default basic FALSE
+#' @param correct a boolean - basic or corrected - Default: FALSE
 #'
 #' @note vif_corrected = vif_basic^{(1/(2*df))}
 #'
@@ -47,7 +47,7 @@ UseMethod('VIF')
 }
 
 
-#' @rdname VIF
+#' @describeIn  VIF
 
 VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE ) {
 
@@ -58,10 +58,8 @@ if(inherits(x,'data.frame')){
 
   if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
 
-
   #contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
   #if(contains_intercept){stop("Do not include an intercept");}
-
 
   cols = colnames(x)
   # posit as character vector
@@ -96,19 +94,16 @@ if(inherits(x,'data.frame')){
 }
 }
 
-#' @rdname VIF
+#' @describeIn  VIF
 
 VIF.matrix <- function(x, posit_y, posit_x, correct = FALSE ) {
 
 if(inherits(x,'matrix')){
 
-
 if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
 
 #contains_intercept = any(unlist(apply(x[,posit_x],2,function(i) all(duplicated(i)[-1L]))))
-
 #if(contains_intercept){stop("Do not include an intercept");}
-
 
 cols = colnames(x)
 # posit as character vector

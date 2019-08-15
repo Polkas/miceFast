@@ -2,15 +2,9 @@
 % Please edit documentation in R/fill_NA.R
 \name{fill_NA}
 \alias{fill_NA}
-\alias{fill_NA.data.frame}
-\alias{fill_NA.matrix}
 \title{\code{fill_NA} function for the imputations purpose.}
 \usage{
-fill_NA(x, model, posit_y, posit_x, w = NULL)
-
-\method{fill_NA}{data.frame}(x, model, posit_y, posit_x, w = NULL)
-
-\method{fill_NA}{matrix}(x, model, posit_y, posit_x, w = NULL)
+fill_NA(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric)  - variables}
@@ -21,7 +15,9 @@ fill_NA(x, model, posit_y, posit_x, w = NULL)
 
 \item{posit_x}{an integer/character vector - positions/names of independent variables}
 
-\item{w}{a numeric vector - a weighting variable - only positive values}
+\item{w}{a numeric vector - a weighting variable - only positive values, Default:NULL}
+
+\item{logreg}{a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE}
 }
 \value{
 load imputations in a numeric/character/factor (similar to the input type) vector format
@@ -33,7 +29,7 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
 }
 \note{
 There is assumed that users add the intercept by their own.
-data.table and numeric matrix data type provide the most efficient environment.
+The miceFast module provides the most efficient environment, the second option is to use data.table and the numeric matrix data type.
 The lda model is assessed only if there are more than 15 complete observations
 and for the lms models if number of independent variables is smaller than number of observations.
 }
