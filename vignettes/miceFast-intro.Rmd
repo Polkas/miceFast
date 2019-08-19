@@ -483,17 +483,15 @@ Title: RcppArmadillo: Easily Extending R with High-Performance C++ Code
 Author: Dirk Eddelbuettel and Conrad Sanderson  
 Date: July 1, 2012
 
-URL: http://www.stefvanbuuren.nl/publications/MICE%20in%20R%20-%20Draft.pdf  
-Title: MICE: Multivariate Imputation by Chained Equations in R  
-Author: Stef van Buuren  
-Date: 2013
-
 URL: http://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf  
 Title: Extending R with C++: A Brief Introduction to Rcpp   
 Author: Dirk Eddelbuettel and James Joseph Balamuta  
 Date: March 8, 2018  
 
-URL: http://courses.cs.tamu.edu/rgutier/csce666_f13/  
+Title: MICE: Multivariate Imputation by Chained Equations in R  
+Author: Stef van Buuren  
+Date: 2013
+
 Title: CSCE 666: Pattern Analysis  
 Author: Ricardo Gutierrez-Osuna  
 Date: Fall 2013

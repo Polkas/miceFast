@@ -1,3 +1,7 @@
+# 0.5.1
+
+* remove old urls form vignettes
+
 # 0.5.0
 
 * providing a more comfortable environment for data.table/dplyr users
