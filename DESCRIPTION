@@ -36,4 +36,5 @@ RcppModules: miceFast,CorrData
 SystemRequirements: 
 	C++11
 NeedsCompilation: yes
+LazyData: true
 RoxygenNote: 6.1.0

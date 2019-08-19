@@ -15,7 +15,7 @@
 #'
 #' @note
 #' There is assumed that users add the intercept by their own.
-#' The miceFast module provides the most efficient environment, the second option is to use data.table and the numeric matrix data type.
+#' The miceFast module provides the most efficient environment, the second recommended option is to use data.table and the numeric matrix data type.
 #' The lda model is assessed only if there are more than 15 complete observations
 #' and for the lms models if number of independent variables is smaller than number of observations.
 #'
@@ -23,142 +23,162 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(miceFast)
-#' library(data.table)
-#' library(magrittr)
-#' library(mice)
-#' library(dplyr)
+#' # install.packages('pacman')
+#' pacman::p_load(miceFast,data.table,magrittr,dplyr)
+#' ### Data
+#' # airquality dataset with additional variables
+#' data(air_miss)
 #'
-#' ### Intro:data.table
-#' #### Working with names
-#' data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
-#' data = do.call(rbind,replicate(10,data,simplify = F))
-#' data_df = as.data.frame(data)
-#' data_DT = data.table(data)
-#'
-#' data_DT[,bmi_imp:=fill_NA(x=.SD,
-#'                          model="lm_pred",
-#'                          posit_y='bmi',
-#'                          posit_x='intercept')] %>%
-#'  .[,hyp_imp:=fill_NA(x=.SD,
-#'                      model="lda",
-#'                      posit_y='hyp',
-#'                      posit_x=c('age','bmi_imp')),] %>%
-#'  .[,chl_imp:=fill_NA_N(x=.SD,
-#'                        model="lm_noise",
-#'                        posit_y='chl',
-#'                        posit_x=c('age','bmi_imp','hyp_imp'),
-#'                        times=10),]
-#'
-#' head(data_DT,2)
-#'
-#' #### Working with positions
-#'
-#' data_DT[,bmi_imp:=fill_NA(x=.SD,
-#'                          model="lm_pred",
-#'                          posit_y=2,
-#'                          posit_x=5)] %>%
-#'  # there is a new variable at position 7 - bmi_imp
-#'  .[,hyp_imp:=fill_NA(x=.SD,
-#'                      model="lda",
-#'                      posit_y=3,
-#'                      posit_x=c(1,7)),] %>%
-#'  .[,chl_imp:=fill_NA_N(x=.SD,
-#'                        model="lm_noise",
-#'                        posit_y=4,
-#'                        posit_x=c(1,7,8),
-#'                        times=10),]
-#'
-#' head(data_DT,2)
-#'
-#' ### Intro:dplyr
-#'
-#' #### Working with names
-#'
-#' data_df = data_df %>% mutate(bmi_imp=fill_NA(x=.,
-#'                                             model="lm_pred",
-#'                                             posit_y='bmi',
-#'                                             posit_x='intercept')) %>%
-#'  mutate(hyp_imp=fill_NA(x=.,
-#'                         model="lda",
-#'                         posit_y='hyp',
-#'                         posit_x=c('age','bmi_imp'))) %>%
-#'  mutate(chl_imp=fill_NA_N(x=.,
-#'                           model="lm_noise",
-#'                           posit_y='chl',
-#'                           posit_x=c('age','bmi_imp','hyp_imp'),
-#'                           times=10))
-#'
-#' head(data_df,2)
-#'
-#'
-#'
-#' #### Working with positions
-#'
-#' data_df = data_df %>% mutate(bmi_imp=fill_NA(x=.,
-#'                                             model="lm_pred",
-#'                                             posit_y=2,
-#'                                             posit_x=5)) %>%
-#'  #there is a new variable at position 7 - bmi_imp
-#'  mutate(hyp_imp=fill_NA(x=.,
-#'                         model="lda",
-#'                         posit_y=3,
-#'                         posit_x=c(1,7))) %>%
-#'  mutate(chl_imp=fill_NA_N(x=.,
-#'                           model="lm_noise",
-#'                           posit_y=4,
-#'                           posit_x=c(1,7,8),
-#'                           times=10))
-#'
-#' head(data_df,2)
-#'
-#'
-#' ### Model with additional parameters: - data with the grouping/weighting variable
-#' ### data.table recommended
-#'
-#' data = cbind(as.matrix(airquality[,-5]),Intercept=1,index=1:nrow(airquality),
-#'             # a numeric vector - positive values
-#'             weights = round(rgamma(nrow(airquality),3,3),1),
-#'             groups = airquality[,5])
-#'
-#' data = do.call(rbind,replicate(10,data,simplify = F))
-#'
-#' data_DT = data.table(data)
-#'
-#'
-#' #### Working with names
-#'
-#' data_DT[,Ozone_imp:=fill_NA(x=.SD,
+#' ### Intro: data.table
+#' # IMPUTATIONS
+#' # Imputations with a grouping option (models are separately assessed for each group)
+#' # taking into account provided weights
+#' air_miss[,Solar_R_imp := fill_NA_N(x=.SD,
+#'                                    model="lm_bayes",
+#'                                    posit_y='Solar.R',
+#'                                    posit_x=c('Wind','Temp','Intercept'),
+#'                                    w=.SD[['weights']],
+#'                                    times=100),by=.(groups)] %>%
+#' # Imputations - discrete variable
+#'   .[,x_character_imp := fill_NA(x=.SD,
+#'                                 model="lda",
+#'                                 posit_y='x_character',
+#'                                 posit_x=c('Wind','Temp','groups'))] %>%
+#' # logreg was used because almost log-normal distribution of Ozone
+#' # imputations around mean
+#' .[,Ozone_imp1 := fill_NA(x=.SD,
+#'                          model="lm_bayes",
+#'                          posit_y='Ozone',
+#'                          posit_x=c('Intercept'),
+#'                          logreg=TRUE)] %>%
+#' # imputations using positions - Intercept, Temp
+#' .[,Ozone_imp2 := fill_NA(x=.SD,
+#'                          model="lm_bayes",
+#'                          posit_y=1,
+#'                          posit_x=c(4,6),
+#'                          logreg=TRUE)] %>%
+#' # model with a factor independent variable
+#' # multiple imputations (average of x30 imputations)
+#' # with a factor independent variable, weights and logreg options
+#'   .[,Ozone_imp3 := fill_NA_N(x=.SD,
+#'                              model="lm_noise",
+#'                              posit_y='Ozone',
+#'                              posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+#'                              w=.SD[['weights']],
+#'                              logreg=TRUE,
+#'                              times=30)] %>%
+#'   .[,Ozone_imp4 := fill_NA_N(x=.SD,
+#'                              model="lm_bayes",
+#'                              posit_y='Ozone',
+#'                              posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+#'                              w=.SD[['weights']],
+#'                              logreg=TRUE,
+#'                              times=30)] %>%
+#'   .[,Ozone_imp5 := fill_NA(x=.SD,
 #'                            model="lm_pred",
 #'                            posit_y='Ozone',
-#'                            posit_x='Intercept',w=.SD[['weights']]),by=.(groups)] %>%
-#'  .[,Solar_R_imp:=fill_NA_N(.SD,
-#'                            model="lm_bayes",
-#'                            posit_y='Solar.R',
-#'                            posit_x=c('Wind','Temp','Day','Intercept','Ozone_imp'),
+#'                            posit_x=c('Intercept','x_character_imp','Wind','Temp'),
 #'                            w=.SD[['weights']],
-#'                            times=10),by=.(groups)]
+#'                            logreg=TRUE),.(groups)] %>%
 #'
-#' data_DT[which(is.na(data_DT[,1]))[1],]
+#' # Average of a few methods
+#'   .[,Ozone_imp_mix := apply(.SD,1,mean),.SDcols=Ozone_imp1:Ozone_imp5] %>%
 #'
+#' # Protecting against collinearity or low number of observations - across small groups
+#' # Be carful when using a data.table grouping option
+#' # because of lack of protection against collinearity or low number of observations.
+#' # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
 #'
-#' #### Working with positions
+#'   .[,Ozone_chac_imp := tryCatch(fill_NA(x=.SD,
+#'                                  model="lda",
+#'                                  posit_y='Ozone_chac',
+#'                                  posit_x=c('Intercept',
+#'                                            'Month',
+#'                                            'Day',
+#'                                            'Temp',
+#'                                            'x_character_imp'),
+#'                                  w=.SD[['weights']]),
+#'                                 error=function(e) .SD[['Ozone_chac']]),.(groups)]
 #'
-#' # simple mean imputation - intercept at position 6
-#' data_DT[,Ozone_imp:=fill_NA(x=.SD,
-#'                            model="lm_pred",
-#'                            posit_y=1,
-#'                            posit_x=c(6),
-#'                            w=.SD[['weights']]),by=.(groups)] %>%
-#'  # avg of 10 multiple imputations - last posit_x equal to 9 not 10
-#'  # because the groups variable is not included in .SD
-#'  .[,Solar_R_imp:=fill_NA_N(.SD,
-#'                            model="lm_bayes",
-#'                            posit_y=2,
-#'                            posit_x=c(3,4,5,6,9),
-#'                            w=.SD[['weights']],times=10),by=.(groups)]
+#' # Sample of results
+#' air_miss[which(is.na(air_miss[,1]))[1:5],]
 #'
-#' data_DT[which(is.na(data_DT[,1]))[1],]
+#' ### Intro: dplyr
+#' # IMPUTATIONS
+#' air_miss = air_miss %>%
+#' # Imputations with a grouping option (models are separately assessed for each group)
+#' # taking into account provided weights
+#' group_by(groups) %>%
+#' do(mutate(.,Solar_R_imp = fill_NA(x=.,
+#'                                   model="lm_pred",
+#'                                   posit_y='Solar.R',
+#'                                   posit_x=c('Wind','Temp','Intercept'),
+#'                                   w=.[['weights']]))) %>%
+#' ungroup() %>%
+#' # Imputations - discrete variable
+#' mutate(x_character_imp = fill_NA(x=.,
+#'                                  model="lda",
+#'                                  posit_y='x_character',
+#'                                  posit_x=c('Wind','Temp'))) %>%
+#' # logreg was used because almost log-normal distribution of Ozone
+#' # imputations around mean
+#' mutate(Ozone_imp1 = fill_NA(x=.,
+#'                             model="lm_bayes",
+#'                             posit_y='Ozone',
+#'                             posit_x=c('Intercept'),
+#'                             logreg=TRUE)) %>%
+#' # imputations using positions - Intercept, Temp
+#' mutate(Ozone_imp2 = fill_NA(x=.,
+#'                             model="lm_bayes",
+#'                             posit_y=1,
+#'                             posit_x=c(4,6),
+#'                             logreg=TRUE)) %>%
+#' # multiple imputations (average of x30 imputations)
+#' # with a factor independent variable, weights and logreg options
+#' mutate(Ozone_imp3 = fill_NA_N(x=.,
+#'                               model="lm_noise",
+#'                               posit_y='Ozone',
+#'                               posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+#'                               w=.[['weights']],
+#'                               logreg=TRUE,
+#'                               times=30)) %>%
+#' mutate(Ozone_imp4 = fill_NA_N(x=.,
+#'                               model="lm_bayes",
+#'                               posit_y='Ozone',
+#'                               posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+#'                               w=.[['weights']],
+#'                               logreg=TRUE,
+#'                               times=30)) %>%
+#' group_by(groups) %>%
+#' do(mutate(.,Ozone_imp5 = fill_NA(x=.,
+#'                                  model="lm_pred",
+#'                                  posit_y='Ozone',
+#'                                  posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+#'                                  w=.[['weights']],
+#'                                  logreg=TRUE))) %>%
+#' ungroup() %>%
+#' # Average of a few methods
+#' mutate(Ozone_imp_mix = rowMeans(select(.,starts_with("Ozone_imp")))) %>%
+#'
+#' # Protecting against collinearity or low number of observations - across small groups
+#' # Be carful when using a data.table grouping option
+#' # because of lack of protection against collinearity or low number of observations.
+#' # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
+#' group_by(groups) %>%
+#' do(mutate(.,Ozone_chac_imp = tryCatch(fill_NA(x=.,
+#'                                        model="lda",
+#'                                        posit_y='Ozone_chac',
+#'                                        posit_x=c('Intercept',
+#'                                                  'Month',
+#'                                                  'Day',
+#'                                                  'Temp',
+#'                                                  'x_character_imp'),
+#'                                        w=.[['weights']]),
+#'                                       error=function(e) .[['Ozone_chac']]))) %>%
+#' ungroup()
+#'
+#' # Sample of results
+#' air_miss[which(is.na(air_miss[,1]))[1:5],]
 #' }
 #'
 #' @name fill_NA
@@ -262,7 +282,6 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL,logreg=FALSE
 
 
 }
-
 
 #' @describeIn fill_NA
 

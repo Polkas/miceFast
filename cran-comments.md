@@ -10,7 +10,7 @@ There were no ERRORs,WARNINGs and a one NOTEs.
 The second NOTE was solved.
 
 I got a note only on travis-ci:
-checking installed package size ...NOTE installed size is  8.4Mb
+checking installed package size ...NOTE installed size is  10.9Mb
 this is a problem of the size of compiled code.
 
 The old NOTE was fixed:
