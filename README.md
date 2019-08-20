@@ -39,7 +39,7 @@ devtools::install_github("polkas/miceFast")
 
 ```r
 #install.packages('pacman')
-pacman::p_load(miceFast,data.table,magrittr,car,dplyr,ggplot2)
+pacman::p_load(miceFast,data.table,magrittr,car,dplyr,ggplot2,mice)
 ```
 
 Usage of `fill_NA` and `fill_NA_N` functions from miceFast - this functions should be resistant to glitches from an user activity perspective and a data structures.
@@ -90,8 +90,8 @@ air_miss[,Solar_R_imp := fill_NA_N(x=.SD,
 .[,Ozone_imp2 := fill_NA(x=.SD, 
                          model="lm_bayes",
                          posit_y=1,
-                         posit_x=c(4,6)),
-                         logreg=TRUE] %>% 
+                         posit_x=c(4,6),
+                         logreg=TRUE)] %>% 
 # model with a factor independent variable 
 # multiple imputations (average of x30 imputations) 
 # with a factor independent variable, weights and logreg options
@@ -235,4 +235,121 @@ melt(id=c('Ozone_NA'),measure=c('Ozone','Ozone_imp_mix')) %>%
 .[(((Ozone_NA=='imputations') & (variable=='Ozone_imp_mix'))|((Ozone_NA=='complete') & (variable=='Ozone'))),] %>% 
 ggplot2::ggplot(.,ggplot2::aes(x=value,fill=variable)) + 
 ggplot2::geom_density() + ggplot2::facet_wrap(Ozone_NA ~.,scales='free')
+```
+
+## miceFast module usage:
+
+Remember that a matrix could be build only under a one data type so factor variables have to be melted
+use `model.matrix.lm` to get numeric matrix from `data.frame` - see Tips in this document
+
+```r
+data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
+model = new(miceFast)
+model$set_data(data) #providing data by a reference
+
+model$update_var(2,model$impute("lm_pred",2,5)$imputations)
+#OR not recommended
+#data[,2] = model$impute("lm_pred",2,5)$imputations
+#model$set_data(data) #Updating the object
+
+model$update_var(3,model$impute("lda",3,c(1,2))$imputations) 
+
+#Old slow syntax
+#model$update_var(4,rowMeans(sapply(1:10,function(x) 
+#  model$impute("lm_bayes",4,c(1,2,3))$imputations))
+#  )
+
+model$update_var(4,model$impute_N("lm_bayes",4,c(1,2,3),10)$imputations)
+
+#When working with 'Big Data'
+#it is recommended to occasionally manually invoke a garbage collector `gc()`
+
+# Be careful with `update_var` because of the permanent update at the object and data
+# That is why `update_var` could be used only ones for a certain column
+# check which variables was updated - inside the object
+model$which_updated()
+head(model$get_data(),4)
+head(data,4)
+head(mice::nhanes,4)
+rm(model)
+
+########################################################################
+###Model with additional parameters: - sorted by the grouping variable
+########################################################################
+
+data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
+weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
+groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values - sorted increasingly
+
+model = new(miceFast)
+model$set_data(data) # providing by a reference
+model$set_w(weights) # providing by a reference
+model$set_g(groups)  # providing by a reference
+
+#impute adapt to provided parmaters like w or g
+#Simple mean - permanent imputation at the object and data
+model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
+
+model$update_var(2,model$impute_N("lm_bayes",2,c(1,3,4,5,6),10)$imputations)
+
+#Printing data and retrieving an old order
+head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),],4)
+
+head(airquality,4)
+
+head(cbind(model$get_data(),model$get_g(),model$get_w()),4)
+
+head(cbind(data,groups,weights),4)
+
+rm(model)
+
+############################################################################
+###Model with additional parameters:** - data not sorted by the grouping variable
+############################################################################
+
+data = cbind(as.matrix(airquality[,-5]),intercept=1,index=1:nrow(airquality))
+weights = rgamma(nrow(data),3,3) # a numeric vector - positive values
+#groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values
+groups = as.numeric(sample(1:3,nrow(data),replace=T)) # a numeric vector not integers - positive values
+
+model = new(miceFast)
+model$set_data(data) # providing by a reference
+model$set_w(weights) # providing by a reference
+model$set_g(groups)  # providing by a reference
+#impute adapt to provided parmaters like w or g
+#Warning - if data is not sorted increasingly by the g then it would be done automatically 
+#during a first imputation
+#Simple mean - permanent imputation at the object and data
+model$update_var(1,model$impute("lm_pred",1,c(6))$imputations)
+
+model$update_var(2,model$impute_N("lm_bayes",2,c(1,3,4,5,6),10)$imputations)
+
+#Printing data and retrieving an old order
+head(cbind(model$get_data(),model$get_g(),model$get_w())[order(model$get_index()),],4)
+
+head(airquality,4)
+
+head(cbind(model$get_data(),model$get_g(),model$get_w()),4) #is ordered by g
+
+head(cbind(data,groups,weights),4) #is sorted by g cause we provide data by a reference
+
+rm(model)
+
+```
+
+## Tips
+
+**matrix from data.frame**
+
+Remember that a matrix could be build only under a one data type so factor/character variables have to be melted
+use `model.matrix` to get numeric matrix from `data.frame`
+
+```r
+str(mtcars)
+
+mtcars$cyl= factor(mtcars$cyl)
+mtcars$gear= factor(mtcars$gear)
+mtcars_mat = model.matrix.lm(~.,mtcars,na.action="na.pass")
+
+str(mtcars_mat)
 ```
