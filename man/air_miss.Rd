@@ -19,7 +19,7 @@ A data frame and data table with 154 observations on 11 variables.
 \item{x_character}{ character discrete version of Solar.R (5-levels)}
 \item{Ozone_chac}{ character discrete version of Ozone (7-levels)}
 \item{Ozone_f}{ factor discrete version of Ozone (7-levels)}
-\item{Ozone_high}{logical Ozone bigger than its mean}
+\item{Ozone_high}{logical Ozone higher than its mean}
 }
 }
 \source{

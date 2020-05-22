@@ -3,7 +3,6 @@
 
 #include <RcppArmadillo.h>
 #include "miceFast.h"
-#include <Rcpp.h>
 
 #include <algorithm>
 using namespace std;
@@ -313,7 +312,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
 
 //PMM
 
-  arma::colvec neibo(arma::colvec &y, arma::mat &X, arma::mat &X1,int k) {
+IntegerVector neibo(arma::colvec &y, arma::mat &X, arma::mat &X1,int k) {
 
       int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -334,13 +333,14 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
       arma::vec noise2(N_NA);
       noise2.randn();
 
-      arma::colvec mis(N_NA,arma::fill::zeros);
+      arma::colvec miss(N_NA,arma::fill::zeros);
 
       miss = (X1 * coef + noise2 * sigma_b);
 
     int n_y = y.size();
     int n_miss = miss.size();
 
+    int jj;
     double dk = 0;
     int count = 0;
     int goal = 0;
