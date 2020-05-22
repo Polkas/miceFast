@@ -3,7 +3,6 @@
 
 #include <RcppArmadillo.h>
 #include "miceFast.h"
-#include <Rcpp.h>
 
 #include <algorithm>
 using namespace std;
