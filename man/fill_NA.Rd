@@ -7,7 +7,7 @@
 fill_NA(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
 }
 \arguments{
-\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric)  - variables}
+\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables}
 
 \item{model}{a character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")}
 

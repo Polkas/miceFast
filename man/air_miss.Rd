@@ -4,7 +4,8 @@
 \name{air_miss}
 \alias{air_miss}
 \title{airquality dataset with additional variables.}
-\format{A data frame and data table with 154 observations on 11 variables.
+\format{
+A data frame and data table with 154 observations on 11 variables.
 \describe{
 \item{Ozone}{	numeric	Ozone (ppb) - Mean ozone in parts per billion from 1300 to 1500 hours at Roosevelt Island}
 \item{Solar.R}{	numeric	Solar R (lang) - Solar radiation in Langleys in the frequency band 4000–7700 Angstroms from 0800 to 1200 hours at Central Park}
@@ -17,7 +18,10 @@
 \item{groups}{ factor Month (1--12)}
 \item{x_character}{ character discrete version of Solar.R (5-levels)}
 \item{Ozone_chac}{ character discrete version of Ozone (7-levels)}
-}}
+\item{Ozone_f}{ factor discrete version of Ozone (7-levels)}
+\item{Ozone_high}{logical Ozone higher than its mean}
+}
+}
 \source{
 The data were obtained from the New York State Department of Conservation (ozone data) and the National Weather Service (meteorological data).
 }
@@ -52,6 +56,8 @@ air_miss$groups = factor(air_miss$groups)
 air_miss$x_character = as.character(cut(air_miss$Solar.R,seq(0,350,70)))
 # Discrete version of dependent variable
 air_miss$Ozone_chac = as.character(cut(air_miss$Ozone, seq(0,160,20)))
+air_miss$Ozone_f = cut(air_miss$Ozone, seq(0,160,20))
+air_miss$Ozone_high = air_miss$Ozone>mean(air_miss$Ozone,na.rm=T)
 }
 
 }

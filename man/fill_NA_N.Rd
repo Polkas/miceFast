@@ -4,11 +4,10 @@
 \alias{fill_NA_N}
 \title{\code{fill_NA_N} function for the multiple imputations purpose.}
 \usage{
-fill_NA_N(x, model, posit_y, posit_x, w = NULL, logreg = FALSE,
-  times = 10)
+fill_NA_N(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10)
 }
 \arguments{
-\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric) - variables}
+\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical) - variables}
 
 \item{model}{a character - posibble options ("lm_bayes","lm_noise")}
 
