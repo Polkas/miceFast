@@ -4,3 +4,6 @@
 README.md
 cran-comments.md
 TODO.md
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

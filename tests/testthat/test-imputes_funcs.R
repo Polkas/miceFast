@@ -7,7 +7,7 @@ test_that("imputes",
 
             set.seed(1234)
 
-            power = 4 # power of 10 - number of observations - should be adjusted to a computer capabilities
+            power = 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
 
             nr_var = 7 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 
@@ -198,8 +198,11 @@ test_that("imputes",
           data_df = data.frame(data)
           data_df$y_chac = as.character(data_df$y)
           data_df$y_fac = as.factor(data_df$y)
+          data_df$y_logi = as.logical(data_df$y>=5)
+          data_df$y_true_bin = as.logical(data_df$y_true>=5)
           data_df$x2 = as.factor(round(pnorm(data_df$x2)*3))
           data_df$x3 = as.character(round(pnorm(data_df$x3)*3))
+          data_df$x4_bhalf = data_df$x4>0.5
 
           data_DT = data.table(data_df)
 
@@ -226,16 +229,23 @@ test_that("imputes",
             .[,y_imp6:=fill_NA(x=.SD,
                                model="lm_pred",
                                posit_y='y_chac',
-                               posit_x=c('x2','x3')),by=.(group)]
+                               posit_x=c('x2','x3')),by=.(group)] %>%
+            .[,y_imp7:=fill_NA(x=.SD,
+                               model="lda",
+                               posit_y='y_logi',
+                               posit_x=c('x2','x3','x4','x5','x4_bhalf'))]
 
           #Better than naive
-          test5 = all(data_DT[index_NA,c('y_true',
+          test5a = all(data_DT[index_NA,c('y_true',
                                          'y_imp',
                                          'y_imp2',
                                          'y_imp3',
                                          'y_imp4',
                                          'y_imp5',
                                          'y_imp6')] %>% .[,lapply(.SD,function(x) 100*mean(y_true==x))]>10)
+
+          test5b = all(data_DT[index_NA,c('y_true_bin',
+                                         'y_imp7')] %>% .[,lapply(.SD,function(x) 100*mean(y_true_bin==x))]>10)
 
           data = cbind(y_true = data_con[,1],data_con_NA,Intercept=1,index=1:nrow(data_con))
 
@@ -258,6 +268,6 @@ test_that("imputes",
           test6=(all(vi1>vi2))&&(any(vi1>7))
 
           #VIF
-          test_all=expect_true(all(c(test0,test1,test2,test3,test4,test5,test6)))
+          test_all=expect_true(all(c(test0,test1,test2,test3,test4,test5a,test5b,test6)))
 
           })

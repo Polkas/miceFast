@@ -37,4 +37,4 @@ SystemRequirements:
 	C++11
 NeedsCompilation: yes
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 7.1.0

@@ -4,21 +4,24 @@ import(methods)
 
 import(data.table)
 
-importFrom(stats, model.matrix.lm)
+importFrom(stats, model.matrix.lm, "median", "na.omit", "prcomp")
 
 useDynLib(miceFast,.registration=TRUE)
 
 #exportPattern("^[[:alpha:]]+")
 
 
+export(naive_fill_NA)
+
+S3method(naive_fill_NA, data.frame)
+
+S3method(naive_fill_NA, matrix)
 
 export(fill_NA)
 
 S3method(fill_NA, data.frame)
 
 S3method(fill_NA, matrix)
-
-
 
 export(fill_NA_N)
 
@@ -39,3 +42,6 @@ S3method(VIF,matrix)
 export(corrData)
 
 export(miceFast)
+
+
+

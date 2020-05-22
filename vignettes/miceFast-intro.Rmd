@@ -18,7 +18,8 @@ knitr::opts_chunk$set(echo = FALSE)
 Loading the package and setting a seed:
 
 ```{r,echo=TRUE,message=FALSE,warning=FALSE}
-library(miceFast);library(data.table);library(magrittr);library(mice);library(car);library(dplyr);library(ggplot2)
+pkgs = c('miceFast','data.table','magrittr','mice','car','dplyr','ggplot2')
+inst = lapply(pkgs, library, character.only = TRUE)
 ```
 
 ```{r,echo=TRUE}
@@ -66,10 +67,6 @@ Moreover there are offered a few functions built to work with the popular R pack
 ## Motivations
 
 Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will sometimes deteriorate quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are user-friendly for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
-
-The presented miceFast package was built under Rcpp packages and the C++ library Armadillo.
-The Rcpp package offers functionality of exporting full C++ capabilities to the R environment.
-More precisely miceFast and corrData are offered. The first module offers capabilities of imputations models with a closed-form solution. Thus package is based on linear algebra operations. The main upgrade is possibility of including a grouping and/or weighting (only for linear models) variable and functions enhancement by C++ capabilities. The second module was made for purpose of presenting the miceFast usage and performance. It provides functionality of generating correlated data with a discrete, binomial or continuous dependent variable and continuous independent variables. 
 
 \newpage
 

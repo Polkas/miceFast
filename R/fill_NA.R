@@ -4,7 +4,7 @@
 #' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 #' Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 #'
-#' @param x a numeric matrix or data.frame/data.table (factor/character/numeric)  - variables
+#' @param x a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables
 #' @param model a character - posibble options ("lda","lm_pred","lm_bayes","lm_noise")
 #' @param posit_y an integer/character - a position/name of dependent variable
 #' @param posit_x an integer/character vector - positions/names of independent variables
@@ -192,7 +192,6 @@ fill_NA <- function(x, model, posit_y, posit_x, w = NULL,logreg=FALSE) {
 }
 
 #' @describeIn fill_NA
-
 fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL,logreg=FALSE) {
 
   if(inherits(x,'data.frame')){
@@ -221,7 +220,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL,logreg=FALSE
 
     is_factor_y =  yy_class == 'factor'
     is_character_y = yy_class == 'character'
-    is_numeric_y = (yy_class == 'numeric') || (yy_class == 'integer')
+    is_numeric_y = (yy_class == 'numeric') || (yy_class == 'integer') || (yy_class == 'logical')
 
     all_pos_y = FALSE
     if(is_numeric_y){all_pos_y = !any(yy<0,na.rm=TRUE)}
@@ -270,6 +269,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL,logreg=FALSE
       f[f>length(l)] = length(l)
       ff = l[f]
     } else if(is_numeric_y){
+      yy = as.numeric(yy)
       ff = fill_NA_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww)
       if(logreg && (model!='lda')){ ff = exp(ff) }
     }
@@ -284,7 +284,6 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL,logreg=FALSE
 }
 
 #' @describeIn fill_NA
-
 fill_NA.matrix <- function(x, model, posit_y, posit_x, w=NULL,logreg=FALSE) {
 
   if(inherits(x,'matrix')){

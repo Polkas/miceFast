@@ -11,12 +11,13 @@ p_load(Rcpp,
        miceFast,
        data.table,
        microbenchmark,
-       car)
+       car,
+       ggplot2)
 
 set.seed(1234)
 #parameters
-power = 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
-nr_var = 20 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
+power = 6 # power of 10 - number of observations - should be adjusted to a computer capabilities
+nr_var = 10 #CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 grs = max(c(10**(power-3),10)) # grouping variable - number of groups
 iters = 30 # number of iterations for benchmarking
 ## generete example - data
@@ -110,7 +111,7 @@ m1
 
 g1 = autoplot(m1,log=FALSE)+theme_economist()+ ggtitle("LDA discrete - without grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g1.png",g1)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g1.png",g1)
 
 ### grouping variable
 
@@ -203,7 +204,7 @@ m2
 
 g2 = autoplot(m2,log=FALSE)+theme_economist()+ ggtitle("LDA discrete - with grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g2.png",g2)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g2.png",g2)
 
 
 #######################Binom
@@ -234,7 +235,7 @@ m3
 
 g3 = autoplot(m3,log=FALSE)+theme_economist()+ ggtitle("LDA binom - without grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g3.png",g3)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g3.png",g3)
 
 
 #####################Continous - LM Noise
@@ -265,7 +266,7 @@ m4
 
 g4 = autoplot(m4,log=FALSE)+theme_economist()+ ggtitle("linear regression noise - without grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g4.png",g4)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g4.png",g4)
 
 #####################Continous - LM Bayes
 
@@ -294,7 +295,7 @@ m5
 
 g5 = autoplot(m5,log=FALSE)+theme_economist()+ ggtitle("linear regression bayes - without grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g5.png",g5)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g5.png",g5)
 
 #####################Continous - LM Predict
 
@@ -326,7 +327,7 @@ m6
 
 g6 = autoplot(m6,log=FALSE)+theme_economist()+ ggtitle("linear regression predict - without grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g6.png",g6)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g6.png",g6)
 
 
 ## grouping variable
@@ -415,7 +416,7 @@ g7 = autoplot(m7,log=FALSE)+
   theme_economist()+
   ggtitle("linear regression predict - with grouping")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g7.png",g7)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g7.png",g7)
 
 ####
 ####Multiple Imputations
@@ -446,7 +447,7 @@ m8
 
 g8 = autoplot(m8,log=FALSE)+theme_economist()+ ggtitle("linear regression noise - without grouping - multiple 10")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g8.png",g8)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g8.png",g8)
 
 #####################Continous - LM Bayes - multiple
 
@@ -475,7 +476,7 @@ m9
 
 g9 = autoplot(m9,log=FALSE)+theme_economist()+ ggtitle("linear regression bayes - without grouping - multiple 10")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g9.png",g9)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g9.png",g9)
 
 #####################Continous - VIFS
 
@@ -504,7 +505,7 @@ m10
 
 g10 = autoplot(m10,log=FALSE)+theme_economist()+ ggtitle("vifs")
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g10.png",g10)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g10.png",g10)
 
 #plot for README/Intro
 
@@ -528,7 +529,7 @@ dats_plot = dats %>% group_by(model,expr) %>% summarise(mean_time_sec=mean(time/
 g_summary = ggplot(dats_plot,aes(model,relative_time,fill=package)) +
   geom_bar(stat="identity",position="dodge") +
   theme(axis.text.x= element_text(angle=90)) +
-  ggtitle(paste0("Benchmarks - 10^" ,power, "obs (20% NA) ",nr_var,"vars - 10^3 groups"))
+  ggtitle(paste0("Benchmarks - 10^" ,power, "obs (20% NA) ",nr_var,"vars - 10^",grs," groups"))
 
-ggsave("C:/Users/user/Desktop/burk/own_R_packages/miceFast/inst/extdata/images/g_summary.png",g_summary)
+ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g_summary.png",g_summary)
 
