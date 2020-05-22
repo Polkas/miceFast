@@ -190,16 +190,18 @@
 
 fill_NA_N <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, times=10) {
 
-  UseMethod('fill_NA_N')
+  if(inherits(x,'data.frame') || inherits(x,'matrix')){
+
+    UseMethod('fill_NA_N')
+
+  } else {stop("wrong data type - it should be data.frame or matrix")}
+
 
 }
 
 #' @describeIn fill_NA_N
 
 fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, times=10) {
-
-
-  if(inherits(x,'data.frame')){
 
     is_DT = inherits(x,'data.table')
     ww = if(is.null(w)) vector() else w
@@ -280,7 +282,6 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALS
       ff = fill_NA_N_(cbind(yy,xx), model, 1, 2:(ncol(xx)+1), ww,times)
       if(logreg && (model!='lda')){ ff = exp(ff) }
     }
-  } else {stop("wrong data type - it should be data.frame")}
 
   attr(ff,'dim') = attributes(ff)$dim[1]
 
@@ -292,8 +293,6 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALS
 #' @describeIn fill_NA_N
 
 fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, times=10) {
-
-  if(inherits(x,'matrix')){
 
     ww = if(is.null(w)) vector() else w
     if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
@@ -318,8 +317,6 @@ fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w=NULL, logreg=FALSE, t
   if(logreg_con){x[[posit_y]] = log(x[[posit_y]]+1e-8)}
   ff = fill_NA_N_(x, model, posit_y, posit_x, ww,times)
   if(logreg_con){ ff = exp(ff) }
-
-  } else {stop("wrong data type - it should be data.frame or matrix")}
 
   attr(ff,'dim') = attributes(ff)$dim[1]
 

@@ -43,16 +43,20 @@
 #' @export
 
 VIF = function(x, posit_y, posit_x, correct = FALSE){
-UseMethod('VIF')
+
+  if(inherits(x,'data.frame') || inherits(x,'matrix')){
+
+    UseMethod('VIF')
+
+  } else {stop("wrong data type - it should be data.frame or matrix")}
+
+
 }
 
 
 #' @describeIn  VIF
 
 VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE ) {
-
-
-if(inherits(x,'data.frame')){
 
   is_DT = inherits(x,'data.table')
 
@@ -92,13 +96,10 @@ if(inherits(x,'data.frame')){
       VIF_(xx, 2 , ll,aa[ll],correct)
 
 }
-}
 
 #' @describeIn  VIF
 
 VIF.matrix <- function(x, posit_y, posit_x, correct = FALSE ) {
-
-if(inherits(x,'matrix')){
 
 if(posit_y %in% posit_x){stop("the same variable is dependent and indepentent");}
 
@@ -126,10 +127,4 @@ x_small = x[,c(posit_y,posit_x)]
 
     VIF_(x_small, 1 , 2:ncol_x,2:ncol_x,correct)
 
-} else {stop("wrong data type - it should be data.frame or matrix")}
-
-
 }
-
-
-
