@@ -2,9 +2,15 @@
 % Please edit documentation in R/naive_fill_NA.R
 \name{naive_fill_NA}
 \alias{naive_fill_NA}
+\alias{naive_fill_NA.data.frame}
+\alias{naive_fill_NA.matrix}
 \title{\code{naive_fill_NA} function for the imputations purpose.}
 \usage{
 naive_fill_NA(x)
+
+\method{naive_fill_NA}{data.frame}(x)
+
+\method{naive_fill_NA}{matrix}(x)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables}
@@ -15,13 +21,18 @@ load imputations in a similar to the input type
 \description{
 Regular imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
-Quantitative models were built under Rcpp packages and the C++ library Armadillo.
+For numeric columns with any missing data a simple bayesian mean will be used.
+Next all numeric variables will be utilized to impute character/factoer variables by Linear Discriminant Analysis.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{data.frame}: S3 method for data.frame
+
+\item \code{matrix}: S3 method for matrix
+}}
+
 \note{
-There is assumed that users add the intercept by their own.
-The miceFast module provides the most efficient environment, the second recommended option is to use data.table and the numeric matrix data type.
-The lda model is assessed only if there are more than 15 complete observations
-and for the lms models if number of independent variables is smaller than number of observations.
+this is a very simple and fast solution but not recommended, for more complex solutions check the vignette
 }
 \examples{
 \dontrun{

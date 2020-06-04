@@ -3,12 +3,15 @@
 \name{VIF}
 \alias{VIF}
 \alias{VIF.data.frame}
+\alias{VIF.data.table}
 \alias{VIF.matrix}
 \title{\code{VIF} function for assessing VIF.}
 \usage{
 VIF(x, posit_y, posit_x, correct = FALSE)
 
 \method{VIF}{data.frame}(x, posit_y, posit_x, correct = FALSE)
+
+\method{VIF}{data.table}(x, posit_y, posit_x, correct = FALSE)
 
 \method{VIF}{matrix}(x, posit_y, posit_x, correct = FALSE)
 }
@@ -33,6 +36,8 @@ You have to decide which variable should be delete. Values higher than 10 signal
 \itemize{
 \item \code{data.frame}: 
 
+\item \code{data.table}: 
+
 \item \code{matrix}: 
 }}
 
@@ -44,22 +49,25 @@ vif_corrected = vif_basic^{(1/(2*df))}
 library(miceFast)
 library(data.table)
 
-airquality2 = airquality
-airquality2$Temp2 = airquality2$Temp**2
-#install.packages("car")
-#car::vif(lm(Ozone ~ ., data=airquality2))
+airquality2 <- airquality
+airquality2$Temp2 <- airquality2$Temp**2
+# install.packages("car")
+# car::vif(lm(Ozone ~ ., data=airquality2))
 
-data_DT = data.table(airquality2)
-data_DT[,.(vifs=VIF(x=.SD,
-                   posit_y='Ozone',
-                   posit_x=c('Solar.R','Wind','Temp','Month','Day','Temp2'),
-                   correct=FALSE))][['vifs']]
+data_DT <- data.table(airquality2)
+data_DT[, .(vifs = VIF(
+  x = .SD,
+  posit_y = "Ozone",
+  posit_x = c("Solar.R", "Wind", "Temp", "Month", "Day", "Temp2"),
+  correct = FALSE
+))][["vifs"]]
 
-data_DT[,.(vifs=VIF(x=.SD,
-                   posit_y=1,
-                   posit_x=c(2,3,4,5,6,7),
-                   correct=TRUE))][['vifs']]
-
+data_DT[, .(vifs = VIF(
+  x = .SD,
+  posit_y = 1,
+  posit_x = c(2, 3, 4, 5, 6, 7),
+  correct = TRUE
+))][["vifs"]]
 }
 
 }

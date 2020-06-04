@@ -10,6 +10,7 @@ useDynLib(miceFast,.registration=TRUE)
 
 #exportPattern("^[[:alpha:]]+")
 
+export(neibo)
 
 export(naive_fill_NA)
 
@@ -21,17 +22,23 @@ export(fill_NA)
 
 S3method(fill_NA, data.frame)
 
+S3method(fill_NA, data.table)
+
 S3method(fill_NA, matrix)
 
 export(fill_NA_N)
 
 S3method(fill_NA_N, data.frame)
 
+S3method(fill_NA_N, data.table)
+
 S3method(fill_NA_N, matrix)
 
 
 
 export(VIF)
+
+S3method(VIF, data.table)
 
 S3method(VIF, data.frame)
 

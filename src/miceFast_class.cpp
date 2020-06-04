@@ -8,7 +8,7 @@
 
 //miceFast Constructors
 
-miceFast::miceFast(){};
+miceFast::miceFast(){}
 
 miceFast::~miceFast(){
 
@@ -19,7 +19,7 @@ miceFast::~miceFast(){
 //sorted=false;
 //updated.clear();
 
-};
+}
 
 void miceFast::set_data(arma::mat & _x){
   x = arma::mat(_x.begin(),_x.n_rows,_x.n_cols,false,false);
@@ -53,26 +53,26 @@ void miceFast::set_w(arma::colvec & _w){
 bool miceFast::is_sorted_byg(){
   if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
   return sorted;
-};
+}
 
 arma::mat miceFast::get_data(){
   if(x.is_empty()){Rcpp::stop("There is no data provided");}
   return x;
-};
+}
 
 arma::colvec miceFast::get_w(){
   if(w.is_empty()){Rcpp::stop("There is no weighting variable provided");}
   return w;
-};
+}
 arma::colvec miceFast::get_g(){
   if(g.is_empty()){Rcpp::stop("There is no grouping variable provided");}
   return g;
-};
+}
 
 arma::uvec miceFast::get_index(){
   if(x.is_empty()){Rcpp::stop("There is no data provided");}
   return index;
-};
+}
 
 //functions for getting indexes
 
@@ -186,7 +186,7 @@ arma::vec miceFast::vifs(int posit_y,arma::uvec posit_x){
   }
 
   return vifs;
-};
+}
 
 
 //function for printing recommended prediction models

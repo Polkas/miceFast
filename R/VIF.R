@@ -19,12 +19,12 @@
 #' \dontrun{
 #' library(miceFast)
 #' library(data.table)
-#' 
+#'
 #' airquality2 <- airquality
 #' airquality2$Temp2 <- airquality2$Temp**2
 #' # install.packages("car")
 #' # car::vif(lm(Ozone ~ ., data=airquality2))
-#' 
+#'
 #' data_DT <- data.table(airquality2)
 #' data_DT[, .(vifs = VIF(
 #'   x = .SD,
@@ -32,7 +32,7 @@
 #'   posit_x = c("Solar.R", "Wind", "Temp", "Month", "Day", "Temp2"),
 #'   correct = FALSE
 #' ))][["vifs"]]
-#' 
+#'
 #' data_DT[, .(vifs = VIF(
 #'   x = .SD,
 #'   posit_y = 1,
@@ -40,16 +40,16 @@
 #'   correct = TRUE
 #' ))][["vifs"]]
 #' }
-#' 
+#'
 #' @name VIF
 #'
 #' @export
 
 VIF <- function(x, posit_y, posit_x, correct = FALSE) {
-  if (inherits(x, "data.frame") || inherits(x, "matrix")) {
+  if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
     UseMethod("VIF")
   } else {
-    stop("wrong data type - it should be data.frame or matrix")
+    stop("wrong data type - it should be data.frame, matrix or data.table")
   }
 }
 
@@ -85,6 +85,48 @@ VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
 
 
   x_small <- if (is_DT) x[, c(posit_y, posit_x), with = FALSE] else x[, c(posit_y, posit_x)]
+
+  x_small[[1]] <- as.numeric(x_small[[1]])
+
+  xx <- model.matrix.lm(~., x_small, na.action = "na.pass")
+
+  aa <- attributes(xx)$assign
+
+  ll <- 3:ncol(xx)
+
+  VIF_(xx, 2, ll, aa[ll], correct)
+}
+
+#' @describeIn  VIF
+
+VIF.data.table <- function(x, posit_y, posit_x, correct = FALSE) {
+
+  if (posit_y %in% posit_x) {
+    stop("the same variable is dependent and indepentent")
+  }
+
+  # contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
+  # if(contains_intercept){stop("Do not include an intercept");}
+
+  cols <- colnames(x)
+  # posit as character vector
+  if (is.character(posit_x)) {
+    posit_x <- pmatch(posit_x, cols)
+    posit_x <- posit_x[!is.na(posit_x)]
+    if (length(posit_x) == 0) stop("posit_x is empty")
+  }
+
+  if (length(posit_x) < 2) stop("at least two independent variables should be provided")
+
+
+  if (is.character(posit_y)) {
+    posit_y <- pmatch(posit_y, cols)
+    if (length(posit_y) == 0) stop("posit_y is empty")
+  }
+
+
+
+  x_small <- x[, c(posit_y, posit_x), with = FALSE]
 
   x_small[[1]] <- as.numeric(x_small[[1]])
 
