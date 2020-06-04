@@ -52,6 +52,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// neibo
+NumericVector neibo(NumericVector y, NumericVector miss, int k);
+RcppExport SEXP _miceFast_neibo(SEXP ySEXP, SEXP missSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type miss(missSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(neibo(y, miss, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_corrData();
 RcppExport SEXP _rcpp_module_boot_miceFast();
@@ -60,6 +73,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_miceFast_VIF_", (DL_FUNC) &_miceFast_VIF_, 5},
     {"_miceFast_fill_NA_N_", (DL_FUNC) &_miceFast_fill_NA_N_, 6},
     {"_miceFast_fill_NA_", (DL_FUNC) &_miceFast_fill_NA_, 5},
+    {"_miceFast_neibo", (DL_FUNC) &_miceFast_neibo, 3},
     {"_rcpp_module_boot_corrData", (DL_FUNC) &_rcpp_module_boot_corrData, 0},
     {"_rcpp_module_boot_miceFast", (DL_FUNC) &_rcpp_module_boot_miceFast, 0},
     {NULL, NULL, 0}

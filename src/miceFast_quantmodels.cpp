@@ -3,7 +3,7 @@
 
 #include <RcppArmadillo.h>
 #include "miceFast.h"
-
+#include <stdlib.h>     /* rand */
 #include <algorithm>
 using namespace std;
 using namespace Rcpp;
@@ -316,70 +316,101 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
 
 //PMM
 
-IntegerVector neibo(arma::colvec &y, arma::mat &X, arma::mat &X1,int k) {
+int findCrossOver(NumericVector arr, double low, double high, double x)
+{
+  if (arr[high] <= x)
+    return high;
+  if (arr[low] > x)
+    return low;
 
-      int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-      arma::colvec coef = arma::solve(X.t()*X, X.t()*y);
+  int mid = (low + high)/2;
 
-      arma::colvec res = y - X*coef;
+  if (arr[mid] <= x && arr[mid+1] > x)
+    return mid;
 
-      double df = N-C ;
+  if(arr[mid] < x)
+    return findCrossOver(arr, mid+1, high, x);
 
-      //arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
+  return findCrossOver(arr, low, mid - 1, x);
+}
 
-      double res2 = arma::as_scalar(arma::trans(res)*res);
 
-      double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
+NumericVector Kclosestrand(NumericVector arr, double x, int k)
+{
+  int n = arr.size();
 
-      double sigma_b = sqrt(res2/chi2);
+  int l = findCrossOver(arr, 0, n-1, x);
+  int r = l;
+  int count = 0;
+  NumericVector resus(k);
 
-      arma::vec noise2(N_NA);
-      noise2.randn();
+  if (arr[l] == x) l--;
 
-      arma::colvec miss(N_NA,arma::fill::zeros);
-
-      miss = (X1 * coef + noise2 * sigma_b);
-
-    int n_y = y.size();
-    int n_miss = miss.size();
-
-    int jj;
-    double dk = 0;
-    int count = 0;
-    int goal = 0;
-
-    NumericVector d(n_y);
-    NumericVector d2(n_y);
-    IntegerVector matched(n_miss);
-
-    k = (k <= n_y) ? k : n_y;
-    k = (k >= 1) ? k : 1;
-
-    NumericVector which = floor(runif(n_miss, 1, k + 1));
-    NumericVector range_y = range(y);
-
-    double nois = (range_y[1] - range_y[0])/(10000) ;
-
-    for(int i = 0; i < n_miss; i++) {
-
-      d2 = runif(n_miss, 0, nois);
-      dk = miss[i];
-      for (int j = 0; j < n_y; j++) d[j] = std::abs(y[j] - dk) + d2[j];
-
-      for (int j = 0; j < n_y; j++) d2[j] = d[j];
-
-      std::nth_element (d2.begin(), d2.begin() + k - 1, d2.end());
-
-      dk = d2[k-1];
-      count = 0;
-      goal = (int) which[i];
-      for (int jj = 0; jj < n_y; jj++) {
-        if (d[jj] <= dk) count++;
-        if (count == goal) break;
-      }
-      matched[i] = jj;
-    }
-
-    return matched + 1;
+  while (l >= 0 && r < n && count < k)
+  {
+    if (x - arr[l] < arr[r] - x)
+      resus[count] = arr[l--];
+    else
+      resus[count] = arr[r++];
+    count++;
   }
+
+  while (count < k && l >= 0)
+    resus[count] = arr[l--], count++;
+
+  while (count < k && r < n)
+    resus[count] = arr[r++], count++;
+
+  return resus;
+
+}
+
+
+
+//' neibo
+//'
+//' @description neibo beibo
+//'
+//' @param y A numeric vector
+//' @param miss A numeric vector
+//' @param k An integer vector
+//'
+//' @name neibo
+//'
+//' @export
+// [[Rcpp::export]]
+NumericVector neibo(NumericVector y, NumericVector miss, int k) {
+  int n_y = y.size();
+  k = (k <= n_y) ? k : n_y;
+  k = (k >= 1) ? k : 1;
+
+  NumericVector y_new = clone(y);
+
+  sort(y_new.begin(),y_new.end());
+
+  int n_miss = miss.size();
+
+  NumericVector resus(n_miss);
+  NumericVector resus_temp(k);
+
+  NumericVector which = floor(runif(n_miss, 0, k));
+
+  int subs;
+
+  for(int i=0; i<n_miss ;i++){
+    double mm = miss[i];
+    resus_temp = Kclosestrand(y_new,mm,k);
+    subs = (int) which[i];
+    resus[i] = resus_temp[subs];
+  }
+
+  return resus ;
+
+}
+
+
+static R_CallMethodDef callMethods[]  = {
+  {"neibo", (DL_FUNC) &neibo, 3},
+  {NULL, NULL, 0}
+};

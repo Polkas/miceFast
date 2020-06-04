@@ -38,26 +38,28 @@ Daily readings of the following air quality values for May 1, 1973 (a Tuesday) t
 \dontrun{
 library(data.table)
 data(airquality)
-data = cbind(as.matrix(airquality[,-5]),Intercept=1,index=1:nrow(airquality),
-            # a numeric vector - positive values
-            weights = rnorm(nrow(airquality),1,0.01),
-            # months as groups
-            groups = airquality[,5])
+data <- cbind(as.matrix(airquality[, -5]),
+  Intercept = 1, index = 1:nrow(airquality),
+  # a numeric vector - positive values
+  weights = rnorm(nrow(airquality), 1, 0.01),
+  # months as groups
+  groups = airquality[, 5]
+)
 
 # data.table
-air_miss = data.table(data)
-air_miss$groups = factor(air_miss$groups)
+air_miss <- data.table(data)
+air_miss$groups <- factor(air_miss$groups)
 
 # Distribution of Ozone - close to log-normal
-#hist(air_miss$Ozone)
+# hist(air_miss$Ozone)
 
 # Additional vars
 # Make a character variable to show package capabilities
-air_miss$x_character = as.character(cut(air_miss$Solar.R,seq(0,350,70)))
+air_miss$x_character <- as.character(cut(air_miss$Solar.R, seq(0, 350, 70)))
 # Discrete version of dependent variable
-air_miss$Ozone_chac = as.character(cut(air_miss$Ozone, seq(0,160,20)))
-air_miss$Ozone_f = cut(air_miss$Ozone, seq(0,160,20))
-air_miss$Ozone_high = air_miss$Ozone>mean(air_miss$Ozone,na.rm=T)
+air_miss$Ozone_chac <- as.character(cut(air_miss$Ozone, seq(0, 160, 20)))
+air_miss$Ozone_f <- cut(air_miss$Ozone, seq(0, 160, 20))
+air_miss$Ozone_high <- air_miss$Ozone > mean(air_miss$Ozone, na.rm = T)
 }
 
 }
