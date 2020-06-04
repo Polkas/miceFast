@@ -13,3 +13,18 @@ fill_NA_ <- function(x, model, posit_y, posit_x, w) {
     .Call(`_miceFast_fill_NA_`, x, model, posit_y, posit_x, w)
 }
 
+#' neibo
+#'
+#' @description neibo beibo
+#'
+#' @param y A numeric vector
+#' @param miss A numeric vector
+#' @param k An integer vector
+#'
+#' @name neibo
+#'
+#' @export
+neibo <- function(y, miss, k) {
+    .Call(`_miceFast_neibo`, y, miss, k)
+}
+

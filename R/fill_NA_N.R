@@ -30,7 +30,7 @@
 #' ### Data
 #' # airquality dataset with additional variables
 #' data(air_miss)
-#' 
+#'
 #' ### Intro: data.table
 #' # IMPUTATIONS
 #' # Imputations with a grouping option (models are separately assessed for each group)
@@ -96,15 +96,15 @@
 #'     w = .SD[["weights"]],
 #'     logreg = TRUE
 #'   ), .(groups)] %>%
-#' 
+#'
 #'   # Average of a few methods
 #'   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp5] %>%
-#' 
+#'
 #'   # Protecting against collinearity or low number of observations - across small groups
 #'   # Be carful when using a data.table grouping option
 #'   # because of lack of protection against collinearity or low number of observations.
 #'   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
-#' 
+#'
 #'   .[, Ozone_chac_imp := tryCatch(fill_NA(
 #'     x = .SD,
 #'     model = "lda",
@@ -120,10 +120,10 @@
 #'   ),
 #'   error = function(e) .SD[["Ozone_chac"]]
 #'   ), .(groups)]
-#' 
+#'
 #' # Sample of results
 #' air_miss[which(is.na(air_miss[, 1]))[1:5], ]
-#' 
+#'
 #' ### Intro: dplyr
 #' # IMPUTATIONS
 #' air_miss <- air_miss %>%
@@ -194,7 +194,7 @@
 #'   ungroup() %>%
 #'   # Average of a few methods
 #'   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
-#' 
+#'
 #'   # Protecting against collinearity or low number of observations - across small groups
 #'   # Be carful when using a data.table grouping option
 #'   # because of lack of protection against collinearity or low number of observations.
@@ -216,27 +216,122 @@
 #'   error = function(e) .[["Ozone_chac"]]
 #'   ))) %>%
 #'   ungroup()
-#' 
+#'
 #' # Sample of results
 #' air_miss[which(is.na(air_miss[, 1]))[1:5], ]
 #' }
-#' 
+#'
 #' @name fill_NA_N
 #'
 #' @export
 
 fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
-  if (inherits(x, "data.frame") || inherits(x, "matrix")) {
+  if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
     UseMethod("fill_NA_N")
   } else {
-    stop("wrong data type - it should be data.frame or matrix")
+    stop("wrong data type - it should be data.frame, matrix or data.table")
   }
 }
 
-#' @describeIn fill_NA_N
+#' @describeIn fill_NA_N s3 method for data.frame
 
 fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
-  is_DT <- inherits(x, "data.table")
+
+  ww <- if (is.null(w)) vector() else w
+
+  if (posit_y %in% posit_x) {
+    stop("the same variable is dependent and indepentent")
+  }
+  model <- match.arg(model, c("lm_bayes", "lm_noise"))
+
+  cols <- colnames(x)
+
+  if (is.character(posit_x)) {
+    posit_x <- pmatch(posit_x, cols)
+    posit_x <- posit_x[!is.na(posit_x)]
+    if (length(posit_x) == 0) stop("posit_x is empty")
+  }
+
+  if (is.character(posit_y)) {
+    posit_y <- pmatch(posit_y, cols)
+    if (length(posit_y) == 0) stop("posit_y is empty")
+  }
+
+  yy <- x[[posit_y]]
+
+  yy_class <- class(yy)
+
+  is_factor_y <- yy_class == "factor"
+  is_character_y <- yy_class == "character"
+  is_numeric_y <- (yy_class == "numeric") || (yy_class == "integer") || (yy_class == "logical") || (yy_class == "logical")
+
+  all_pos_y <- FALSE
+  if (is_numeric_y) {
+    all_pos_y <- !any(yy < 0, na.rm = TRUE)
+  }
+
+  if ((is_character_y || is_factor_y || (model == "lda")) && logreg) {
+    stop("logreg works only for a non-negative numeric dependent variable and lm models")
+  } else if (all_pos_y && logreg) {
+    yy <- log(yy + 1e-8)
+  }
+
+  x_small <-  x[, posit_x]
+  types <- lapply(x_small, class)
+  x_ncols <- length(posit_x)
+  p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
+  len_p_x_factor_character <- length(p_x_factor_character)
+
+  xx <- vector("list", 2)
+
+  if (len_p_x_factor_character > 0) {
+    posit_fc <- posit_x[p_x_factor_character]
+    x_fc <- x[, posit_fc]
+    x_fc <- model.matrix.lm(~., x_fc, na.action = "na.pass")[, -1]
+    xx[[1]] <- x_fc
+  }
+
+  if (x_ncols > len_p_x_factor_character) {
+    posit_ni <- setdiff(posit_x, posit_x[p_x_factor_character])
+    x_ni <- as.matrix(x[, posit_ni])
+    xx[[2]] <- x_ni
+  }
+
+  xx <- do.call(cbind, xx[!is.null(xx)])
+
+  if (is_factor_y) {
+    l <- levels(yy)
+    yy <- as.numeric(yy)
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times))
+    f[f <= 0] <- 1
+    f[f > length(l)] <- length(l)
+    ff <- factor(l[f])
+  } else if (is_character_y) {
+    yy <- factor(yy)
+    l <- levels(yy)
+    yy <- as.numeric(yy)
+    yy <- yy
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times))
+    f[f <= 0] <- 1
+    f[f > length(l)] <- length(l)
+    ff <- l[f]
+  } else if (is_numeric_y) {
+    yy <- as.numeric(yy)
+    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times)
+    if (logreg && (model != "lda")) {
+      ff <- exp(ff)
+    }
+  }
+
+  attr(ff, "dim") <- attributes(ff)$dim[1]
+
+  return(ff)
+}
+
+#' @describeIn fill_NA_N S3 method for data.table
+
+fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
+
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
@@ -275,7 +370,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     yy <- log(yy + 1e-8)
   }
 
-  x_small <- if (is_DT) x[, posit_x, with = FALSE] else x[, posit_x]
+  x_small <-  x[, posit_x, with = FALSE]
   types <- lapply(x_small, class)
   x_ncols <- length(posit_x)
   p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
@@ -285,14 +380,14 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
   if (len_p_x_factor_character > 0) {
     posit_fc <- posit_x[p_x_factor_character]
-    x_fc <- if (is_DT) x[, posit_fc, with = FALSE] else x[, posit_fc]
+    x_fc <- x[, posit_fc, with = FALSE]
     x_fc <- model.matrix.lm(~., x_fc, na.action = "na.pass")[, -1]
     xx[[1]] <- x_fc
   }
 
   if (x_ncols > len_p_x_factor_character) {
     posit_ni <- setdiff(posit_x, posit_x[p_x_factor_character])
-    x_ni <- if (is_DT) as.matrix(x[, posit_ni, with = FALSE]) else as.matrix(x[, posit_ni])
+    x_ni <-  as.matrix(x[, posit_ni, with = FALSE])
     xx[[2]] <- x_ni
   }
 
@@ -327,7 +422,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   return(ff)
 }
 
-#' @describeIn fill_NA_N
+#' @describeIn fill_NA_N S3 method for matrix
 
 fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
   ww <- if (is.null(w)) vector() else w
