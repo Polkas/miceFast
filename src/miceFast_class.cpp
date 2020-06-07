@@ -336,6 +336,7 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
     {"pmm",pmm_neibo}};
 
 
+
 arma::colvec miceFast::option_impute_multiple(std::string s,int posit_y,arma::uvec posit_x,int times){
 
   arma::colvec pred;
@@ -490,6 +491,7 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
   {"lm_noise",fastLm_weighted_noise},
   {"lm_bayes",fastLm_weighted_bayes},
   {"pmm",pmm_weighted_neibo}};
+
 
 arma::colvec miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x,int times){
 

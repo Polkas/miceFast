@@ -85,6 +85,7 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
   {"lm_bayes",fastLm_weighted_bayes},
   {"pmm",pmm_weighted_neibo}};
 
+
   arma::uvec posit_y_uvec(1);
   posit_y_uvec(0) = posit_y;
 

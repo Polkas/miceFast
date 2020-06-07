@@ -54,12 +54,14 @@ END_RCPP
 }
 // neibo
 arma::colvec neibo(arma::colvec y, arma::colvec miss, int k);
+
 RcppExport SEXP _miceFast_neibo(SEXP ySEXP, SEXP missSEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type miss(missSEXP);
+
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     rcpp_result_gen = Rcpp::wrap(neibo(y, miss, k));
     return rcpp_result_gen;
@@ -93,6 +95,7 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
 
 RcppExport SEXP _rcpp_module_boot_corrData();
 RcppExport SEXP _rcpp_module_boot_miceFast();
