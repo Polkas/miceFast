@@ -1,4 +1,4 @@
-# miceFast
+# miceFast <a href='https://github.com/polkas/miceFast'><img src='miceFast_logo.png' align="right" height="200" /></a>
 
 Maciej Nasinski  
 GitHub:  https://github.com/polkas/miceFast
@@ -10,7 +10,7 @@ GitHub:  https://github.com/polkas/miceFast
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
 
 Fast imputations under the object-oriented programming paradigm. There was used quantitative models with a closed-form solution. Thus package is based on linear algebra operations. The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used. A single evaluation of a quantitative model for the multiple imputations is another major enhancement. Moreover there are offered a few functions built to work with popular R packages (data.table/dplyr).
-A new major enhancement is the fastest predictive mean matching in the R world, based on pre-sorting and binary search not knn algorithms or O(N^2) loops.
+A new major enhancement is the one of the fastest predictive mean matching in the R world, based on pre-sorting and binary search not knn algorithms or O(N^2) loops.
 
 Performance benchmarks (check performance_validity.R file at extdata).
 
@@ -33,6 +33,7 @@ devtools::install_github("polkas/miceFast")
 
 ```r
 library(miceFast)
+
 set.seed(1234)
 data(air_miss)
 
@@ -43,15 +44,9 @@ naive_fill_NA(air_miss)
 
 #Other packages - popular simple solutions
 #Hmisc
-data.frame(Map(function(x) Hmisc::impute(x,'random'),air_miss))
-
-library(magrittr)
-air_miss %>% 
-split(air_miss$groups) %>% 
-purrr::map(~ data.frame(Map(function(x) Hmisc::impute(x,'random'),.x))) %>% 
-do.call(rbind,.)
+data.frame(Map(function(x) Hmisc::impute(x,'random'), air_miss))
 
 #mice
-mice::complete(mice::mice(air_miss,printFlag = F))
+mice::complete(mice::mice(air_miss, printFlag = F))
 
 ```

@@ -11,6 +11,8 @@ using namespace Rcpp;
 #include <algorithm>
 using namespace std;
 using namespace Rcpp;
+using namespace arma;
+
 
 #define UNUSED(expr) (void)(expr)
 
@@ -316,7 +318,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
 
 //PMM
 
-int findCrossOver(NumericVector arr, double low, double high, double x)
+int findCrossOver(arma::colvec arr, double low, double high, double x)
 {
   if (arr[high] <= x)
     return high;
@@ -336,14 +338,14 @@ int findCrossOver(NumericVector arr, double low, double high, double x)
 }
 
 
-NumericVector Kclosestrand(NumericVector arr, double x, int k)
+arma::colvec Kclosestrand(arma::colvec arr, double x, int k)
 {
-  int n = arr.size();
+  int n = arr.n_rows;
 
   int l = findCrossOver(arr, 0, n-1, x);
   int r = l;
   int count = 0;
-  NumericVector resus(k);
+  arma::colvec resus(k);
 
   if (arr[l] == x) l--;
 
@@ -368,35 +370,38 @@ NumericVector Kclosestrand(NumericVector arr, double x, int k)
 
 
 
-//' neibo
+//' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
 //'
-//' @description neibo beibo
+//' @description this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
 //'
-//' @param y A numeric vector
-//' @param miss A numeric vector
-//' @param k An integer vector
+//' @param y numeric vector values to be look up
+//' @param miss numeric vector a values to be look for
+//' @param k integer a number of values which should be taken into account during sampling one of the k closest point
+//'
+//' @return a numeric vector
 //'
 //' @name neibo
 //'
 //' @export
 // [[Rcpp::export]]
-NumericVector neibo(NumericVector y, NumericVector miss, int k) {
-  int n_y = y.size();
+arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
+
+  int n_y = y.n_rows;
+
   k = (k <= n_y) ? k : n_y;
   k = (k >= 1) ? k : 1;
 
-  NumericVector y_new = clone(y);
+  arma::colvec y_new = arma::sort(y);
 
-  sort(y_new.begin(),y_new.end());
+  int n_miss = miss.n_rows;
 
-  int n_miss = miss.size();
+  arma::colvec resus(n_miss);
+  arma::colvec resus_temp(k);
 
-  NumericVector resus(n_miss);
-  NumericVector resus_temp(k);
+  arma::vec which = floor(runif(n_miss, 0, k));
 
-  NumericVector which = floor(runif(n_miss, 0, k));
 
-  int subs;
+    int subs;
 
   for(int i=0; i<n_miss ;i++){
     double mm = miss[i];
@@ -410,7 +415,154 @@ NumericVector neibo(NumericVector y, NumericVector miss, int k) {
 }
 
 
+
+arma::uvec Kclosestrand_index(arma::colvec arr, double x, int k)
+{
+  int n = arr.size();
+
+  int l = findCrossOver(arr, 0, n-1, x);
+  int r = l;
+  int count = 0;
+  arma::uvec resus(k);
+
+  if (arr[l] == x) l--;
+
+  while (l >= 0 && r < n && count < k)
+  {
+    if (x - arr[l] < arr[r] - x)
+      resus[count] = l--;
+    else
+      resus[count] = r++;
+    count++;
+  }
+
+  while (count < k && l >= 0)
+    resus[count] = l--, count++;
+
+  while (count < k && r < n)
+    resus[count] = r++, count++;
+
+  return resus;
+
+}
+
+
+
+//' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
+//'
+//' @description this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
+//'
+//' @param y numeric vector values to be look up
+//' @param miss numeric vector a values to be look for
+//' @param k integer a number of values which should be taken into account during sampling one of the k closest point
+//'
+//' @return a numeric vector
+//'
+//' @name neibo_index
+//'
+//' @export
+// [[Rcpp::export]]
+arma::uvec neibo_index(arma::colvec y, arma::colvec miss, int k) {
+  int n_y = y.n_rows;
+
+  k = (k <= n_y) ? k : n_y;
+  k = (k >= 1) ? k : 1;
+
+  arma::colvec y_new = arma::sort(y);
+
+  int n_miss = miss.n_rows;
+
+  arma::uvec resus(n_miss);
+  arma::uvec resus_temp(k);
+
+  arma::vec which = floor(runif(n_miss, 0, k));
+
+
+  int subs;
+
+  for(int i=0; i<n_miss ;i++){
+    double mm = miss[i];
+    resus_temp = Kclosestrand_index(y_new,mm,k);
+    subs = (int) which[i];
+    resus[i] = resus_temp[subs];
+  }
+
+  return resus ;
+
+}
+
+
+// [[Rcpp::export]]
+arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k) {
+
+  int N = X.n_rows; int C = X.n_cols;
+
+  arma::colvec wq=sqrt(w);
+  arma::colvec y2 = wq%y;
+  arma::mat X2(N,C);
+
+  for(int h=0;h<C;h++){
+    X2.col(h)=wq%X.col(h);
+  }
+
+
+    arma::mat xtx = arma::mat( arma::trans(X2) * X2 );
+    for (int ii=0;ii<k;ii++){
+        xtx(ii,ii)=xtx(ii,ii)+ridge;
+    }
+    arma::mat xinv = arma::inv( xtx );
+    arma::mat coef2 = arma::mat( xinv * arma::trans(X2) * y );
+    arma::colvec resid = arma::mat( y - X*coef2 );
+    double sig2 = arma::as_scalar( arma::trans(resid)*resid/(N-C) );
+
+    arma::mat vcoef = arma::mat( sig2 * xinv );
+
+    arma::colvec coefu(k,fill::randn);
+
+    arma::mat coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
+
+
+    arma::colvec ypred_mis = X1 * coef;
+    arma::colvec y_full = arma::sort(y);
+
+    arma::colvec yimp = neibo(y_full,ypred_mis,k);
+
+    return yimp;
+}
+
+arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k) {
+
+  int N = X.n_rows; int C = X.n_cols;
+
+
+    arma::mat xtx = arma::mat( arma::trans(X) * X );
+    for (int ii=0;ii<k;ii++){
+        xtx(ii,ii)=xtx(ii,ii)+ridge;
+    }
+    arma::mat xinv = arma::inv( xtx );
+    arma::mat coef2 = arma::mat( xinv * arma::trans(X) * y );
+    arma::colvec resid = arma::mat( y - X*coef2 );
+    double sig2 = arma::as_scalar( arma::trans(resid)*resid/(N-C) );
+
+        arma::mat vcoef = arma::mat( sig2 * xinv );
+
+    arma::colvec coefu(k,fill::randn);
+
+    arma::mat coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
+
+   arma::colvec ypred_mis = X1 * coef;
+    arma::colvec y_full = arma::sort(y);
+
+
+    arma::colvec yimp = neibo(y_full,ypred_mis,k);
+
+    return yimp;
+}
+
 static R_CallMethodDef callMethods[]  = {
   {"neibo", (DL_FUNC) &neibo, 3},
+  {"neibo_index", (DL_FUNC) &neibo_index, 3},
+  {"pmm_neibo", (DL_FUNC) &pmm_neibo, 4},
+  {"pmm_weighted_neibo", (DL_FUNC) &pmm_weighted_neibo, 5},
   {NULL, NULL, 0}
 };

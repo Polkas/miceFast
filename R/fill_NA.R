@@ -225,7 +225,9 @@
 
 fill_NA <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
+
     UseMethod("fill_NA")
+
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
   }

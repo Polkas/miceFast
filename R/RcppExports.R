@@ -13,18 +13,41 @@ fill_NA_ <- function(x, model, posit_y, posit_x, w) {
     .Call(`_miceFast_fill_NA_`, x, model, posit_y, posit_x, w)
 }
 
-#' neibo
+#' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
 #'
-#' @description neibo beibo
+#' @description this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
 #'
-#' @param y A numeric vector
-#' @param miss A numeric vector
-#' @param k An integer vector
+#' @param y numeric vector values to be look up
+#' @param miss numeric vector a values to be look for
+#' @param k integer a number of values which should be taken into account during sampling one of the k closest point
+#'
+#' @return a numeric vector
 #'
 #' @name neibo
 #'
 #' @export
 neibo <- function(y, miss, k) {
     .Call(`_miceFast_neibo`, y, miss, k)
+}
+
+#' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
+#'
+#' @description this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
+#'
+#' @param y numeric vector values to be look up
+#' @param miss numeric vector a values to be look for
+#' @param k integer a number of values which should be taken into account during sampling one of the k closest point
+#'
+#' @return a numeric vector
+#'
+#' @name neibo_index
+#'
+#' @export
+neibo_index <- function(y, miss, k) {
+    .Call(`_miceFast_neibo_index`, y, miss, k)
+}
+
+pmm_weighted_neibo <- function(y, X, w, X1, k) {
+    .Call(`_miceFast_pmm_weighted_neibo`, y, X, w, X1, k)
 }
 

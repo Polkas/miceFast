@@ -12,6 +12,8 @@ useDynLib(miceFast,.registration=TRUE)
 
 export(neibo)
 
+export(neibo_index)
+
 export(naive_fill_NA)
 
 S3method(naive_fill_NA, data.frame)

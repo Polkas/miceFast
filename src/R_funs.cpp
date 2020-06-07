@@ -2,7 +2,6 @@
 #include "miceFast.h"
 #include <math.h>
 
-//functions for getting indexes
 
 arma::uvec get_index_full_R(arma::mat &x,int posit_y, arma::uvec posit_x){
 
@@ -45,11 +44,12 @@ arma::uvec get_index_NA_R(arma::mat &x,int posit_y, arma::uvec posit_x){
 arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec posit_x,int times){
 
   typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&,int);
-  std::map<std::string, pfunc> funMap = {
+    std::map<std::string, pfunc> funMap = {
     {"lda",fastLda},
     {"lm_pred",fastLm_pred},
     {"lm_noise",fastLm_noise},
-    {"lm_bayes",fastLm_bayes}};
+    {"lm_bayes",fastLm_bayes},
+    {"pmm",pmm_neibo}};
 
   arma::uvec posit_y_uvec(1);
   posit_y_uvec(0) = posit_y;
@@ -82,7 +82,8 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
   typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&,int);
   std::map<std::string, pfuncw> funMapw = {{"lm_pred",fastLm_weighted},
   {"lm_noise",fastLm_weighted_noise},
-  {"lm_bayes",fastLm_weighted_bayes}};
+  {"lm_bayes",fastLm_weighted_bayes},
+  {"pmm",pmm_weighted_neibo}};
 
   arma::uvec posit_y_uvec(1);
   posit_y_uvec(0) = posit_y;
@@ -262,70 +263,4 @@ arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec pos
   return pred_avg;
 }
 
-// // [[Rcpp::export]]
-// arma::colvec PMM(arma::mat &x, int posit_y,arma::uvec posit_x,arma::colvec w, int k){
-//
-//   posit_x =  posit_x - 1;
-//   posit_y = posit_y - 1;
-//
-//   arma::uvec posit_y_uvec(1);
-//   posit_y_uvec(0) = posit_y;
-//
-//   arma::uvec index_full = get_index_full_R(x,posit_y, posit_x);
-//   arma::uvec index_NA = get_index_NA_R(x,posit_y, posit_x);
-//
-//   arma::colvec pred = x(index_NA,posit_y_uvec);
-//
-//   if((!(index_NA.n_elem==0)) && ((index_full.n_elem>15 && s=="lda")|| (index_full.n_elem>posit_x.n_elem && s!="lda"))){
-//
-//     arma::mat X_full = x(index_full,posit_x);
-//     arma::mat X_NA = x(index_NA,posit_x);
-//     arma::colvec Y_full = x(index_full,posit_y_uvec);
-//
-//   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
-//   double df = N-C ;
-//
-//   arma::colvec coef(C);
-//
-//   if(w.is_empty()){
-//
-//     coef = arma::solve(X.t()*X, X.t()*y);
-//
-//   } else {
-//
-//     arma::colvec wq=sqrt(w);
-//     arma::colvec y2 = wq%y;
-//     arma::mat X2(N,C);
-//
-//     for(int h=0;h<C;h++){
-//       X2.col(h)=wq%X.col(h);
-//     }
-//
-//     coef = arma::solve(X2.t()*X2, X2.t()*y2);
-//
-//
-//   }
-//
-//   arma::colvec res = y - X*coef;
-//
-//   //arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
-//
-//   double res2 = arma::as_scalar(arma::trans(res)*res);
-//
-//   double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
-//
-//   double sigma_b = sqrt(res2/chi2);
-//
-//   arma::vec noise2(N_NA);
-//   noise2.randn();
-//
-//   arma::colvec miss(N_NA,arma::fill::zeros);
-//
-//   miss = (X1 * coef + noise2 * sigma_b);
-//
-//
-//
-//
-//   //index
-//   return pred_avg;
-// }
+
