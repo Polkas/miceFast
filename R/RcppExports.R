@@ -51,3 +51,4 @@ pmm_weighted_neibo <- function(y, X, w, X1, k) {
     .Call(`_miceFast_pmm_weighted_neibo`, y, X, w, X1, k)
 }
 
+
