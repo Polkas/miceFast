@@ -50,15 +50,3 @@
 #' }
 #'
 "air_miss"
-
-#'  daily measurements of particulate matter chemical constituents in the United States for the year 2014.
-#'  Note that you should NOT have to decompress this file. The data are measured at a network of federal, state, and local monitors and assembled by the EPA.
-#'  In this dataset, the “Arithmetic Mean” column provides the level of the indicated chemical constituent and the “Parameter.Name” column provides the name of the chemical constituent.
-#'  The combination of a “State Code”, a “County Code”, and a “Site Num”,
-#'  uniquely identifies a monitoring site (the location of which is provided by the “Latitude” and “Longitude” columns).
-#'
-#' @usage dailySpec
-#'
-#' @format A data table with 2108467 obs. of  29 variables.
-#'
-"dailySpec"

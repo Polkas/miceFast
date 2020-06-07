@@ -118,7 +118,9 @@ naive_fill_NA.data.frame <- function(x) {
 
         class(ff) <- yy_class
 
-        x[[posit_y]] <- as.vector(ff)
+          attr(ff, "dim") <- attributes(ff)$dim[1]
+
+        x[[posit_y]] <- ff
       }
     }
 
