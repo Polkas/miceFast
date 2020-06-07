@@ -1,0 +1,25 @@
+---
+title: "uml_diagram.Rmd"
+author: "Bartosz Baranowski"
+date: "07/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nomnoml)
+```
+
+## UML diagram for R and cpp refactor
+
+We want to provide easy to use interface that can be modular, extendable and easy to use for end users. We decided to create miceFast R6 class as a base class that will be use as an interface for other classes and methods in miceFast package. For the sake of calculation speed the the author of the package (Polkas) decided to move heavy calculations to C++.
+
+```{nomnoml, svg=TRUE, echo=FALSE}
+#stroke: #a86128
+[<frame>Abstract view|
+  [miceFast R6] --> [miceFast wrappers for cpp]
+  [miceFast wrappers for cpp] --> [miceFast cpp]
+  [miceFast R6] --> [miceFast wrappers for end users]
+]
+```
+
