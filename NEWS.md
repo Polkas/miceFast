@@ -1,3 +1,10 @@
+
+# 0.6.0
+
+* super fast PMM - pre-sortinh and binary search
+* naice_fill_NA - auto function for data.frames - bayes mean and lda
+* sicker
+
 # 0.5.1
 
 * remove old urls form vignettes

@@ -144,6 +144,7 @@ naive_fill_NA.matrix <- function(x) {
     nn <- col_names[(na_col_p > 0)]
 
     for (posit_y in nn) {
+
       yy <- x[[posit_y]]
 
       all_pos_y <- !any(yy < 0, na.rm = TRUE)

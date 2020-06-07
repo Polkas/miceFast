@@ -56,6 +56,9 @@ class miceFast{
 
 };
 
+
+const double ridge = 0.00001;
+
 //
 //quantitative models
 //
@@ -80,6 +83,11 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1, int times
 
 //LDA prediction model
 arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times);
+
+//PMM
+arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k);
+
+arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k );
 
 //LDA prediction model - noise
 //arma::colvec fastLda_noise( arma::colvec &y,  arma::mat &X, arma::mat &X1);
@@ -119,3 +127,10 @@ arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x);
 arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w,int times);
 
 arma::colvec fill_NA(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w);
+
+arma::uvec neibo_index(arma::colvec y, arma::colvec miss, int k);
+
+arma::colvec neibo(arma::colvec y, arma::colvec miss, int k);
+
+
+

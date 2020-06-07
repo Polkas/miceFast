@@ -327,12 +327,14 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
 
 // map - implementing functions
 
-typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&,int);
-std::map<std::string, pfunc> funMap = {
-  {"lda",fastLda},
-  {"lm_pred",fastLm_pred},
-  {"lm_noise",fastLm_noise},
-  {"lm_bayes",fastLm_bayes}};
+  typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&,int);
+    std::map<std::string, pfunc> funMap = {
+    {"lda",fastLda},
+    {"lm_pred",fastLm_pred},
+    {"lm_noise",fastLm_noise},
+    {"lm_bayes",fastLm_bayes},
+    {"pmm",pmm_neibo}};
+
 
 
 arma::colvec miceFast::option_impute_multiple(std::string s,int posit_y,arma::uvec posit_x,int times){
@@ -484,10 +486,12 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
 //WEIGHTED
 
-typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&,int);
-std::map<std::string, pfuncw> funMapw = {{"lm_pred",fastLm_weighted},
-{"lm_noise",fastLm_weighted_noise},
-{"lm_bayes",fastLm_weighted_bayes}};
+  typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&,int);
+  std::map<std::string, pfuncw> funMapw = {{"lm_pred",fastLm_weighted},
+  {"lm_noise",fastLm_weighted_noise},
+  {"lm_bayes",fastLm_weighted_bayes},
+  {"pmm",pmm_weighted_neibo}};
+
 
 arma::colvec miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x,int times){
 

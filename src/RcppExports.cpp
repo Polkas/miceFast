@@ -53,18 +53,49 @@ BEGIN_RCPP
 END_RCPP
 }
 // neibo
-NumericVector neibo(NumericVector y, NumericVector miss, int k);
+arma::colvec neibo(arma::colvec y, arma::colvec miss, int k);
+
 RcppExport SEXP _miceFast_neibo(SEXP ySEXP, SEXP missSEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type miss(missSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type miss(missSEXP);
+
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     rcpp_result_gen = Rcpp::wrap(neibo(y, miss, k));
     return rcpp_result_gen;
 END_RCPP
 }
+// neibo_index
+arma::uvec neibo_index(arma::colvec y, arma::colvec miss, int k);
+RcppExport SEXP _miceFast_neibo_index(SEXP ySEXP, SEXP missSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type miss(missSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(neibo_index(y, miss, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pmm_weighted_neibo
+arma::colvec pmm_weighted_neibo(arma::colvec& y, arma::mat& X, arma::colvec& w, arma::mat& X1, int k);
+RcppExport SEXP _miceFast_pmm_weighted_neibo(SEXP ySEXP, SEXP XSEXP, SEXP wSEXP, SEXP X1SEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::colvec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::colvec& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type X1(X1SEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(pmm_weighted_neibo(y, X, w, X1, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+
 
 RcppExport SEXP _rcpp_module_boot_corrData();
 RcppExport SEXP _rcpp_module_boot_miceFast();
@@ -74,6 +105,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_miceFast_fill_NA_N_", (DL_FUNC) &_miceFast_fill_NA_N_, 6},
     {"_miceFast_fill_NA_", (DL_FUNC) &_miceFast_fill_NA_, 5},
     {"_miceFast_neibo", (DL_FUNC) &_miceFast_neibo, 3},
+    {"_miceFast_neibo_index", (DL_FUNC) &_miceFast_neibo_index, 3},
+    {"_miceFast_pmm_weighted_neibo", (DL_FUNC) &_miceFast_pmm_weighted_neibo, 5},
+
     {"_rcpp_module_boot_corrData", (DL_FUNC) &_rcpp_module_boot_corrData, 0},
     {"_rcpp_module_boot_miceFast", (DL_FUNC) &_rcpp_module_boot_miceFast, 0},
     {NULL, NULL, 0}
