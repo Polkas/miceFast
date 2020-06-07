@@ -107,7 +107,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_miceFast_neibo", (DL_FUNC) &_miceFast_neibo, 3},
     {"_miceFast_neibo_index", (DL_FUNC) &_miceFast_neibo_index, 3},
     {"_miceFast_pmm_weighted_neibo", (DL_FUNC) &_miceFast_pmm_weighted_neibo, 5},
-
     {"_rcpp_module_boot_corrData", (DL_FUNC) &_rcpp_module_boot_corrData, 0},
     {"_rcpp_module_boot_miceFast", (DL_FUNC) &_rcpp_module_boot_miceFast, 0},
     {NULL, NULL, 0}

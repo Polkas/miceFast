@@ -242,7 +242,8 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
-  model <- match.arg(model, c("lm_bayes", "lm_noise"))
+  model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
+
 
   cols <- colnames(x)
 
@@ -336,7 +337,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
-  model <- match.arg(model, c("lm_bayes", "lm_noise"))
+  model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
 
   cols <- colnames(x)
 
@@ -429,7 +430,7 @@ fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALS
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
-  model <- match.arg(model, c("lm_bayes", "lm_noise"))
+  model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
 
   cols <- colnames(x)
 

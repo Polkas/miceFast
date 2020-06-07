@@ -51,7 +51,6 @@ arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec pos
     {"lm_bayes",fastLm_bayes},
     {"pmm",pmm_neibo}};
 
-
   arma::uvec posit_y_uvec(1);
   posit_y_uvec(0) = posit_y;
 
@@ -264,4 +263,5 @@ arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec pos
   //index
   return pred_avg;
 }
+
 

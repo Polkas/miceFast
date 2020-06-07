@@ -319,7 +319,6 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
 //PMM
 
 int findCrossOver(arma::colvec arr, double low, double high, double x)
-
 {
   if (arr[high] <= x)
     return high;
@@ -343,12 +342,10 @@ arma::colvec Kclosestrand(arma::colvec arr, double x, int k)
 {
   int n = arr.n_rows;
 
-
   int l = findCrossOver(arr, 0, n-1, x);
   int r = l;
   int count = 0;
   arma::colvec resus(k);
-
 
   if (arr[l] == x) l--;
 
@@ -382,7 +379,6 @@ arma::colvec Kclosestrand(arma::colvec arr, double x, int k)
 //' @param k integer a number of values which should be taken into account during sampling one of the k closest point
 //'
 //' @return a numeric vector
-
 //'
 //' @name neibo
 //'
