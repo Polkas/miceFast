@@ -244,6 +244,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   }
   model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
 
+
   cols <- colnames(x)
 
   if (is.character(posit_x)) {
