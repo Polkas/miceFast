@@ -372,7 +372,7 @@ arma::colvec Kclosestrand(arma::colvec arr, double x, int k)
 
 //' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
 //'
-//' @description this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
+//' @description this function using pre-sorting of a y and the binary search the one of the k closest value for each miss is returned.
 //'
 //' @param y numeric vector values to be look up
 //' @param miss numeric vector a values to be look for
@@ -507,19 +507,19 @@ arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,a
 
 
     arma::mat xtx = arma::mat( arma::trans(X2) * X2 );
-    for (int ii=0;ii<k;ii++){
+    for (int ii=0;ii<C;ii++){
         xtx(ii,ii)=xtx(ii,ii)+ridge;
     }
     arma::mat xinv = arma::inv( xtx );
-    arma::mat coef2 = arma::mat( xinv * arma::trans(X2) * y );
-    arma::colvec resid = arma::mat( y - X*coef2 );
+    arma::vec coef2 = arma::mat( xinv * arma::trans(X2) * y2 );
+    arma::colvec resid = arma::mat( y2 - X2*coef2 );
     double sig2 = arma::as_scalar( arma::trans(resid)*resid/(N-C) );
 
     arma::mat vcoef = arma::mat( sig2 * xinv );
 
-    arma::colvec coefu(k,fill::randn);
+    arma::colvec coefu(C,fill::randn);
 
-    arma::mat coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
+    arma::vec coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
 
 
     arma::colvec ypred_mis = X1 * coef;
@@ -536,19 +536,19 @@ arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k) {
 
 
     arma::mat xtx = arma::mat( arma::trans(X) * X );
-    for (int ii=0;ii<k;ii++){
+    for (int ii=0;ii<C;ii++){
         xtx(ii,ii)=xtx(ii,ii)+ridge;
     }
     arma::mat xinv = arma::inv( xtx );
-    arma::mat coef2 = arma::mat( xinv * arma::trans(X) * y );
-    arma::colvec resid = arma::mat( y - X*coef2 );
+    arma::vec coef2 =  xinv * arma::trans(X) * y ;
+    arma::colvec resid =  y - X*coef2 ;
     double sig2 = arma::as_scalar( arma::trans(resid)*resid/(N-C) );
 
         arma::mat vcoef = arma::mat( sig2 * xinv );
 
-    arma::colvec coefu(k,fill::randn);
+    arma::colvec coefu(C,fill::randn);
 
-    arma::mat coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
+    arma::vec coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
 
    arma::colvec ypred_mis = X1 * coef;
     arma::colvec y_full = arma::sort(y);

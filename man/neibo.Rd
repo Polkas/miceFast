@@ -17,5 +17,5 @@ neibo(y, miss, k)
 a numeric vector
 }
 \description{
-this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
+this function using pre-sorting of a y and the binary search the one of the k closest value for each miss is returned.
 }
