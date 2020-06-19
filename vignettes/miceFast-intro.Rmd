@@ -40,7 +40,7 @@ miceFast was compared[^Environment] with the mice package. For grouping option t
 Summing up, miceFast offer a relevant reduction of a calculations time for:  
 
 - Linear Discriminant Analysis around **(x5)**
-- where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few times faster or even the same)** because of pre-sorting by grouping variable
+- where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable
 - multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
 - Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
 
@@ -66,7 +66,7 @@ Moreover there are offered a few functions built to work with the popular R pack
 
 ## Motivations
 
-Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will sometimes deteriorate quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are user-friendly for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
+Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will somek deteriorate quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate a missing observations for a dependent variable. R or Python language are user-friendly for data manipulation but parallely brings slower computations. Languages such as C++ gives an opportunity to boost our applications or projects.
 
 \newpage
 
@@ -103,7 +103,7 @@ air_miss[,Solar_R_imp := fill_NA_N(x=.SD,
                                    posit_y='Solar.R',
                                    posit_x=c('Wind','Temp','Intercept'),
                                    w=.SD[['weights']],
-                                   times=100),by=.(groups)] %>%
+                                   k=100),by=.(groups)] %>%
 # Imputations - discrete variable
   .[,x_character_imp := fill_NA(x=.SD,
                                 model="lda",
@@ -131,14 +131,14 @@ air_miss[,Solar_R_imp := fill_NA_N(x=.SD,
                              posit_x=c('Intercept','x_character_imp','Wind','Temp'),
                              w=.SD[['weights']],
                              logreg=TRUE,
-                             times=30)] %>% 
+                             k=30)] %>% 
   .[,Ozone_imp4 := fill_NA_N(x=.SD, 
                              model="lm_bayes",
                              posit_y='Ozone',
                              posit_x=c('Intercept','x_character_imp','Wind','Temp'),
                              w=.SD[['weights']],
                              logreg=TRUE,
-                             times=30)] %>% 
+                             k=30)] %>% 
   .[,Ozone_imp5 := fill_NA(x=.SD, 
                            model="lm_pred",
                            posit_y='Ozone',
@@ -213,14 +213,14 @@ mutate(Ozone_imp3 = fill_NA_N(x=.,
                               posit_x=c('Intercept','x_character_imp','Wind','Temp'),
                               w=.[['weights']],
                               logreg=TRUE,
-                              times=30)) %>% 
+                              k=30)) %>% 
 mutate(Ozone_imp4 = fill_NA_N(x=., 
                               model="lm_bayes",
                               posit_y='Ozone',
                               posit_x=c('Intercept','x_character_imp','Wind','Temp'),
                               w=.[['weights']],
                               logreg=TRUE,
-                              times=30)) %>% 
+                              k=30)) %>% 
 group_by(groups) %>%
 do(mutate(.,Ozone_imp5 = fill_NA(x=., 
                                  model="lm_pred",
@@ -299,7 +299,7 @@ relevant class methods:
 - `get_w()` - retrieving the weighting variable [return a numeric vector] - the same values as provided by reference w, recommended to use w directly
 - `get_index()` - getting the index [return a integer vector] - useful after automatic sorting procedure
 - `impute("model",posit_y,posit_x)` - impute data under characteristics form object like a optional grouping or weighting variable [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
-- `impute_N("model2",posit_y,posit_x,times)` - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for ("lm_bayes","lm_noise") - [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values by average of N results, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
+- `impute_N("model2",posit_y,posit_x,k)` - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for ("lm_bayes","lm_noise") - [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values by average of N results, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
 - `update_var(posit_y,imputations)` - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters. [void]
 - `get_models()` - possible quantitative models for a certain type of dependent variable [return a character vector: recommended models for impute and impute_N methods] 
 - `get_model()` - a recommended quantitative model for a certain type of dependent variable [return a character: recommended model for impute and impute_N methods] - useful while looping
@@ -314,7 +314,7 @@ relevant class methods:
 `posit_y`: integer - a position of dependent variable  
 `posit_x`: integer vector - positions of independent variables  
 `imputations` : numeric vector - imputations  
-`times` : integer - number of multiple imputations 
+`k` : integer - number of multiple imputations 
 
 *For a simple mean imputations add intercept to data and use "lm_pred"*  
 *The lda model is assessed only if there are more than 15 complete observations and for the lms models if the number of independent variables is smaller than the number of observations.*

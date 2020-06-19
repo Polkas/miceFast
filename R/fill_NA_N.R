@@ -1,16 +1,19 @@
 
 #' \code{fill_NA_N} function for the multiple imputations purpose.
 #'
-#' @description Multiple imputations to fill the missing data.
+#' @description
+#' \Sexpr[results=rd, stage=render]{rlang:::lifecycle("maturing")}
+#' Multiple imputations to fill the missing data.
 #' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 #' Quantitative models were built under Rcpp packages and the C++ library Armadillo.
 #'
 #' @param x a numeric matrix or data.frame/data.table (factor/character/numeric/logical) - variables
-#' @param model a character - posibble options ("lm_bayes","lm_noise")
+#' @param model a character - posibble options ("lm_bayes","lm_noise","pmm")
 #' @param posit_y an integer/character - a position/name of dependent variable
 #' @param posit_x an integer/character vector - positions/names of independent variables
 #' @param w  a numeric vector - a weighting variable - only positive values, Default: NULL
-#' @param times an integer - a number of multiple imputations, Default:10
+#' @param k an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10
+#' @param times deprecated
 #' @param logreg a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE
 #'
 #' @return load imputations in a numeric/character/factor (similar to the input type) vector format
@@ -22,6 +25,8 @@
 #' and for the lms models if number of variables is smaller than number of observations.
 #'
 #' @seealso \code{\link{fill_NA}} \code{\link{VIF}}
+#'
+#' @importFrom lifecycle deprecate_warn
 #'
 #' @examples
 #' \dontrun{
@@ -196,7 +201,7 @@
 #'   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
 #'
 #'   # Protecting against collinearity or low number of observations - across small groups
-#'   # Be carful when using a data.table grouping option
+#'   # Be carful when using a grouping option
 #'   # because of lack of protection against collinearity or low number of observations.
 #'   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
 #'   group_by(groups) %>%
@@ -225,8 +230,14 @@
 #'
 #' @export
 
-fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
+fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
+
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
+
+    if (lifecycle::is_present(times)) {
+    deprecate_warn("0.6.0", "miceFast::fill_NA_N(times=)", "miceFast::fill_NA_N(k=)")
+    k = times
+    }
     UseMethod("fill_NA_N")
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
@@ -235,7 +246,7 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, time
 
 #' @describeIn fill_NA_N s3 method for data.frame
 
-fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
+fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
 
   ww <- if (is.null(w)) vector() else w
 
@@ -303,7 +314,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
@@ -312,13 +323,13 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     l <- levels(yy)
     yy <- as.numeric(yy)
     yy <- yy
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
   } else if (is_numeric_y) {
     yy <- as.numeric(yy)
-    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times)
+    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k)
     if (logreg && (model != "lda")) {
       ff <- exp(ff)
     }
@@ -331,7 +342,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for data.table
 
-fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
+fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
 
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
@@ -397,7 +408,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
@@ -406,13 +417,13 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     l <- levels(yy)
     yy <- as.numeric(yy)
     yy <- yy
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
   } else if (is_numeric_y) {
     yy <- as.numeric(yy)
-    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, times)
+    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k)
     if (logreg && (model != "lda")) {
       ff <- exp(ff)
     }
@@ -425,7 +436,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for matrix
 
-fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10) {
+fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
@@ -451,7 +462,7 @@ fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALS
   if (logreg_con) {
     x[[posit_y]] <- log(x[[posit_y]] + 1e-8)
   }
-  ff <- fill_NA_N_(x, model, posit_y, posit_x, ww, times)
+  ff <- fill_NA_N_(x, model, posit_y, posit_x, ww, k)
   if (logreg_con) {
     ff <- exp(ff)
   }

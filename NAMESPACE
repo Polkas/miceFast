@@ -4,9 +4,17 @@ import(methods)
 
 import(data.table)
 
+importFrom(lifecycle,deprecate_warn)
+
+importFrom(lifecycle,deprecated)
+
 importFrom(stats, model.matrix.lm, "median", "na.omit", "prcomp")
 
 useDynLib(miceFast,.registration=TRUE)
+
+export(corrData)
+
+export(miceFast)
 
 #exportPattern("^[[:alpha:]]+")
 
@@ -48,9 +56,7 @@ S3method(VIF,matrix)
 
 
 
-export(corrData)
 
-export(miceFast)
 
 
 

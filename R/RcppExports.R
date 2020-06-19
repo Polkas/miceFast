@@ -13,6 +13,18 @@ fill_NA_ <- function(x, model, posit_y, posit_x, w) {
     .Call(`_miceFast_fill_NA_`, x, model, posit_y, posit_x, w)
 }
 
+cpp_miceFast <- function() {
+    .Call(`_miceFast_cpp_miceFast`)
+}
+
+cpp_miceFast_set_data <- function(ptr, doc) {
+    invisible(.Call(`_miceFast_cpp_miceFast_set_data`, ptr, doc))
+}
+
+cpp_miceFast_get_data <- function(ptr) {
+    .Call(`_miceFast_cpp_miceFast_get_data`, ptr)
+}
+
 #' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
 #'
 #' @description this function using pre-sorting of a y and the binary search the one of the k closest value for each miss is returned.

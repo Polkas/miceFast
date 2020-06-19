@@ -3,7 +3,6 @@
 \name{neibo}
 \alias{neibo}
 \title{Finding in random manner one of the k closets points in a certain vector for each value in a second vector}
-
 \usage{
 neibo(y, miss, k)
 }
@@ -20,4 +19,3 @@ a numeric vector
 \description{
 this function using pre-sorting of a y and the binary search the one of the k closest value for each miss is returned.
 }
-

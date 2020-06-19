@@ -265,3 +265,24 @@ arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec pos
 }
 
 
+// [[Rcpp::export]]
+SEXP cpp_miceFast() {
+  miceFast *v = new miceFast();
+  Rcpp::XPtr<miceFast> ptr(v, true);
+  return ptr;
+}
+
+
+
+
+// [[Rcpp::export]]
+void cpp_miceFast_set_data(SEXP ptr, arma::mat &doc) {
+  Rcpp::XPtr<miceFast> v(ptr);
+  v->set_data(doc);
+}
+
+// [[Rcpp::export]]
+arma::mat cpp_miceFast_get_data(SEXP ptr) {
+  Rcpp::XPtr<miceFast> v(ptr);
+  return(v->get_data());
+}

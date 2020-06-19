@@ -7,18 +7,54 @@
 \alias{fill_NA_N.matrix}
 \title{\code{fill_NA_N} function for the multiple imputations purpose.}
 \usage{
-fill_NA_N(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10)
+fill_NA_N(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  times = deprecated()
+)
 
-\method{fill_NA_N}{data.frame}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10)
+\method{fill_NA_N}{data.frame}(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  times = deprecated()
+)
 
-\method{fill_NA_N}{data.table}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10)
+\method{fill_NA_N}{data.table}(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  times = deprecated()
+)
 
-\method{fill_NA_N}{matrix}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10)
+\method{fill_NA_N}{matrix}(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  times = deprecated()
+)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical) - variables}
 
-\item{model}{a character - posibble options ("lm_bayes","lm_noise")}
+\item{model}{a character - posibble options ("lm_bayes","lm_noise","pmm")}
 
 \item{posit_y}{an integer/character - a position/name of dependent variable}
 
@@ -28,12 +64,15 @@ fill_NA_N(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, times = 10)
 
 \item{logreg}{a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE}
 
-\item{times}{an integer - a number of multiple imputations, Default:10}
+\item{k}{an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10}
+
+\item{times}{deprecated}
 }
 \value{
 load imputations in a numeric/character/factor (similar to the input type) vector format
 }
 \description{
+\Sexpr[results=rd, stage=render]{rlang:::lifecycle("maturing")}
 Multiple imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
 Quantitative models were built under Rcpp packages and the C++ library Armadillo.
@@ -226,7 +265,7 @@ air_miss <- air_miss \%>\%
   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) \%>\%
 
   # Protecting against collinearity or low number of observations - across small groups
-  # Be carful when using a data.table grouping option
+  # Be carful when using a grouping option
   # because of lack of protection against collinearity or low number of observations.
   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
   group_by(groups) \%>\%

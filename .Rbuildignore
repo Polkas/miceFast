@@ -7,3 +7,6 @@ TODO.md
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+.*\.png
+^doc$
+^Meta$

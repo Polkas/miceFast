@@ -57,7 +57,7 @@ bool miceFast::is_sorted_byg(){
 
 arma::mat miceFast::get_data(){
   if(x.is_empty()){Rcpp::stop("There is no data provided");}
-  return x;
+  return this -> x;
 }
 
 arma::colvec miceFast::get_w(){
@@ -269,7 +269,7 @@ void miceFast::update_var(int posit_y,arma::vec impute){
 
 Rcpp::List miceFast::impute_N(std::string s, int posit_y,arma::uvec posit_x,int times){
 
-  if( !(s.compare("lm_bayes") == 0) && !(s.compare("lm_noise") == 0)){Rcpp::stop("Works only for `lm_bayes` and `lm_noise` models");}
+  if( !(s.compare("lm_bayes") == 0) && !(s.compare("lm_noise") == 0) && !(s.compare("pmm") == 0)){Rcpp::stop("Works only for `lm_bayes`, `lm_noise` and `pmm` models");}
   if(!different_y_and_x(posit_y,posit_x)){Rcpp::stop("the same variable is dependent and indepentent");}
   if(!different_x(posit_x)){Rcpp::stop("the same variables repeated few times as independent");}
   if(x.is_empty()){Rcpp::stop("at least set the data");}
@@ -646,7 +646,6 @@ RCPP_MODULE(miceFast){
     .method("get_models", &miceFast::get_models)
     .method("get_model", &miceFast::get_model)
     .method("set_data", &miceFast::set_data)
-    .method("set_data_sparse", &miceFast::set_data_sparse)
     .method("set_g", &miceFast::set_g)
     .method("set_w", &miceFast::set_w)
     .method("sort_byg",&miceFast::sortData_byg)

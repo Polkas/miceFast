@@ -52,16 +52,46 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cpp_miceFast
+SEXP cpp_miceFast();
+RcppExport SEXP _miceFast_cpp_miceFast() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(cpp_miceFast());
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_miceFast_set_data
+void cpp_miceFast_set_data(SEXP ptr, arma::mat& doc);
+RcppExport SEXP _miceFast_cpp_miceFast_set_data(SEXP ptrSEXP, SEXP docSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type doc(docSEXP);
+    cpp_miceFast_set_data(ptr, doc);
+    return R_NilValue;
+END_RCPP
+}
+// cpp_miceFast_get_data
+arma::mat cpp_miceFast_get_data(SEXP ptr);
+RcppExport SEXP _miceFast_cpp_miceFast_get_data(SEXP ptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_miceFast_get_data(ptr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // neibo
 arma::colvec neibo(arma::colvec y, arma::colvec miss, int k);
-
 RcppExport SEXP _miceFast_neibo(SEXP ySEXP, SEXP missSEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type miss(missSEXP);
-
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     rcpp_result_gen = Rcpp::wrap(neibo(y, miss, k));
     return rcpp_result_gen;
@@ -96,7 +126,6 @@ BEGIN_RCPP
 END_RCPP
 }
 
-
 RcppExport SEXP _rcpp_module_boot_corrData();
 RcppExport SEXP _rcpp_module_boot_miceFast();
 
@@ -104,6 +133,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_miceFast_VIF_", (DL_FUNC) &_miceFast_VIF_, 5},
     {"_miceFast_fill_NA_N_", (DL_FUNC) &_miceFast_fill_NA_N_, 6},
     {"_miceFast_fill_NA_", (DL_FUNC) &_miceFast_fill_NA_, 5},
+    {"_miceFast_cpp_miceFast", (DL_FUNC) &_miceFast_cpp_miceFast, 0},
+    {"_miceFast_cpp_miceFast_set_data", (DL_FUNC) &_miceFast_cpp_miceFast_set_data, 2},
+    {"_miceFast_cpp_miceFast_get_data", (DL_FUNC) &_miceFast_cpp_miceFast_get_data, 1},
     {"_miceFast_neibo", (DL_FUNC) &_miceFast_neibo, 3},
     {"_miceFast_neibo_index", (DL_FUNC) &_miceFast_neibo_index, 3},
     {"_miceFast_pmm_weighted_neibo", (DL_FUNC) &_miceFast_pmm_weighted_neibo, 5},

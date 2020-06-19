@@ -1,6 +1,8 @@
 #' \code{naive_fill_NA} function for the imputations purpose.
 #'
-#' @description Regular imputations to fill the missing data.
+#' @description
+#' \Sexpr[results=rd, stage=render]{rlang:::lifecycle("experimental")}
+#' Regular imputations to fill the missing data.
 #' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 #' For numeric columns with any missing data a simple bayesian mean will be used.
 #' Next all numeric variables will be utilized to impute character/factoer variables by Linear Discriminant Analysis.
@@ -15,7 +17,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(miceFast)
+#' library(naive_fill_NAast)
 #' data(air_miss)
 #' naive_fill_NA(air_miss)
 #' }

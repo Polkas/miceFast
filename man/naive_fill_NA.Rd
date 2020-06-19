@@ -19,6 +19,7 @@ naive_fill_NA(x)
 load imputations in a similar to the input type
 }
 \description{
+\Sexpr[results=rd, stage=render]{rlang:::lifecycle("experimental")}
 Regular imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
 For numeric columns with any missing data a simple bayesian mean will be used.
@@ -36,7 +37,7 @@ this is a very simple and fast solution but not recommended, for more complex so
 }
 \examples{
 \dontrun{
-library(miceFast)
+library(naive_fill_NAast)
 data(air_miss)
 naive_fill_NA(air_miss)
 }
