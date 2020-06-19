@@ -1,7 +1,7 @@
 
 # 0.6.0
 
-* fast PMM - pre-sortinh and binary search
+* fast PMM - pre-sorting and binary search
 * naice_fill_NA - auto function for data.frames - bayes mean and lda
 * sicker
 

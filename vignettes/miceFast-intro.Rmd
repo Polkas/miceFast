@@ -43,11 +43,7 @@ Summing up, miceFast offer a relevant reduction of a calculations time for:
 - where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable
 - multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
 - Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
-
-Example (2019-08-07):
-
-![Performance Summary](../inst/extdata/images/g_summary.png)
-
+- Predictive mean matching (PMM) **(x100)** because of pre-sorting and binary search
 If you are interested about the procedure of testing performance check performance_validity.R file at the extdata folder.
 
 ```{r,eval=FALSE,echo=TRUE}
