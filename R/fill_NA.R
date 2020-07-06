@@ -25,9 +25,9 @@
 #' @seealso \code{\link{fill_NA_N}}  \code{\link{VIF}}
 #'
 #' @examples
-#' \dontrun{
-#' # install.packages('pacman')
-#' pacman::p_load(miceFast, data.table, magrittr, dplyr)
+#' library(miceFast)
+#' library(dplyr)
+#' library(data.table)
 #' ### Data
 #' # airquality dataset with additional variables
 #' data(air_miss)
@@ -97,9 +97,18 @@
 #'     w = .SD[["weights"]],
 #'     logreg = TRUE
 #'   ), .(groups)] %>%
+#'   .[, Ozone_imp6 := fill_NA_N(
+#'     x = .SD,
+#'     model = "pmm",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+#'     w = .SD[["weights"]],
+#'     logreg = TRUE,
+#'     k = 10
+#'   ), .(groups)] %>%
 #'
 #'   # Average of a few methods
-#'   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp5] %>%
+#'   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] %>%
 #'
 #'   # Protecting against collinearity or low number of observations - across small groups
 #'   # Be carful when using a data.table grouping option
@@ -192,6 +201,15 @@
 #'     w = .[["weights"]],
 #'     logreg = TRUE
 #'   ))) %>%
+#'   do(mutate(., Ozone_imp6 = fill_NA_N(
+#'     x = .,
+#'     model = "pmm",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+#'     w = .[["weights"]],
+#'     logreg = TRUE,
+#'     k = 20
+#'   ))) %>%
 #'   ungroup() %>%
 #'   # Average of a few methods
 #'   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
@@ -220,8 +238,6 @@
 #'
 #' # Sample of results
 #' air_miss[which(is.na(air_miss[, 1]))[1:5], ]
-#' }
-#'
 #' @name fill_NA
 #'
 #' @export

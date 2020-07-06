@@ -1,23 +1,18 @@
 ## Test environments
 
-* Ubuntu 16.04.6 LTS (on travis-ci), R 3.6.1
-* local Windows 10, MRO 3.5.3
+github actions:
+
+* Ubuntu R version 4.0.2 (2020-06-22) x86_64-pc-linux-gnu (64-bit)
+* Windows R version 4.0.2 (2020-06-22) x86_64-w64-mingw32 (64-bit)
+* macOS R version 4.0.2 (2020-06-22) x86_64-apple-darwin17.0 (64-bit)
 * win-builder: R-devel
 
 ## R CMD check results
 
 There were no ERRORs,WARNINGs and a one NOTEs.
-The second NOTE was solved.
 
-I got a note only on travis-ci:
 checking installed package size ...NOTE installed size is  10.9Mb
 this is a problem of the size of compiled code.
-
-The old NOTE was fixed:
-
-Check: use of SHLIB_OPENMP_*FLAGS in Makefiles 
-Result: NOTE 
-...
 
 
 

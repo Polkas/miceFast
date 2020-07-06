@@ -77,7 +77,7 @@ arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w
 
 arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge) {
 
-  int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
+  int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows; int C_NA = X1.n_cols;
 
   arma::colvec wq=sqrt(w);
   arma::colvec y2 = wq%y;
@@ -90,13 +90,15 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
   arma::mat XX = X2.t()*X2 ;
   XX.diag() += ridge;
 
-  arma::colvec coef = arma::inv(XX)*X2.t() * y2;
+  arma::mat XX_inv = arma::inv(XX) ;
+
+  arma::mat XX_inv_chol = arma::chol(XX_inv) ;
+
+  arma::colvec coef = XX_inv*X2.t() * y2;
 
   arma::colvec res = y - X*coef;
 
   double df = N-C ;
-
-  //arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
 
   double res2 = arma::as_scalar(arma::trans(res)*res);
 
@@ -110,8 +112,13 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
 
     arma::vec noise2(N_NA);
     noise2.randn();
+    arma::colvec noise2b(C_NA);
+    noise2b.randn();
 
-    pred_sum = pred_sum +( X1 * coef + noise2 * sigma_b);
+    arma::colvec coef2 =  coef + arma::trans(XX_inv_chol) * noise2b * sigma_b;
+    coef2.replace(datum::nan, 0);
+
+    pred_sum = pred_sum + (X1 * coef2 + noise2 * sigma_b);
   }
 
   return pred_sum/(double) k;
@@ -122,18 +129,20 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
 
 arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int k, double ridge) {
 
-  int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
+  int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows; int C_NA = X1.n_cols;
 
   arma::mat XX = X.t()*X ;
   XX.diag() += ridge;
 
-  arma::colvec coef = arma::inv(XX)*X.t() * y;
+  arma::mat XX_inv = arma::inv(XX) ;
+
+  arma::mat XX_inv_chol = arma::chol(XX_inv);
+
+  arma::colvec coef = XX_inv*X.t() * y;
 
   arma::colvec res = y - X*coef;
 
   double df = N-C;
-
-  //arma::mat XX_inv = arma::inv(arma::trans(X)*X) ;
 
   double res2 = arma::as_scalar(arma::trans(res)*res);
 
@@ -147,8 +156,13 @@ arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int k, do
 
     arma::vec noise2(N_NA);
     noise2.randn();
+    arma::colvec noise2b(C_NA);
+    noise2b.randn();
 
-    pred_sum = pred_sum + (X1 * coef + noise2 * sigma_b);
+    arma::colvec coef2 =  coef + arma::trans(XX_inv_chol) * noise2b * sigma_b;
+    coef2.replace(datum::nan, 0);
+
+    pred_sum = pred_sum + (X1 * coef2 + noise2 * sigma_b);
   }
 
   return pred_sum/(double) k;
@@ -571,20 +585,16 @@ arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k, doubl
 
     double sigma_b = sqrt(res2/chi2);
 
-
     arma::vec noise2(N_NA);
     noise2.randn();
     arma::colvec noise2b(C_NA);
     noise2b.randn();
 
-
-
     arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
-
     coef3.replace(datum::nan, 0);
-   arma::colvec ypred_mis =  X1 * coef3 + noise2 * sigma_b;
-    arma::colvec y_full = arma::sort(y);
 
+    arma::colvec ypred_mis =  X1 * coef3 + noise2 * sigma_b;
+    arma::colvec y_full = arma::sort(y);
 
     arma::colvec yimp = neibo(y_full,ypred_mis,k);
 

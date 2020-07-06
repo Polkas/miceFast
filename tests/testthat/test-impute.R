@@ -96,6 +96,7 @@ test_that("impute", {
   model <- new(miceFast)
   data <- data_disc_NA[, c(posit_y, posit_x)]
   model$set_data(data)
+  model$get_ridge()
   pred_miceFast <- model$impute("lda", posit_y, posit_x)
 
   rm(model)
@@ -226,7 +227,8 @@ test_that("impute", {
   model <- new(miceFast)
   model$set_data(data)
   pred_miceFast <- model$impute("lm_pred", posit_y, posit_x)
-
+  model$set_ridge(1e-7)
+  model$get_ridge
   rm(model)
 
   a <- sum((pred_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)

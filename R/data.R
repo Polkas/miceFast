@@ -32,14 +32,14 @@
 #'   # months as groups
 #'   groups = airquality[, 5]
 #' )
-#' 
+#'
 #' # data.table
 #' air_miss <- data.table(data)
 #' air_miss$groups <- factor(air_miss$groups)
-#' 
+#'
 #' # Distribution of Ozone - close to log-normal
 #' # hist(air_miss$Ozone)
-#' 
+#'
 #' # Additional vars
 #' # Make a character variable to show package capabilities
 #' air_miss$x_character <- as.character(cut(air_miss$Solar.R, seq(0, 350, 70)))
@@ -48,5 +48,5 @@
 #' air_miss$Ozone_f <- cut(air_miss$Ozone, seq(0, 160, 20))
 #' air_miss$Ozone_high <- air_miss$Ozone > mean(air_miss$Ozone, na.rm = T)
 #' }
-#' 
+#'
 "air_miss"

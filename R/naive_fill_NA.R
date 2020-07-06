@@ -21,7 +21,7 @@
 #' data(air_miss)
 #' naive_fill_NA(air_miss)
 #' }
-#' 
+#'
 #' @name naive_fill_NA
 #'
 #' @export

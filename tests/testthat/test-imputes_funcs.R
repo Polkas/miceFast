@@ -5,7 +5,7 @@ context("miceFast-imputes_funcs")
 test_that("imputes", {
   set.seed(1234)
 
-  power <- 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
+  power <- 4 # power of 10 - number of observations - should be adjusted to a computer capabilities
 
   nr_var <- 7 # CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 
@@ -87,7 +87,7 @@ test_that("imputes", {
     model = "lm_noise",
     posit_y = 1,
     posit_x = c(2, 3, 4),
-    times = 10
+    k = 10
   )
 
   test1 <- cor(cbind(pred_lm_noise_N[index_NA], data_con[index_NA, 1]))[1, 2] > 0.5
@@ -130,15 +130,133 @@ test_that("imputes", {
   data_df$x2 <- as.factor(round(pnorm(data_df$x2) * 5))
   data_df$x3 <- as.character(round(pnorm(data_df$x3) * 5))
 
-#
-#   data_df %>%
-#     group_by(group) %>%
-#     do(mutate(.,y_imp = fill_NA(
-#     x = .,
-#     model = "lm_pred",
-#     posit_y = "y",
-#     posit_x = c("Intercept", "x2", "x3", "x4"),
-#     w = .[["weights"]])))
+
+  data_df2 <- data_df %>%
+    group_by(group) %>%
+    do(mutate(., y_imp = fill_NA(
+      x = .,
+      model = "lm_pred",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"),
+      w = .[["weights"]]
+    ))) %>%
+    do(mutate(., y_imp2 := fill_NA_N(
+      x = .,
+      model = "lm_bayes",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]], k = 100
+    ))) %>%
+    do(mutate(., y_imp3 := fill_NA(
+      x = .,
+      model = "lm_pred",
+      posit_y = "y",
+      posit_x = c("Intercept"), w = .[["weights"]]
+    ))) %>%
+    do(mutate(., y_imp4 := fill_NA(
+      x = .,
+      model = "lm_pred",
+      posit_y = "y",
+      posit_x = c("Intercept")
+    ))) %>%
+    do(mutate(., y_imp5 := fill_NA_N(
+      x = .,
+      model = "lm_noise",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]], k = 10
+    ))) %>%
+    do(mutate(., y_imp6 := fill_NA_N(
+      x = .,
+      model = "lm_bayes",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 100
+    ))) %>%
+    ungroup() %>%
+    mutate(y_imp7 := fill_NA_N(
+      x = .,
+      model = "lm_bayes",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 10
+    )) %>%
+    group_by(group) %>%
+    do(mutate(., y_imp8 = fill_NA_N(
+      x = .,
+      model = "lm_bayes",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]], k = 100
+    ))) %>%
+    ungroup() %>%
+    mutate(y_imp9 = fill_NA(
+      x = .,
+      model = "lm_pred",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]]
+    )) %>%
+    mutate(y_imp10 = fill_NA(
+      x = .,
+      model = "lm_bayes",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]]
+    )) %>%
+    mutate(y_imp11 = fill_NA(
+      x = .,
+      model = "lm_pred",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4")
+    )) %>%
+    mutate(y_imp12 = fill_NA(
+      x = .,
+      model = "lm_noise",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4")
+    )) %>%
+    mutate(y_imp13 = fill_NA_N(
+      x = .,
+      model = "pmm",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 10
+    )) %>%
+    group_by(group) %>%
+    do(mutate(., y_imp14 = fill_NA_N(
+      x = .,
+      model = "pmm",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 10
+    ))) %>%
+    ungroup() %>%
+    mutate(y_imp15 = fill_NA_N(
+      x = .,
+      model = "lm_noise",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 100
+    )) %>%
+    mutate(y_imp16 = fill_NA_N(
+      x = .,
+      model = "lm_noise",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[['weights']], k = 100
+    ))
+
+
+
+  test4a <- all(cor(data_df2[index_NA, c(
+    "y_true",
+    "y_imp",
+    "y_imp2",
+    "y_imp3",
+    "y_imp4",
+    "y_imp5",
+    "y_imp6",
+    "y_imp7",
+    "y_imp8",
+    "y_imp9",
+    "y_imp10",
+    "y_imp11",
+    "y_imp12",
+    "y_imp13",
+    "y_imp14",
+        "y_imp15",
+    "y_imp16"
+  )])[, 1] > 0.3)
 
   data_DT <- data.table(data_df)
   # fill_NA
@@ -154,7 +272,7 @@ test_that("imputes", {
       x = .SD,
       model = "lm_bayes",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]], times = 10
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]], k = 100
     ), by = .(group)] %>%
     .[, y_imp3 := fill_NA(
       x = .SD,
@@ -172,25 +290,25 @@ test_that("imputes", {
       x = .SD,
       model = "lm_noise",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]], times = 10
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]], k = 10
     ), by = .(group)] %>%
     .[, y_imp6 := fill_NA_N(
       x = .SD,
       model = "lm_bayes",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), times = 10
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 100
     ), by = .(group)] %>%
     .[, y_imp7 := fill_NA_N(
       x = .SD,
       model = "lm_bayes",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), times = 10
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 10
     )] %>%
-    .[, y_imp8 := fill_NA(
+    .[, y_imp8 := fill_NA_N(
       x = .SD,
       model = "lm_bayes",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]]
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]], k = 100
     ), by = .(group)] %>%
     .[, y_imp9 := fill_NA(
       x = .SD,
@@ -215,7 +333,32 @@ test_that("imputes", {
       model = "lm_noise",
       posit_y = "y",
       posit_x = c("Intercept", "x2", "x3", "x4")
+    )] %>%
+    .[, y_imp13 := fill_NA_N(
+      x = .SD,
+      model = "pmm",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 10
+    )] %>%
+    .[, y_imp14 := fill_NA_N(
+      x = .SD,
+      model = "pmm",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 10
+    ), by = .(group)] %>%
+    .[, y_imp15 := fill_NA_N(
+      x = .SD,
+      model = "lm_noise",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), k = 100
+    )] %>%
+    .[, y_imp16 := fill_NA_N(
+      x = .SD,
+      model = "lm_noise",
+      posit_y = "y",
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[['weights']], k = 100
     )]
+
 
   test4 <- all(cor(data_DT[index_NA, c(
     "y_true",
@@ -230,7 +373,11 @@ test_that("imputes", {
     "y_imp9",
     "y_imp10",
     "y_imp11",
-    "y_imp12"
+    "y_imp12",
+    "y_imp13",
+    "y_imp14",
+    "y_imp15",
+    "y_imp16"
   )])[, 1] > 0.3)
 
   data <- cbind(y_true = data_disc[, 1], data_disc_NA, Intercept = 1, index = 1:nrow(data_disc))
@@ -330,5 +477,5 @@ test_that("imputes", {
   test6 <- (all(vi1 > vi2)) && (any(vi1 > 7))
 
   # VIF
-  test_all <- expect_true(all(c(test0, test1, test2, test3, test4, test5a, test5b, test6)))
+  test_all <- expect_true(all(c(test0, test1, test2, test3, test4a, test4, test5a, test5b, test6)))
 })

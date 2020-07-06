@@ -31,4 +31,12 @@ test_that("VIF", {
   all_vifs_sd <- apply(do.call(rbind, list(vif_R[[1]], vif_R[[2]], as.vector(vif_det_miceFast))), 2, sd)
 
   expect_true(all(all_vifs_sd < 0.01))
+
+  data("air_miss")
+
+  expect_identical(VIF(air_miss, 1, 2:4), VIF(airquality2, 1, 2:4))
+
+  expect_true(any(VIF(air_miss, 1, c(2:5, 7:9)) > 10**4))
+  expect_true(any(VIF(air_miss, 1, c(2:5, 7:9)) > 10**4))
+  expect_true(all(VIF(air_miss, 1, c(2:5, 7:9), correct = FALSE) > VIF(air_miss, 1, c(2:5, 7:9), correct = TRUE)))
 })

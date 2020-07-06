@@ -16,10 +16,11 @@ Encoding: UTF-8
 Imports:
     methods,
     data.table,
+    dplyr,
+    magrittr,
     Rcpp (>= 0.12.12),
     lifecycle
 Suggests:
-  	dplyr,
 	  knitr,
     rmarkdown,
     pacman,
@@ -27,7 +28,6 @@ Suggests:
     mice,
     broom,
     car,
-    magrittr,
     ggplot2
 VignetteBuilder: knitr
 LinkingTo: 

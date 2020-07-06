@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE)
 Loading the package and setting a seed:
 
 ```{r,echo=TRUE,message=FALSE,warning=FALSE}
-pkgs = c('miceFast','data.table','magrittr','mice','car','dplyr','ggplot2')
+pkgs = c('miceFast','mice','car','ggplot2','dplyr','data.table')
 inst = lapply(pkgs, library, character.only = TRUE)
 ```
 
@@ -141,9 +141,16 @@ air_miss[,Solar_R_imp := fill_NA_N(x=.SD,
                            posit_x=c('Intercept','x_character_imp','Wind','Temp'),
                            w=.SD[['weights']],
                            logreg=TRUE),.(groups)] %>%
+  .[,Ozone_imp6 := fill_NA_N(x=.SD, 
+                           model="pmm",
+                           posit_y='Ozone',
+                           posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+                           w=.SD[['weights']],
+                           logreg=TRUE,
+                           k=10),.(groups)] %>%
                            
 # Average of a few methods
-  .[,Ozone_imp_mix := apply(.SD,1,mean),.SDcols=Ozone_imp1:Ozone_imp5] %>% 
+  .[,Ozone_imp_mix := apply(.SD,1,mean),.SDcols=Ozone_imp1:Ozone_imp6] %>% 
   
 # Protecting against collinearity or low number of observations - across small groups
 # Be carful when using a data.table grouping option 
@@ -224,6 +231,13 @@ do(mutate(.,Ozone_imp5 = fill_NA(x=.,
                                  posit_x=c('Intercept','x_character_imp','Wind','Temp'),
                                  w=.[['weights']],
                                  logreg=TRUE))) %>%
+do(mutate(.,Ozone_imp6 = fill_NA_N(x=., 
+                                 model="pmm",
+                                 posit_y='Ozone',
+                                 posit_x=c('Intercept','x_character_imp','Wind','Temp'),
+                                 w=.[['weights']],
+                                 logreg=TRUE,
+                                 k=20))) %>%
 ungroup() %>%
 # Average of a few methods
 mutate(Ozone_imp_mix = rowMeans(select(.,starts_with("Ozone_imp")))) %>%
@@ -294,6 +308,8 @@ relevant class methods:
 - `set_w(w)` - providing the weighting variable by a reference - a numeric vector - positive values
 - `get_w()` - retrieving the weighting variable [return a numeric vector] - the same values as provided by reference w, recommended to use w directly
 - `get_index()` - getting the index [return a integer vector] - useful after automatic sorting procedure
+-  `set_ridge(ridge)` - providing a ridge i.e. the disturbance to diag of XX, default 1e-6
+-  `get_ridge()` - getting a ridge
 - `impute("model",posit_y,posit_x)` - impute data under characteristics form object like a optional grouping or weighting variable [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
 - `impute_N("model2",posit_y,posit_x,k)` - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for ("lm_bayes","lm_noise") - [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values by average of N results, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
 - `update_var(posit_y,imputations)` - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters. [void]
@@ -310,7 +326,7 @@ relevant class methods:
 `posit_y`: integer - a position of dependent variable  
 `posit_x`: integer vector - positions of independent variables  
 `imputations` : numeric vector - imputations  
-`k` : integer - number of multiple imputations 
+`k` : integer - number of multiple imputations or k-nearest for pmm
 
 *For a simple mean imputations add intercept to data and use "lm_pred"*  
 *The lda model is assessed only if there are more than 15 complete observations and for the lms models if the number of independent variables is smaller than the number of observations.*
@@ -329,7 +345,7 @@ use `model.matrix` to get numeric matrix from `data.frame` - see Tips in this do
 data = cbind(as.matrix(mice::nhanes),intercept=1,index=1:nrow(mice::nhanes))
 model = new(miceFast)
 model$set_data(data) #providing data by a reference
-
+model$get_ridge()
 model$update_var(2,model$impute("lm_pred",2,5)$imputations)
 #OR not recommended
 #data[,2] = model$impute("lm_pred",2,5)$imputations
