@@ -1,7 +1,6 @@
 #' \code{fill_NA} function for the imputations purpose.
 #'
 #' @description
-#' \Sexpr[results=rd, stage=render]{rlang:::lifecycle("maturing")}
 #' Regular imputations to fill the missing data.
 #' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 #' Quantitative models were built under Rcpp packages and the C++ library Armadillo.

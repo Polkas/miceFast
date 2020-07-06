@@ -2,7 +2,6 @@
 #' \code{fill_NA_N} function for the multiple imputations purpose.
 #'
 #' @description
-#' \Sexpr[results=rd, stage=render]{rlang:::lifecycle("maturing")}
 #' Multiple imputations to fill the missing data.
 #' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 #' Quantitative models were built under Rcpp packages and the C++ library Armadillo.
@@ -249,7 +248,7 @@
 
 fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
-    if (lifecycle::is_present(times)) {
+    if (is_present(times)) {
       deprecate_warn("0.6.0", "miceFast::fill_NA_N(times=)", "miceFast::fill_NA_N(k=)")
       k <- times
     }

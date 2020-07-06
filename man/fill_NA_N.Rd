@@ -78,7 +78,6 @@ fill_NA_N(
 load imputations in a numeric/character/factor (similar to the input type) vector format
 }
 \description{
-\Sexpr[results=rd, stage=render]{rlang:::lifecycle("maturing")}
 Multiple imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
 Quantitative models were built under Rcpp packages and the C++ library Armadillo.

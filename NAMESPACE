@@ -18,6 +18,8 @@ importFrom(lifecycle,deprecate_warn)
 
 importFrom(lifecycle,deprecated)
 
+importFrom(lifecycle,is_present)
+
 importFrom(stats, model.matrix.lm, "median", "na.omit", "prcomp")
 
 useDynLib(miceFast,.registration=TRUE)

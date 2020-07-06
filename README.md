@@ -14,8 +14,7 @@ Fast imputations under the object-oriented programming paradigm.
 Moreover there are offered a few functions built to work with popular R packages such as 'data.table' or 'dplyr'.
 The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
 A single evaluation of a quantitative model for the multiple imputations is another major enhancement.
-A new major improvement is the one of the fastest predictive mean matching in the R world, 
-based on pre-sorting and binary search not knn algorithms or O(N^2) loops.
+A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.
 
 Performance benchmarks (check performance_validity.R file at extdata).
 

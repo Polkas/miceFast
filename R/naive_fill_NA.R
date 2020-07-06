@@ -1,7 +1,6 @@
 #' \code{naive_fill_NA} function for the imputations purpose.
 #'
 #' @description
-#' \Sexpr[results=rd, stage=render]{rlang:::lifecycle("experimental")}
 #' Regular imputations to fill the missing data.
 #' Non missing independent variables are used to approximate a missing observations for a dependent variable.
 #' For numeric columns with any missing data a simple bayesian mean will be used.
