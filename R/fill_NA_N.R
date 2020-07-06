@@ -15,6 +15,7 @@
 #' @param k an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10
 #' @param times deprecated
 #' @param logreg a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE
+#' @param ridge a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5
 #'
 #' @return load imputations in a numeric/character/factor (similar to the input type) vector format
 #'
@@ -230,13 +231,11 @@
 #'
 #' @export
 
-fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
-
+fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
-
     if (lifecycle::is_present(times)) {
-    deprecate_warn("0.6.0", "miceFast::fill_NA_N(times=)", "miceFast::fill_NA_N(k=)")
-    k = times
+      deprecate_warn("0.6.0", "miceFast::fill_NA_N(times=)", "miceFast::fill_NA_N(k=)")
+      k <- times
     }
     UseMethod("fill_NA_N")
   } else {
@@ -246,14 +245,13 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 
 
 #' @describeIn fill_NA_N s3 method for data.frame
 
-fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
-
+fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
   ww <- if (is.null(w)) vector() else w
 
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
-  model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
+  model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
 
 
   cols <- colnames(x)
@@ -288,7 +286,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     yy <- log(yy + 1e-8)
   }
 
-  x_small <-  x[, posit_x]
+  x_small <- x[, posit_x]
   types <- lapply(x_small, class)
   x_ncols <- length(posit_x)
   p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
@@ -314,7 +312,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
@@ -323,13 +321,13 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     l <- levels(yy)
     yy <- as.numeric(yy)
     yy <- yy
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
   } else if (is_numeric_y) {
     yy <- as.numeric(yy)
-    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k)
+    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge)
     if (logreg && (model != "lda")) {
       ff <- exp(ff)
     }
@@ -342,13 +340,12 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for data.table
 
-fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
-
+fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
-  model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
+  model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
 
   cols <- colnames(x)
 
@@ -382,7 +379,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     yy <- log(yy + 1e-8)
   }
 
-  x_small <-  x[, posit_x, with = FALSE]
+  x_small <- x[, posit_x, with = FALSE]
   types <- lapply(x_small, class)
   x_ncols <- length(posit_x)
   p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
@@ -399,7 +396,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
   if (x_ncols > len_p_x_factor_character) {
     posit_ni <- setdiff(posit_x, posit_x[p_x_factor_character])
-    x_ni <-  as.matrix(x[, posit_ni, with = FALSE])
+    x_ni <- as.matrix(x[, posit_ni, with = FALSE])
     xx[[2]] <- x_ni
   }
 
@@ -408,7 +405,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
@@ -417,13 +414,13 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     l <- levels(yy)
     yy <- as.numeric(yy)
     yy <- yy
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k))
+    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
   } else if (is_numeric_y) {
     yy <- as.numeric(yy)
-    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k)
+    ff <- fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge)
     if (logreg && (model != "lda")) {
       ff <- exp(ff)
     }
@@ -436,12 +433,12 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for matrix
 
-fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, times = deprecated()) {
+fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
-  model <- match.arg(model, c("lm_bayes", "lm_noise","pmm"))
+  model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
 
   cols <- colnames(x)
 
@@ -462,7 +459,7 @@ fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALS
   if (logreg_con) {
     x[[posit_y]] <- log(x[[posit_y]] + 1e-8)
   }
-  ff <- fill_NA_N_(x, model, posit_y, posit_x, ww, k)
+  ff <- fill_NA_N_(x, model, posit_y, posit_x, ww, k, ridge)
   if (logreg_con) {
     ff <- exp(ff)
   }

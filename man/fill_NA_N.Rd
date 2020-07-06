@@ -15,6 +15,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
+  ridge = 1e-06,
   times = deprecated()
 )
 
@@ -26,6 +27,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
+  ridge = 1e-06,
   times = deprecated()
 )
 
@@ -37,6 +39,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
+  ridge = 1e-06,
   times = deprecated()
 )
 
@@ -48,6 +51,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
+  ridge = 1e-06,
   times = deprecated()
 )
 }
@@ -65,6 +69,8 @@ fill_NA_N(
 \item{logreg}{a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE}
 
 \item{k}{an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10}
+
+\item{ridge}{a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5}
 
 \item{times}{deprecated}
 }

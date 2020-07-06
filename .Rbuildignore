@@ -10,3 +10,4 @@ TODO.md
 .*\.png
 ^doc$
 ^Meta$
+^\.github$

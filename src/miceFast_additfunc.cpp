@@ -33,25 +33,25 @@ arma::uvec complete_cases_vec(arma::colvec &y) {
   return out;
 }
 
-arma::uvec histFast(arma::uvec &gg){
-  unsigned int n = gg.n_elem;
-  arma::uvec un = arma::unique(gg);
-  unsigned int group = un.n_elem;
-  arma::uvec h(group,arma::fill::zeros);
-  unsigned int gg_prev,gg_curr;
-  gg_prev = gg(0);
-  unsigned int iter = 0 ;
-  h(iter) = 0;
-  for(unsigned int i=0;i<n;i++){
-    gg_curr = gg(i);
-    if(gg_prev!=gg_curr){
-      iter++;
-    }
-    h(iter) = h(iter) + 1;
-    gg_prev = gg_curr;
-  }
-  return h;
-}
+// arma::uvec histFast(arma::uvec &gg){
+//   unsigned int n = gg.n_elem;
+//   arma::uvec un = arma::unique(gg);
+//   unsigned int group = un.n_elem;
+//   arma::uvec h(group,arma::fill::zeros);
+//   unsigned int gg_prev,gg_curr;
+//   gg_prev = gg(0);
+//   unsigned int iter = 0 ;
+//   h(iter) = 0;
+//   for(unsigned int i=0;i<n;i++){
+//     gg_curr = gg(i);
+//     if(gg_prev!=gg_curr){
+//       iter++;
+//     }
+//     h(iter) = h(iter) + 1;
+//     gg_prev = gg_curr;
+//   }
+//   return h;
+// }
 
 bool different_y_and_x(int posit_y, arma::uvec posit_x){
 
@@ -69,4 +69,10 @@ bool different_x(arma::uvec posit_x){
   bool different_vars = uni_x.n_elem == posit_x.n_elem;
 
   return different_vars;
+}
+
+arma::mat sym(arma::mat x){
+
+  return (x + arma::trans(x))/2;
+
 }

@@ -7,13 +7,13 @@
 \alias{fill_NA.matrix}
 \title{\code{fill_NA} function for the imputations purpose.}
 \usage{
-fill_NA(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
+fill_NA(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-06)
 
-\method{fill_NA}{data.frame}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
+\method{fill_NA}{data.frame}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-06)
 
-\method{fill_NA}{data.table}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
+\method{fill_NA}{data.table}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-06)
 
-\method{fill_NA}{matrix}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
+\method{fill_NA}{matrix}(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-06)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables}
@@ -27,6 +27,8 @@ fill_NA(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
 \item{w}{a numeric vector - a weighting variable - only positive values, Default:NULL}
 
 \item{logreg}{a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE}
+
+\item{ridge}{a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5}
 }
 \value{
 load imputations in a numeric/logical/character/factor (similar to the input type) vector format

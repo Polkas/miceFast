@@ -41,9 +41,9 @@ arma::uvec get_index_NA_R(arma::mat &x,int posit_y, arma::uvec posit_x){
   return index_NA;
 }
 
-arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec posit_x,int times){
+arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec posit_x,int k, double ridge = 1e-6){
 
-  typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&,int);
+  typedef arma::colvec (*pfunc)(arma::colvec&,arma::mat&,arma::mat&,int,double);
     std::map<std::string, pfunc> funMap = {
     {"lda",fastLda},
     {"lm_pred",fastLm_pred},
@@ -66,7 +66,7 @@ arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec pos
   arma::colvec Y_full = x(index_full,posit_y_uvec);
 
   pfunc f = funMap[s];
-  pred = (*f)(Y_full,X_full,X_NA,times);
+  pred = (*f)(Y_full,X_full,X_NA,k,ridge);
 
   }
 
@@ -77,9 +77,9 @@ arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec pos
 }
 
 
-arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x,arma::colvec w,int times){
+arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x,arma::colvec w,int k, double ridge = 1e-6){
 
-  typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&,int);
+  typedef arma::colvec (*pfuncw)(arma::colvec&,arma::mat&,arma::colvec&,arma::mat&,int, double);
   std::map<std::string, pfuncw> funMapw = {{"lm_pred",fastLm_weighted},
   {"lm_noise",fastLm_weighted_noise},
   {"lm_bayes",fastLm_weighted_bayes},
@@ -107,7 +107,7 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
   arma::colvec w_full = w.elem(index_full);
 
   pfuncw f = funMapw[s];
-  pred  = (*f)(Y_full,X_full,w_full,X_NA,times);
+  pred  = (*f)(Y_full,X_full,w_full,X_NA,k,ridge);
 
 
   }
@@ -222,12 +222,12 @@ arma::vec VIF_(arma::mat &x,int posit_y,arma::uvec posit_x,arma::uvec posit_x_va
 
   return vifs;
 
-};
+}
 
 
 
 // [[Rcpp::export]]
-arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w,int times=10){
+arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w,int k=10, double ridge = 1e-6){
 
 
   posit_x =  posit_x - 1;
@@ -236,9 +236,9 @@ arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec 
   arma::colvec pred_avg;
 
   if(w.is_empty() || (model.compare("lda") == 0)){
-    pred_avg = impute_raw_R(x,model,posit_y,posit_x,times);
+    pred_avg = impute_raw_R(x,model,posit_y,posit_x,k, ridge);
   } else{
-    pred_avg = imputeW_R(x,model,posit_y,posit_x,w,times);
+    pred_avg = imputeW_R(x,model,posit_y,posit_x,w,k, ridge);
   }
 
   //index
@@ -247,7 +247,7 @@ arma::colvec fill_NA_N_(arma::mat &x, std::string model, int posit_y,arma::uvec 
 
 
 // [[Rcpp::export]]
-arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w){
+arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w, double ridge = 1e-6){
 
   posit_x =  posit_x - 1;
   posit_y = posit_y - 1;
@@ -255,34 +255,32 @@ arma::colvec fill_NA_(arma::mat &x,std::string model, int posit_y,arma::uvec pos
   arma::colvec pred_avg;
 
   if(w.is_empty() || (model.compare("lda") == 0)){
-    pred_avg = impute_raw_R(x,model,posit_y,posit_x,1);
+    pred_avg = impute_raw_R(x,model,posit_y,posit_x,1, ridge);
   } else {
-    pred_avg = imputeW_R(x,model,posit_y,posit_x,w,1);
+    pred_avg = imputeW_R(x,model,posit_y,posit_x,w,1, ridge);
   }
 
   //index
   return pred_avg;
 }
 
-
-// [[Rcpp::export]]
-SEXP cpp_miceFast() {
-  miceFast *v = new miceFast();
-  Rcpp::XPtr<miceFast> ptr(v, true);
-  return ptr;
-}
-
-
-
-
-// [[Rcpp::export]]
-void cpp_miceFast_set_data(SEXP ptr, arma::mat &doc) {
-  Rcpp::XPtr<miceFast> v(ptr);
-  v->set_data(doc);
-}
-
-// [[Rcpp::export]]
-arma::mat cpp_miceFast_get_data(SEXP ptr) {
-  Rcpp::XPtr<miceFast> v(ptr);
-  return(v->get_data());
-}
+//
+// // [[Rcpp::export]]
+// SEXP cpp_miceFast() {
+//   miceFast *v = new miceFast();
+//   Rcpp::XPtr<miceFast> ptr(v, true);
+//   return ptr;
+// }
+//
+//
+// // [[Rcpp::export]]
+// void cpp_miceFast_set_data(SEXP ptr, arma::mat &doc) {
+//   Rcpp::XPtr<miceFast> v(ptr);
+//   v->set_data(doc);
+// }
+//
+// // [[Rcpp::export]]
+// arma::mat cpp_miceFast_get_data(SEXP ptr) {
+//   Rcpp::XPtr<miceFast> v(ptr);
+//   return(v->get_data());
+// }

@@ -3,7 +3,8 @@
 
 * fast PMM - pre-sorting and binary search
 * naice_fill_NA - auto function for data.frames - bayes mean and lda
-* sicker
+* codecov
+* ridge argument
 
 # 0.5.1
 

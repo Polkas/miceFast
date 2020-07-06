@@ -5,24 +5,12 @@ VIF_ <- function(x, posit_y, posit_x, posit_x_var, correct) {
     .Call(`_miceFast_VIF_`, x, posit_y, posit_x, posit_x_var, correct)
 }
 
-fill_NA_N_ <- function(x, model, posit_y, posit_x, w, times = 10L) {
-    .Call(`_miceFast_fill_NA_N_`, x, model, posit_y, posit_x, w, times)
+fill_NA_N_ <- function(x, model, posit_y, posit_x, w, k = 10L, ridge = 1e-6) {
+    .Call(`_miceFast_fill_NA_N_`, x, model, posit_y, posit_x, w, k, ridge)
 }
 
-fill_NA_ <- function(x, model, posit_y, posit_x, w) {
-    .Call(`_miceFast_fill_NA_`, x, model, posit_y, posit_x, w)
-}
-
-cpp_miceFast <- function() {
-    .Call(`_miceFast_cpp_miceFast`)
-}
-
-cpp_miceFast_set_data <- function(ptr, doc) {
-    invisible(.Call(`_miceFast_cpp_miceFast_set_data`, ptr, doc))
-}
-
-cpp_miceFast_get_data <- function(ptr) {
-    .Call(`_miceFast_cpp_miceFast_get_data`, ptr)
+fill_NA_ <- function(x, model, posit_y, posit_x, w, ridge = 1e-6) {
+    .Call(`_miceFast_fill_NA_`, x, model, posit_y, posit_x, w, ridge)
 }
 
 #' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
@@ -59,7 +47,7 @@ neibo_index <- function(y, miss, k) {
     .Call(`_miceFast_neibo_index`, y, miss, k)
 }
 
-pmm_weighted_neibo <- function(y, X, w, X1, k) {
-    .Call(`_miceFast_pmm_weighted_neibo`, y, X, w, X1, k)
+pmm_weighted_neibo <- function(y, X, w, X1, k, ridge) {
+    .Call(`_miceFast_pmm_weighted_neibo`, y, X, w, X1, k, ridge)
 }
 

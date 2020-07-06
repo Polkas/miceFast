@@ -53,10 +53,3 @@ S3method(VIF, data.table)
 S3method(VIF, data.frame)
 
 S3method(VIF,matrix)
-
-
-
-
-
-
-

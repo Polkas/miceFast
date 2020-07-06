@@ -130,6 +130,15 @@ test_that("imputes", {
   data_df$x2 <- as.factor(round(pnorm(data_df$x2) * 5))
   data_df$x3 <- as.character(round(pnorm(data_df$x3) * 5))
 
+#
+#   data_df %>%
+#     group_by(group) %>%
+#     do(mutate(.,y_imp = fill_NA(
+#     x = .,
+#     model = "lm_pred",
+#     posit_y = "y",
+#     posit_x = c("Intercept", "x2", "x3", "x4"),
+#     w = .[["weights"]])))
 
   data_DT <- data.table(data_df)
   # fill_NA

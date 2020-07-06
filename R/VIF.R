@@ -19,12 +19,12 @@
 #' \dontrun{
 #' library(miceFast)
 #' library(data.table)
-#'
+#' 
 #' airquality2 <- airquality
 #' airquality2$Temp2 <- airquality2$Temp**2
 #' # install.packages("car")
 #' # car::vif(lm(Ozone ~ ., data=airquality2))
-#'
+#' 
 #' data_DT <- data.table(airquality2)
 #' data_DT[, .(vifs = VIF(
 #'   x = .SD,
@@ -32,7 +32,7 @@
 #'   posit_x = c("Solar.R", "Wind", "Temp", "Month", "Day", "Temp2"),
 #'   correct = FALSE
 #' ))][["vifs"]]
-#'
+#' 
 #' data_DT[, .(vifs = VIF(
 #'   x = .SD,
 #'   posit_y = 1,
@@ -40,7 +40,7 @@
 #'   correct = TRUE
 #' ))][["vifs"]]
 #' }
-#'
+#' 
 #' @name VIF
 #'
 #' @export
@@ -100,7 +100,6 @@ VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
 #' @describeIn  VIF
 
 VIF.data.table <- function(x, posit_y, posit_x, correct = FALSE) {
-
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }

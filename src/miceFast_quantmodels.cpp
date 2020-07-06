@@ -7,38 +7,38 @@
 #include <algorithm>
 using namespace std;
 using namespace Rcpp;
-
-#include <algorithm>
-using namespace std;
-using namespace Rcpp;
 using namespace arma;
 
 
 #define UNUSED(expr) (void)(expr)
 
 //weighted linear regression
-arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1,int times) {
+arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1,int k, double ridge) {
 
-  UNUSED(times);
+  UNUSED(k);
 
-  int n = X.n_rows, k = X.n_cols;
+  int n = X.n_rows;
+  int C = X.n_cols;
 
   arma::colvec wq=sqrt(w);
   arma::colvec y2 = wq%y;
-  arma::mat X2(n,k);
+  arma::mat X2(n,C);
 
-  for(int h=0;h<k;h++){
+  for(int h=0;h<C;h++){
     X2.col(h)=wq%X.col(h);
   }
 
-  arma::colvec coef = arma::solve(X2.t()*X2, X2.t()*y2);
+  arma::mat XX = X2.t()*X2 ;
+  XX.diag() += ridge;
+
+  arma::colvec coef = arma::inv(XX)*X2.t() * y2;
 
   return X1*coef;
 
 }
 
 //weighted linear regression - noise
-arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int times) {
+arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -50,7 +50,10 @@ arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w
     X2.col(h)=wq%X.col(h);
   }
 
-  arma::colvec coef = arma::solve(X2.t()*X2, X2.t()*y2);
+  arma::mat XX = X2.t()*X2 ;
+  XX.diag() += ridge;
+
+  arma::colvec coef = arma::inv(XX)*X2.t() * y2;
 
   arma::colvec res = y - X*coef;
 
@@ -58,7 +61,7 @@ arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w
 
   arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  for(int i=0;i<times;i++){
+  for(int i=0;i<k;i++){
 
     arma::vec noise(N_NA);
     noise.randn();
@@ -66,13 +69,13 @@ arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w
     pred_sum = pred_sum + (X1 * coef + noise * sigma);
   }
 
-  return pred_sum/(double) times;
+  return pred_sum/(double) k;
 
 }
 
 //weighted linear regression - bayes
 
-arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int times) {
+arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
@@ -84,7 +87,10 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
     X2.col(h)=wq%X.col(h);
   }
 
-  arma::colvec coef = arma::solve(X2.t()*X2, X2.t()*y2);
+  arma::mat XX = X2.t()*X2 ;
+  XX.diag() += ridge;
+
+  arma::colvec coef = arma::inv(XX)*X2.t() * y2;
 
   arma::colvec res = y - X*coef;
 
@@ -96,7 +102,7 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
 
   arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  for(int i=0;i<times;i++){
+  for(int i=0;i<k;i++){
 
     double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
 
@@ -108,17 +114,20 @@ arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w
     pred_sum = pred_sum +( X1 * coef + noise2 * sigma_b);
   }
 
-  return pred_sum/(double) times;
+  return pred_sum/(double) k;
 
 }
 
 //linear regression - bayes
 
-arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int times) {
+arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int k, double ridge) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-  arma::colvec coef =  arma::solve(X.t()*X, X.t()*y);
+  arma::mat XX = X.t()*X ;
+  XX.diag() += ridge;
+
+  arma::colvec coef = arma::inv(XX)*X.t() * y;
 
   arma::colvec res = y - X*coef;
 
@@ -130,7 +139,7 @@ arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int times
 
   arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  for(int i=0;i<times;i++){
+  for(int i=0;i<k;i++){
 
     double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
 
@@ -142,16 +151,19 @@ arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1,int times
     pred_sum = pred_sum + (X1 * coef + noise2 * sigma_b);
   }
 
-  return pred_sum/(double) times;
+  return pred_sum/(double) k;
 
 }
 
 //Linear regression with noise
-arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1,int times) {
+arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1,int k, double ridge) {
 
   int N = X.n_rows; int C = X.n_cols; int N_NA = X1.n_rows;
 
-  arma::colvec coef =  arma::solve(X.t()*X, X.t()*y);
+  arma::mat XX = X.t()*X ;
+  XX.diag() += ridge;
+
+  arma::colvec coef = arma::inv(XX)*X.t() * y;
 
   arma::colvec res = y - X*coef;
 
@@ -159,7 +171,7 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1,int times)
 
   arma::colvec pred_sum(N_NA,arma::fill::zeros);
 
-  for(int i=0;i<times;i++){
+  for(int i=0;i<k;i++){
 
     arma::vec noise(N_NA);
     noise.randn();
@@ -167,17 +179,20 @@ arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1,int times)
     pred_sum = pred_sum + (X1 * coef + noise * sigma);
   }
 
-  return pred_sum/(double) times;
+  return pred_sum/(double) k;
 
 }
 
 //Simple linear regression
 
-arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1,int times) {
+arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1,int k, double ridge) {
 
-  UNUSED(times);
+  UNUSED(k);
 
-  arma::colvec coef = arma::solve(X.t()*X, X.t()*y);
+  arma::mat XX = X.t()*X ;
+  XX.diag() += ridge;
+
+  arma::colvec coef = arma::inv(XX)*X.t() * y;
 
   return X1*coef;
 
@@ -185,9 +200,9 @@ arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1,int times)
 
 //LDA prediction model
 
-arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) {
+arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int k, double ridge) {
 
-  UNUSED(times);
+  UNUSED(k);
 
   arma::uvec vars = arma::find(arma::var(X)>0);
 
@@ -235,8 +250,8 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int times) 
   arma::mat X0 = sqrt(fac) * (X_vol - group_means_mat) * scaling;
 
   X_vol.clear();
-
-  arma::mat input = X0.t()*X0;
+  arma::mat input = X0.t()*X0 ;
+  input.diag() += ridge;
   X0.clear();
   arma::mat U;
   arma::mat V;
@@ -493,9 +508,9 @@ arma::uvec neibo_index(arma::colvec y, arma::colvec miss, int k) {
 
 
 // [[Rcpp::export]]
-arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k) {
+arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge) {
 
-  int N = X.n_rows; int C = X.n_cols;
+  int N = X.n_rows; int C = X.n_cols; int C_NA = X1.n_cols;int N_NA = X1.n_rows;
 
   arma::colvec wq=sqrt(w);
   arma::colvec y2 = wq%y;
@@ -506,23 +521,31 @@ arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,a
   }
 
 
-    arma::mat xtx = arma::mat( arma::trans(X2) * X2 );
+    arma::mat xtx = arma::mat( arma::trans(X2) * X2);
     for (int ii=0;ii<C;ii++){
         xtx(ii,ii)=xtx(ii,ii)+ridge;
     }
     arma::mat xinv = arma::inv( xtx );
     arma::vec coef2 = arma::mat( xinv * arma::trans(X2) * y2 );
     arma::colvec resid = arma::mat( y2 - X2*coef2 );
-    double sig2 = arma::as_scalar( arma::trans(resid)*resid/(N-C) );
+    double res2 = arma::as_scalar(resid.t()*resid);
 
-    arma::mat vcoef = arma::mat( sig2 * xinv );
+    double df = N - C;
 
-    arma::colvec coefu(C,fill::randn);
+    double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
 
-    arma::vec coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
+    double sigma_b = sqrt(res2/chi2);
 
+    arma::vec noise2(N_NA);
+    noise2.randn();
+    arma::colvec noise2b(C_NA);
+    noise2b.randn();
 
-    arma::colvec ypred_mis = X1 * coef;
+    arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
+       coef3.replace(datum::nan, 0);
+
+    arma::colvec ypred_mis = X1 * coef3 + noise2 * sigma_b;
+
     arma::colvec y_full = arma::sort(y);
 
     arma::colvec yimp = neibo(y_full,ypred_mis,k);
@@ -530,27 +553,36 @@ arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,a
     return yimp;
 }
 
-arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k) {
+arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k, double ridge) {
 
-  int N = X.n_rows; int C = X.n_cols;
+  int N = X.n_rows; int C = X.n_cols; int C_NA = X1.n_cols;int N_NA = X1.n_rows;
 
 
-    arma::mat xtx = arma::mat( arma::trans(X) * X );
-    for (int ii=0;ii<C;ii++){
-        xtx(ii,ii)=xtx(ii,ii)+ridge;
-    }
+    arma::mat xtx = arma::mat( arma::trans(X) * X);
+    xtx.diag() = xtx.diag() + ridge;
     arma::mat xinv = arma::inv( xtx );
     arma::vec coef2 =  xinv * arma::trans(X) * y ;
     arma::colvec resid =  y - X*coef2 ;
-    double sig2 = arma::as_scalar( arma::trans(resid)*resid/(N-C) );
+    double res2 = arma::as_scalar(resid.t() *resid);
 
-        arma::mat vcoef = arma::mat( sig2 * xinv );
+    double df = N - C;
 
-    arma::colvec coefu(C,fill::randn);
+    double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
 
-    arma::vec coef = arma::mat( coef2 + arma::chol(vcoef) * coefu );
+    double sigma_b = sqrt(res2/chi2);
 
-   arma::colvec ypred_mis = X1 * coef;
+
+    arma::vec noise2(N_NA);
+    noise2.randn();
+    arma::colvec noise2b(C_NA);
+    noise2b.randn();
+
+
+
+    arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
+
+    coef3.replace(datum::nan, 0);
+   arma::colvec ypred_mis =  X1 * coef3 + noise2 * sigma_b;
     arma::colvec y_full = arma::sort(y);
 
 

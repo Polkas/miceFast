@@ -12,6 +12,7 @@
 #' @param posit_x an integer/character vector - positions/names of independent variables
 #' @param w  a numeric vector - a weighting variable - only positive values, Default:NULL
 #' @param logreg a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE
+#' @param ridge a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5
 #'
 #' @return load imputations in a numeric/logical/character/factor (similar to the input type) vector format
 #'
@@ -225,19 +226,16 @@
 #'
 #' @export
 
-fill_NA <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE) {
+fill_NA <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-6) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
-
     UseMethod("fill_NA")
-
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
   }
 }
 
 #' @describeIn fill_NA S3 method for data.frame
-fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE) {
-
+fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
@@ -301,7 +299,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww))
+    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
@@ -309,13 +307,13 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     yy <- factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww))
+    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
   } else if (is_numeric_y) {
     yy <- as.numeric(yy)
-    ff <- fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww)
+    ff <- fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge)
     if (logreg && (model != "lda")) {
       ff <- exp(ff)
     }
@@ -328,9 +326,8 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
 }
 
 #' @describeIn fill_NA s3 method for data.table
-fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE) {
-
-    ww <- if (is.null(w)) vector() else w
+fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-6) {
+  ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
@@ -368,7 +365,7 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     yy <- log(yy + 1e-8)
   }
 
-  x_small <-  x[, posit_x, with = FALSE]
+  x_small <- x[, posit_x, with = FALSE]
   types <- lapply(x_small, class)
   x_ncols <- length(posit_x)
   p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
@@ -393,7 +390,7 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww))
+    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
@@ -401,13 +398,13 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     yy <- factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww))
+    f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
   } else if (is_numeric_y) {
     yy <- as.numeric(yy)
-    ff <- fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww)
+    ff <- fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge)
     if (logreg && (model != "lda")) {
       ff <- exp(ff)
     }
@@ -420,7 +417,7 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
 }
 
 #' @describeIn fill_NA S3 method for matrix
-fill_NA.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE) {
+fill_NA.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
@@ -446,7 +443,7 @@ fill_NA.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE)
   if (logreg_con) {
     x[[posit_y]] <- log(x[[posit_y]] + 1e-8)
   }
-  ff <- fill_NA_(x, model, posit_y, posit_x, ww)
+  ff <- fill_NA_(x, model, posit_y, posit_x, ww, ridge)
   if (logreg_con) {
     ff <- exp(ff)
   }
