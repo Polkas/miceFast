@@ -11,3 +11,5 @@ TODO.md
 ^doc$
 ^Meta$
 ^\.github$
+^\revdep$
+codecov.yml
