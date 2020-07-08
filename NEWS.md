@@ -1,11 +1,20 @@
+# 0.6.2
+
+* R CRAN r-oldrel-windows-ix86+x86_64 problems
+
+# 0.6.1
+
+* lifecycle problems
 
 # 0.6.0
 
-* fast PMM - pre-sorting and binary search
-* naice_fill_NA - auto function for data.frames - bayes mean and lda
-* codecov
-* ridge argument
+* fill_NA_N has a new model which is pmm - predictive mean matching
+* fast PMM - presorting and binary search
+* naive_fill_NA - auto function for data.frames - bayes mean and lda
+* ridge argument for lm models - adding small disturbance to diag of X'X
+* lm_bayes provide more disturbance
 * new tests
+* codecov
 
 # 0.5.1
 

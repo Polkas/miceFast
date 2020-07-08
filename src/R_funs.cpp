@@ -175,7 +175,7 @@ arma::vec VIF_(arma::mat &x,int posit_y,arma::uvec posit_x,arma::uvec posit_x_va
 
   arma::mat xtx = x_vols.t()*x_vols;
 
-  arma::mat XXinv = arma::inv_sympd(xtx);
+  arma::mat XXinv = arma::inv(xtx);
 
 
   if(Nvar<Ncol){ XXinv = cov2cor(XXinv) ;}
