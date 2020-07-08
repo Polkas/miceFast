@@ -19,16 +19,13 @@
      -- 1. Error: VIF (@test-vif.R#39) ---------------------------------------------
      inv_sympd(): matrix is singular or not positive definite
     
-  which was a problem of assesing inverse of X'X on this certain machine 
-  where X'X has determinat close to zero so there is high collinearity
+  which was a problem of assessing inverse of X'X on this certain machine 
+  where X'X has determinant close to zero so there is high collinearity
   
   I changed arma::inv_sympd() to arma::inv() which is a little bit slower 
   although do not assume symmetrical matrix for input. 
-  Morover I do not testing such a collinear case now.
+  Moreover I do not testing such a collinear case now.
   
   checking installed package size ...NOTE installed size is  10.9Mb
   this is a problem of the size of compiled code.
-  
-  
-  
   
