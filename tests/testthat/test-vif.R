@@ -36,7 +36,8 @@ test_that("VIF", {
 
   expect_identical(VIF(air_miss, 1, 2:4), VIF(airquality2, 1, 2:4))
 
-  expect_true(any(VIF(air_miss, 1, c(2:5)) > 1))
-  expect_true(any(VIF(air_miss, 1, c(2:5)) > 1))
-  expect_true(all(VIF(air_miss, 1, c(2:5), correct = FALSE) > VIF(air_miss, 1, c(2:5), correct = TRUE)))
+  expect_true(any(VIF(air_miss, 1, c(2:5)) >= 1))
+  expect_true(any(VIF(air_miss, 1, c(2:5)) >= 1))
+  expect_true(all(VIF(air_miss, 1, c(2:5), correct = FALSE) >= VIF(air_miss, 1, c(2:5), correct = TRUE)))
+
 })

@@ -33,11 +33,15 @@ or
 devtools::install_github("polkas/miceFast")
 ```
 
+**Recommended to download boosted BLAS library:**
+
+- Windows Users recommended to download MRO MKL: https://mran.microsoft.com/download
+- Linux users recommended to download Optimized BLAS (linear algebra) library: `sudo apt-get install libopenblas-dev`
+
 ## Quick Implementation
 
 ```r
 library(miceFast)
-library(dplyr)
 
 set.seed(1234)
 data(air_miss)
@@ -51,8 +55,27 @@ naive_fill_NA(air_miss)
 #Hmisc
 data.frame(Map(function(x) Hmisc::impute(x,'random'), air_miss))
 
-
 #mice
 mice::complete(mice::mice(air_miss, printFlag = F))
 
 ```
+
+**Quick Reference Table** 
+
+|  Function | Description |
+|----------------------|----------------------|
+| `new(miceFast)` | OOP instance with bunch of methods - check vigniette |
+| `fill_NA()`  |  imputation - lda,lm_pred,lm_bayes,lm_noise |
+| `fill_NA_N()` |   multiple imputation - pmm,lm_bayes,lm_noise |
+| `VIF()` | Variance inflation factor |
+| `naive_fill_NA()` | auto imputations |  
+
+Summing up, miceFast offer a relevant reduction of a calculations time for:  
+
+- Linear Discriminant Analysis around **(x5)**
+- where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable
+- multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
+- Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
+- Predictive mean matching (PMM) **(x100)** because of pre-sorting and binary search
+
+If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.
