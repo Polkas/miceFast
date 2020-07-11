@@ -1,7 +1,7 @@
 # miceFast <a href='https://github.com/polkas/miceFast'><img src='miceFast_logo.png' align="right" height="200" /></a>
 
 Maciej Nasinski  
-GitHub:  https://github.com/polkas/miceFast
+pkgdown: https://polkas.github.io/miceFast/index.html
 
 [**Check the R CRAN for more details**](https://CRAN.R-project.org/package=miceFast)
 
