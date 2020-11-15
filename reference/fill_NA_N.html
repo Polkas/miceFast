@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><code>fill_NA_N</code> function for the multiple imputations purpose. — fill_NA_N • miceFast</title>
+<title>fill_NA_N function for the multiple imputations purpose. — fill_NA_N • miceFast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="<code>fill_NA_N</code> function for the multiple imputations purpose. — fill_NA_N" />
+<meta property="og:title" content="fill_NA_N function for the multiple imputations purpose. — fill_NA_N" />
 <meta property="og:description" content="Multiple imputations to fill the missing data.
 Non missing independent variables are used to approximate a missing observations for a dependent variable.
 Quantitative models were built under Rcpp packages and the C++ library Armadillo." />
@@ -81,12 +81,6 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -136,56 +130,56 @@ Non missing independent variables are used to approximate a missing observations
 Quantitative models were built under Rcpp packages and the C++ library Armadillo.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-  <span class='kw'>x</span>,
-  <span class='kw'>model</span>,
-  <span class='kw'>posit_y</span>,
-  <span class='kw'>posit_x</span>,
-  w = <span class='kw'>NULL</span>,
-  logreg = <span class='fl'>FALSE</span>,
-  k = <span class='fl'>10</span>,
-  ridge = <span class='fl'>1e-06</span>,
-  times = <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span>()
-)
+    <pre class="usage"><span class='fu'>fill_NA_N</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>model</span>,
+  <span class='va'>posit_y</span>,
+  <span class='va'>posit_x</span>,
+  w <span class='op'>=</span> <span class='cn'>NULL</span>,
+  logreg <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  k <span class='op'>=</span> <span class='fl'>10</span>,
+  ridge <span class='op'>=</span> <span class='fl'>1e-06</span>,
+  times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for data.frame</span>
-<span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-  <span class='kw'>x</span>,
-  <span class='kw'>model</span>,
-  <span class='kw'>posit_y</span>,
-  <span class='kw'>posit_x</span>,
-  w = <span class='kw'>NULL</span>,
-  logreg = <span class='fl'>FALSE</span>,
-  k = <span class='fl'>10</span>,
-  ridge = <span class='fl'>1e-06</span>,
-  times = <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span>()
-)
+<span class='fu'>fill_NA_N</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>model</span>,
+  <span class='va'>posit_y</span>,
+  <span class='va'>posit_x</span>,
+  w <span class='op'>=</span> <span class='cn'>NULL</span>,
+  logreg <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  k <span class='op'>=</span> <span class='fl'>10</span>,
+  ridge <span class='op'>=</span> <span class='fl'>1e-06</span>,
+  times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for data.table</span>
-<span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-  <span class='kw'>x</span>,
-  <span class='kw'>model</span>,
-  <span class='kw'>posit_y</span>,
-  <span class='kw'>posit_x</span>,
-  w = <span class='kw'>NULL</span>,
-  logreg = <span class='fl'>FALSE</span>,
-  k = <span class='fl'>10</span>,
-  ridge = <span class='fl'>1e-06</span>,
-  times = <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span>()
-)
+<span class='fu'>fill_NA_N</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>model</span>,
+  <span class='va'>posit_y</span>,
+  <span class='va'>posit_x</span>,
+  w <span class='op'>=</span> <span class='cn'>NULL</span>,
+  logreg <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  k <span class='op'>=</span> <span class='fl'>10</span>,
+  ridge <span class='op'>=</span> <span class='fl'>1e-06</span>,
+  times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-  <span class='kw'>x</span>,
-  <span class='kw'>model</span>,
-  <span class='kw'>posit_y</span>,
-  <span class='kw'>posit_x</span>,
-  w = <span class='kw'>NULL</span>,
-  logreg = <span class='fl'>FALSE</span>,
-  k = <span class='fl'>10</span>,
-  ridge = <span class='fl'>1e-06</span>,
-  times = <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span>()
-)</pre>
+<span class='fu'>fill_NA_N</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>model</span>,
+  <span class='va'>posit_y</span>,
+  <span class='va'>posit_x</span>,
+  w <span class='op'>=</span> <span class='cn'>NULL</span>,
+  logreg <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  k <span class='op'>=</span> <span class='fl'>10</span>,
+  ridge <span class='op'>=</span> <span class='fl'>1e-06</span>,
+  times <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Deprecated.html'>deprecated</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -247,114 +241,115 @@ The lda model is assessed only if there are more than 15 complete observations
 and for the lms models if number of variables is smaller than number of observations.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></code> <code><a href='https://rdrr.io/pkg/miceFast/man/VIF.html'>VIF</a></code></p></div>
+    <div class='dont-index'><p><code><a href='fill_NA.html'>fill_NA</a></code> <code><a href='VIF.html'>VIF</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://github.com/Polkas/miceFast'>miceFast</a></span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://r-datatable.com'>data.table</a></span>)
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Polkas/miceFast'>miceFast</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://r-datatable.com'>data.table</a></span><span class='op'>)</span>
 <span class='co'>### Data</span>
 <span class='co'># airquality dataset with additional variables</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>air_miss</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>air_miss</span><span class='op'>)</span>
 
 <span class='co'>### Intro: data.table</span>
 <span class='co'># IMPUTATIONS</span>
 <span class='co'># Imputations with a grouping option (models are separately assessed for each group)</span>
 <span class='co'># taking into account provided weights</span>
-<span class='kw'>air_miss</span>[, <span class='kw'>Solar_R_imp</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-  x = <span class='kw'>.SD</span>,
-  model = <span class='st'>"lm_bayes"</span>,
-  posit_y = <span class='st'>"Solar.R"</span>,
-  posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"Intercept"</span>),
-  w = <span class='kw'>.SD</span>[[<span class='st'>"weights"</span>]],
-  times = <span class='fl'>100</span>
-), by = <span class='fu'>.</span>(<span class='kw'>groups</span>)] <span class='op'>%&gt;%</span>
+<span class='va'>air_miss</span><span class='op'>[</span>, <span class='va'>Solar_R_imp</span> <span class='op'>:=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='va'>.SD</span>,
+  model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+  posit_y <span class='op'>=</span> <span class='st'>"Solar.R"</span>,
+  posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"Intercept"</span><span class='op'>)</span>,
+  w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+  times <span class='op'>=</span> <span class='fl'>100</span>
+<span class='op'>)</span>, by <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='co'># Imputations - discrete variable</span>
-  <span class='kw'>.</span>[, <span class='kw'>x_character_imp</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lda"</span>,
-    posit_y = <span class='st'>"x_character"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"groups"</span>)
-  )] <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>x_character_imp</span> <span class='op'>:=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lda"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"x_character"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"groups"</span><span class='op'>)</span>
+  <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='co'># logreg was used because almost log-normal distribution of Ozone</span>
   <span class='co'># imputations around mean</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp1</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lm_bayes"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>),
-    logreg = <span class='fl'>TRUE</span>
-  )] <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp1</span> <span class='op'>:=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span><span class='op'>)</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='co'># imputations using positions - Intercept, Temp</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp2</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lm_bayes"</span>,
-    posit_y = <span class='fl'>1</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>, <span class='fl'>6</span>),
-    logreg = <span class='fl'>TRUE</span>
-  )] <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp2</span> <span class='op'>:=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='fl'>1</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fl'>6</span><span class='op'>)</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='co'># model with a factor independent variable</span>
   <span class='co'># multiple imputations (average of x30 imputations)</span>
   <span class='co'># with a factor independent variable, weights and logreg options</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp3</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lm_noise"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.SD</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>,
-    times = <span class='fl'>30</span>
-  )] <span class='op'>%&gt;%</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp4</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lm_bayes"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.SD</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>,
-    times = <span class='fl'>30</span>
-  )] <span class='op'>%&gt;%</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp5</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lm_pred"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.SD</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>
-  ), <span class='fu'>.</span>(<span class='kw'>groups</span>)] <span class='op'>%&gt;%</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp6</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"pmm"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.SD</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>,
-    k = <span class='fl'>10</span>
-  ), <span class='fu'>.</span>(<span class='kw'>groups</span>)] <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp3</span> <span class='op'>:=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_noise"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
+    times <span class='op'>=</span> <span class='fl'>30</span>
+  <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp4</span> <span class='op'>:=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
+    times <span class='op'>=</span> <span class='fl'>30</span>
+  <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp5</span> <span class='op'>:=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_pred"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp6</span> <span class='op'>:=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"pmm"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
+    k <span class='op'>=</span> <span class='fl'>10</span>
+  <span class='op'>)</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
 
   <span class='co'># Average of a few methods</span>
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_imp_mix</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span>(<span class='kw'>.SD</span>, <span class='fl'>1</span>, <span class='kw'>mean</span>), .SDcols = <span class='kw'>Ozone_imp1</span><span class='op'>:</span><span class='kw'>Ozone_imp6</span>] <span class='op'>%&gt;%</span>
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp_mix</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>.SD</span>, <span class='fl'>1</span>, <span class='va'>mean</span><span class='op'>)</span>, .SDcols <span class='op'>=</span> <span class='va'>Ozone_imp1</span><span class='op'>:</span><span class='va'>Ozone_imp6</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
 
   <span class='co'># Protecting against collinearity or low number of observations - across small groups</span>
   <span class='co'># Be carful when using a data.table grouping option</span>
   <span class='co'># because of lack of protection against collinearity or low number of observations.</span>
   <span class='co'># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span>
 
-  <span class='kw'>.</span>[, <span class='kw'>Ozone_chac_imp</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/conditions.html'>tryCatch</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.SD</span>,
-    model = <span class='st'>"lda"</span>,
-    posit_y = <span class='st'>"Ozone_chac"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+  <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_chac_imp</span> <span class='op'>:=</span> <span class='kw'><a href='https://rdrr.io/r/base/conditions.html'>tryCatch</a></span><span class='op'>(</span><span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.SD</span>,
+    model <span class='op'>=</span> <span class='st'>"lda"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone_chac"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
       <span class='st'>"Intercept"</span>,
       <span class='st'>"Month"</span>,
       <span class='st'>"Day"</span>,
       <span class='st'>"Temp"</span>,
       <span class='st'>"x_character_imp"</span>
-    ),
-    w = <span class='kw'>.SD</span>[[<span class='st'>"weights"</span>]]
-  ),
-  error = <span class='fu'>function</span>(<span class='kw'>e</span>) <span class='kw'>.SD</span>[[<span class='st'>"Ozone_chac"</span>]]
-  ), <span class='fu'>.</span>(<span class='kw'>groups</span>)]</div><div class='output co'>#&gt;      Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character
+    <span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>
+  <span class='op'>)</span>,
+  error <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"Ozone_chac"</span><span class='op'>]</span><span class='op'>]</span>
+  <span class='op'>)</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;      Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character
 #&gt;   1:    41     190  7.4   67   1         1     1 1.0186350      5   (140,210]
 #&gt;   2:    36     118  8.0   72   2         1     2 1.0107583      5    (70,140]
 #&gt;   3:    12     149 12.6   74   3         1     3 0.9891023      5   (140,210]
@@ -379,17 +374,17 @@ and for the lms models if number of variables is smaller than number of observat
 #&gt; 152:     (0,20]  (0,20]      FALSE    131.0000        (70,140]   18.00000
 #&gt; 153:     (0,20]  (0,20]      FALSE    223.0000       (210,280]   20.00000
 #&gt;      Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix
-#&gt;   1:   41.00000  41.000000  41.000000  41.000000         41      41.00000
-#&gt;   2:   36.00000  36.000000  36.000000  36.000000         36      36.00000
-#&gt;   3:   12.00000  12.000000  12.000000  12.000000         12      12.00000
-#&gt;   4:   18.00000  18.000000  18.000000  18.000000         18      18.00000
-#&gt;   5:    8.55008   4.518698   5.613219   5.127981         11      28.96680
+#&gt;   1:   41.00000  41.000000  41.000000  41.000000   41.00000      41.00000
+#&gt;   2:   36.00000  36.000000  36.000000  36.000000   36.00000      36.00000
+#&gt;   3:   12.00000  12.000000  12.000000  12.000000   12.00000      12.00000
+#&gt;   4:   18.00000  18.000000  18.000000  18.000000   18.00000      18.00000
+#&gt;   5:    8.55008   4.518698   5.613219   5.127981   10.88617      28.94783
 #&gt;  ---                                                                     
-#&gt; 149:   30.00000  30.000000  30.000000  30.000000         30      30.00000
-#&gt; 150:   15.65201  33.009877  25.427530  24.046683         32      26.01057
-#&gt; 151:   14.00000  14.000000  14.000000  14.000000         14      14.00000
-#&gt; 152:   18.00000  18.000000  18.000000  18.000000         18      18.00000
-#&gt; 153:   20.00000  20.000000  20.000000  20.000000         20      20.00000
+#&gt; 149:   30.00000  30.000000  30.000000  30.000000   30.00000      30.00000
+#&gt; 150:   15.65201  33.009877  25.427530  24.046683   33.44550      26.25148
+#&gt; 151:   14.00000  14.000000  14.000000  14.000000   14.00000      14.00000
+#&gt; 152:   18.00000  18.000000  18.000000  18.000000   18.00000      18.00000
+#&gt; 153:   20.00000  20.000000  20.000000  20.000000   20.00000      20.00000
 #&gt;      Ozone_chac_imp
 #&gt;   1:        (40,60]
 #&gt;   2:        (20,40]
@@ -403,7 +398,8 @@ and for the lms models if number of variables is smaller than number of observat
 #&gt; 152:         (0,20]
 #&gt; 153:         (0,20]</div><div class='input'>
 <span class='co'># Sample of results</span>
-<span class='kw'>air_miss</span>[<span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='kw'>air_miss</span>[, <span class='fl'>1</span>]))[<span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>], ]</div><div class='output co'>#&gt;    Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character
+<span class='va'>air_miss</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>air_miss</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>]</span>, <span class='op'>]</span>
+</div><div class='output co'>#&gt;    Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character
 #&gt; 1:    NA      NA 14.3   56   5         1     5 0.9945367      5        &lt;NA&gt;
 #&gt; 2:    NA     194  8.6   69  10         1    10 0.9950548      5   (140,210]
 #&gt; 3:    NA      66 16.6   57  25         1    25 1.0124095      5      (0,70]
@@ -416,11 +412,11 @@ and for the lms models if number of variables is smaller than number of observat
 #&gt; 4:       &lt;NA&gt;    &lt;NA&gt;         NA   266.00000       (210,280]   34.95723
 #&gt; 5:       &lt;NA&gt;    &lt;NA&gt;         NA    22.55152          (0,70]   58.94392
 #&gt;    Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix
-#&gt; 1:   8.550080   4.518698   5.613219   5.127981         11      28.96680
-#&gt; 2:  24.784280  20.105659  26.667271  20.388899         12      21.52837
-#&gt; 3:  11.137643   3.481798   5.992705   5.311351         11      19.07822
-#&gt; 4:  15.423650  10.413051   8.994433   5.663351         18      15.57529
-#&gt; 5:   2.583633   8.501164   5.983687   6.391228         18      16.73394
+#&gt; 1:   8.550080   4.518698   5.613219   5.127981   10.88617      28.94783
+#&gt; 2:  24.784280  20.105659  26.667271  20.388899   12.82412      21.66573
+#&gt; 3:  11.137643   3.481798   5.992705   5.311351   11.80028      19.21160
+#&gt; 4:  15.423650  10.413051   8.994433   5.663351   17.52725      15.49649
+#&gt; 5:   2.583633   8.501164   5.983687   6.391228   16.06883      16.41208
 #&gt;    Ozone_chac_imp
 #&gt; 1:         (0,20]
 #&gt; 2:        (40,60]
@@ -429,108 +425,109 @@ and for the lms models if number of variables is smaller than number of observat
 #&gt; 5:         (0,20]</div><div class='input'>
 <span class='co'>### Intro: dplyr</span>
 <span class='co'># IMPUTATIONS</span>
-<span class='kw'>air_miss</span> <span class='op'>&lt;-</span> <span class='kw'>air_miss</span> <span class='op'>%&gt;%</span>
+<span class='va'>air_miss</span> <span class='op'>&lt;-</span> <span class='va'>air_miss</span> <span class='op'>%&gt;%</span>
   <span class='co'># Imputations with a grouping option (models are separately assessed for each group)</span>
   <span class='co'># taking into account provided weights</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='kw'>groups</span>) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>.</span>, Solar_R_imp = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lm_pred"</span>,
-    posit_y = <span class='st'>"Solar.R"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"Intercept"</span>),
-    w = <span class='kw'>.</span>[[<span class='st'>"weights"</span>]]
-  ))) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span>() <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span><span class='va'>.</span>, Solar_R_imp <span class='op'>=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_pred"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Solar.R"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"Intercept"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>
+  <span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='co'># Imputations - discrete variable</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(x_character_imp = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lda"</span>,
-    posit_y = <span class='st'>"x_character"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>)
-  )) <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>x_character_imp <span class='op'>=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lda"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"x_character"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>
+  <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='co'># logreg was used because almost log-normal distribution of Ozone</span>
   <span class='co'># imputations around mean</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(Ozone_imp1 = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lm_bayes"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>),
-    logreg = <span class='fl'>TRUE</span>
-  )) <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Ozone_imp1 <span class='op'>=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span><span class='op'>)</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='co'># imputations using positions - Intercept, Temp</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(Ozone_imp2 = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lm_bayes"</span>,
-    posit_y = <span class='fl'>1</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>, <span class='fl'>6</span>),
-    logreg = <span class='fl'>TRUE</span>
-  )) <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Ozone_imp2 <span class='op'>=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='fl'>1</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fl'>6</span><span class='op'>)</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='co'># multiple imputations (average of x30 imputations)</span>
   <span class='co'># with a factor independent variable, weights and logreg options</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(Ozone_imp3 = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lm_noise"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>,
-    times = <span class='fl'>30</span>
-  )) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(Ozone_imp4 = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lm_bayes"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>,
-    times = <span class='fl'>30</span>
-  )) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='kw'>groups</span>) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>.</span>, Ozone_imp5 = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lm_pred"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>
-  ))) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>.</span>, Ozone_imp6 = <span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA_N.html'>fill_NA_N</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"pmm"</span>,
-    posit_y = <span class='st'>"Ozone"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>),
-    w = <span class='kw'>.</span>[[<span class='st'>"weights"</span>]],
-    logreg = <span class='fl'>TRUE</span>,
-    k = <span class='fl'>20</span>
-  ))) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span>() <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Ozone_imp3 <span class='op'>=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_noise"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
+    times <span class='op'>=</span> <span class='fl'>30</span>
+  <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Ozone_imp4 <span class='op'>=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
+    times <span class='op'>=</span> <span class='fl'>30</span>
+  <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span><span class='va'>.</span>, Ozone_imp5 <span class='op'>=</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_pred"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+  <span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span><span class='va'>.</span>, Ozone_imp6 <span class='op'>=</span> <span class='fu'>fill_NA_N</span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"pmm"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
+    k <span class='op'>=</span> <span class='fl'>20</span>
+  <span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='co'># Average of a few methods</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(Ozone_imp_mix = <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowMeans</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='kw'>.</span>, <span class='fu'><a href='https://tidyselect.r-lib.org/reference/starts_with.html'>starts_with</a></span>(<span class='st'>"Ozone_imp"</span>)))) <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Ozone_imp_mix <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowMeans</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>.</span>, <span class='fu'><a href='https://tidyselect.r-lib.org/reference/starts_with.html'>starts_with</a></span><span class='op'>(</span><span class='st'>"Ozone_imp"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
 
   <span class='co'># Protecting against collinearity or low number of observations - across small groups</span>
   <span class='co'># Be carful when using a grouping option</span>
   <span class='co'># because of lack of protection against collinearity or low number of observations.</span>
   <span class='co'># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='kw'>groups</span>) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>.</span>, Ozone_chac_imp = <span class='fu'><a href='https://rdrr.io/r/base/conditions.html'>tryCatch</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/miceFast/man/fill_NA.html'>fill_NA</a></span>(
-    x = <span class='kw'>.</span>,
-    model = <span class='st'>"lda"</span>,
-    posit_y = <span class='st'>"Ozone_chac"</span>,
-    posit_x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span><span class='va'>.</span>, Ozone_chac_imp <span class='op'>=</span> <span class='kw'><a href='https://rdrr.io/r/base/conditions.html'>tryCatch</a></span><span class='op'>(</span><span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>.</span>,
+    model <span class='op'>=</span> <span class='st'>"lda"</span>,
+    posit_y <span class='op'>=</span> <span class='st'>"Ozone_chac"</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
       <span class='st'>"Intercept"</span>,
       <span class='st'>"Month"</span>,
       <span class='st'>"Day"</span>,
       <span class='st'>"Temp"</span>,
       <span class='st'>"x_character_imp"</span>
-    ),
-    w = <span class='kw'>.</span>[[<span class='st'>"weights"</span>]]
-  ),
-  error = <span class='fu'>function</span>(<span class='kw'>e</span>) <span class='kw'>.</span>[[<span class='st'>"Ozone_chac"</span>]]
-  ))) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span>()
+    <span class='op'>)</span>,
+    w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>
+  <span class='op'>)</span>,
+  error <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"Ozone_chac"</span><span class='op'>]</span><span class='op'>]</span>
+  <span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span><span class='op'>(</span><span class='op'>)</span>
 
 <span class='co'># Sample of results</span>
-<span class='kw'>air_miss</span>[<span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='kw'>air_miss</span>[, <span class='fl'>1</span>]))[<span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>], ]</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5 x 23</span><span>
+<span class='va'>air_miss</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>air_miss</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>]</span>, <span class='op'>]</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5 x 23</span><span>
 #&gt;   Ozone Solar.R  Wind  Temp   Day Intercept index weights groups x_character
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      
 #&gt; </span><span style='color: #555555;'>1</span><span>    </span><span style='color: #BB0000;'>NA</span><span>      </span><span style='color: #BB0000;'>NA</span><span>  14.3    56     5         1     5   0.995 5      </span><span style='color: #BB0000;'>NA</span><span>         
@@ -557,7 +554,7 @@ and for the lms models if number of variables is smaller than number of observat
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
