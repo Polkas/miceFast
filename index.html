@@ -87,7 +87,7 @@
 <p>Maciej Nasinski<br>
 pkgdown: <a href="https://polkas.github.io/miceFast/index.html" class="uri">https://polkas.github.io/miceFast/index.html</a></p>
 <p><a href="https://CRAN.R-project.org/package=miceFast"><strong>Check the R CRAN for more details</strong></a></p>
-<p><a href="https://github.com/polkas/miceFast/actions"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="http://www.r-pkg.org/pkg/miceFast"><img src="http://cranlogs.r-pkg.org/badges/grand-total/miceFast?color=brightgreen" alt="Downloads"></a> <a href="https://cran.r-project.org/package=miceFast"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://codecov.io/gh/Polkas/miceFast"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a></p>
+<p><a href="https://github.com/polkas/miceFast/actions"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=miceFast"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://codecov.io/gh/Polkas/miceFast"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a></p>
 <p>Fast imputations under the object-oriented programming paradigm.<br>
 Moreover there are offered a few functions built to work with popular R packages such as ‘data.table’ or ‘dplyr’. The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used. A single evaluation of a quantitative model for the multiple imputations is another major enhancement. A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.</p>
 <p>Performance benchmarks (check performance_validity.R file at extdata).</p>
@@ -101,18 +101,21 @@ Moreover there are offered a few functions built to work with popular R packages
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"polkas/miceFast"</span><span class="op">)</span></code></pre></div>
-<p><strong>Recommended to download boosted BLAS library:</strong></p>
+<p><strong>Recommended to download boosted BLAS library, even x100 faster:</strong></p>
 <ul>
 <li>Windows Users recommended to download MRO MKL: <a href="https://mran.microsoft.com/download" class="uri">https://mran.microsoft.com/download</a>
 </li>
 <li>Linux users recommended to download Optimized BLAS (linear algebra) library: <code>sudo apt-get install libopenblas-dev</code>
 </li>
+<li>Apple vecLib BLAS:</li>
 </ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="bu">cd</span> /Library/Frameworks/R.framework/Resources/lib</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">ln</span> -sf /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib</span></code></pre></div>
 </div>
 <div id="quick-implementation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quick-implementation" class="anchor"></a>Quick Implementation</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Polkas/miceFast">miceFast</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span>
