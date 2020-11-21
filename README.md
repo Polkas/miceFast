@@ -6,7 +6,6 @@ Maciej Nasinski
 [**Check the R CRAN for more details**](https://CRAN.R-project.org/package=miceFast)
 
 [![R build status](https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg)](https://github.com/polkas/miceFast/actions)
-[![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/miceFast?color=brightgreen)](http://www.r-pkg.org/pkg/miceFast)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
 [![codecov](https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg)](https://codecov.io/gh/Polkas/miceFast)
 
@@ -33,10 +32,15 @@ or
 devtools::install_github("polkas/miceFast")
 ```
 
-**Recommended to download boosted BLAS library:**
+**Recommended to download boosted BLAS library, even x100 faster:**
 
 - Windows Users recommended to download MRO MKL: https://mran.microsoft.com/download
 - Linux users recommended to download Optimized BLAS (linear algebra) library: `sudo apt-get install libopenblas-dev`
+- Apple vecLib BLAS:
+```bash
+cd /Library/Frameworks/R.framework/Resources/lib
+ln -sf /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib
+```
 
 ## Quick Implementation
 
