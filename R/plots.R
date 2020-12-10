@@ -48,7 +48,7 @@ compare_imp = function(df, origin, target) {
 #' to be displayed alongside the UpSet plot. The user also has the the ability to pass their own plots into the function to further analyze
 #' data belonging to queries of interest. Most aspects of the UpSet plot are customizable, allowing the user to select the plot that best suits their style.
 #' Depending on how the features are selected, UpSet can display between 25-65 sets and between 40-100 intersections.
-#' @note Data set must be formatted as described on the original UpSet github page: \url{http://github.com/VCG/upset/wiki}.
+#' @note Data set must be formatted as described on the original UpSet github page: \url{https://github.com/VCG/upset/wiki}.
 #' @references Lex et al. (2014). UpSet: Visualization of Intersecting Sets
 #' IEEE Transactions on Visualization and Computer Graphics (Proceedings of InfoVis 2014), vol 20, pp. 1983-1992, (2014).
 #' @references Lex and Gehlenborg (2014). Points of view: Sets and intersections. Nature Methods 11, 779 (2014). \url{https://www.nature.com/articles/nmeth.3033}
