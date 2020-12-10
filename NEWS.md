@@ -1,3 +1,7 @@
+# 0.6.6
+
+* solve UpSetR::upset reference links
+
 # 0.6.5
 
 * upset_NA based on UpSetR::upset plot function
