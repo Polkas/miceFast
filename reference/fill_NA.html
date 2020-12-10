@@ -74,7 +74,7 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.3</span>
       </span>
     </div>
 
@@ -221,7 +221,7 @@ and for the lms models if number of independent variables is smaller than number
   posit_y <span class='op'>=</span> <span class='st'>"Solar.R"</span>,
   posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Wind"</span>, <span class='st'>"Temp"</span>, <span class='st'>"Intercept"</span><span class='op'>)</span>,
   w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
-  times <span class='op'>=</span> <span class='fl'>100</span>
+  k <span class='op'>=</span> <span class='fl'>100</span>
 <span class='op'>)</span>, by <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='co'># Imputations - discrete variable</span>
   <span class='va'>.</span><span class='op'>[</span>, <span class='va'>x_character_imp</span> <span class='op'>:=</span> <span class='fu'>fill_NA</span><span class='op'>(</span>
@@ -257,7 +257,7 @@ and for the lms models if number of independent variables is smaller than number
     posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
     w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
     logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
-    times <span class='op'>=</span> <span class='fl'>30</span>
+    k <span class='op'>=</span> <span class='fl'>30</span>
   <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp4</span> <span class='op'>:=</span> <span class='fu'><a href='fill_NA_N.html'>fill_NA_N</a></span><span class='op'>(</span>
     x <span class='op'>=</span> <span class='va'>.SD</span>,
@@ -266,7 +266,7 @@ and for the lms models if number of independent variables is smaller than number
     posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
     w <span class='op'>=</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
     logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
-    times <span class='op'>=</span> <span class='fl'>30</span>
+    k <span class='op'>=</span> <span class='fl'>30</span>
   <span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
   <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Ozone_imp5</span> <span class='op'>:=</span> <span class='fu'>fill_NA</span><span class='op'>(</span>
     x <span class='op'>=</span> <span class='va'>.SD</span>,
@@ -309,10 +309,7 @@ and for the lms models if number of independent variables is smaller than number
   <span class='op'>)</span>,
   error <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>e</span><span class='op'>)</span> <span class='va'>.SD</span><span class='op'>[[</span><span class='st'>"Ozone_chac"</span><span class='op'>]</span><span class='op'>]</span>
   <span class='op'>)</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: The `times` argument of `fill_NA_N()` is deprecated as of miceFast 0.6.0.</span>
-#&gt; <span class='warning'>Please use the `k` argument instead.</span>
-#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt;      Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character
+</div><div class='output co'>#&gt;      Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character
 #&gt;   1:    41     190  7.4   67   1         1     1 1.0186350      5   (140,210]
 #&gt;   2:    36     118  8.0   72   2         1     2 1.0107583      5    (70,140]
 #&gt;   3:    12     149 12.6   74   3         1     3 0.9891023      5   (140,210]
@@ -325,29 +322,29 @@ and for the lms models if number of independent variables is smaller than number
 #&gt; 152:    18     131  8.0   76  29         1   152 0.9968826      9    (70,140]
 #&gt; 153:    20     223 11.5   68  30         1   153 1.0056592      9   (210,280]
 #&gt;      Ozone_chac Ozone_f Ozone_high Solar_R_imp x_character_imp Ozone_imp1
-#&gt;   1:    (40,60] (40,60]      FALSE   190.00000       (140,210]   41.00000
-#&gt;   2:    (20,40] (20,40]      FALSE   118.00000        (70,140]   36.00000
-#&gt;   3:     (0,20]  (0,20]      FALSE   149.00000       (140,210]   12.00000
-#&gt;   4:     (0,20]  (0,20]      FALSE   313.00000       (280,350]   18.00000
-#&gt;   5:       &lt;NA&gt;    &lt;NA&gt;         NA    62.95815          (0,70]   57.53985
+#&gt;   1:    (40,60] (40,60]      FALSE    190.0000       (140,210]   41.00000
+#&gt;   2:    (20,40] (20,40]      FALSE    118.0000        (70,140]   36.00000
+#&gt;   3:     (0,20]  (0,20]      FALSE    149.0000       (140,210]   12.00000
+#&gt;   4:     (0,20]  (0,20]      FALSE    313.0000       (280,350]   18.00000
+#&gt;   5:       &lt;NA&gt;    &lt;NA&gt;         NA    115.9183          (0,70]   24.51652
 #&gt;  ---                                                                     
-#&gt; 149:    (20,40] (20,40]      FALSE   193.00000       (140,210]   30.00000
-#&gt; 150:       &lt;NA&gt;    &lt;NA&gt;         NA   145.00000       (140,210]   44.99621
-#&gt; 151:     (0,20]  (0,20]      FALSE   191.00000       (140,210]   14.00000
-#&gt; 152:     (0,20]  (0,20]      FALSE   131.00000        (70,140]   18.00000
-#&gt; 153:     (0,20]  (0,20]      FALSE   223.00000       (210,280]   20.00000
+#&gt; 149:    (20,40] (20,40]      FALSE    193.0000       (140,210]   30.00000
+#&gt; 150:       &lt;NA&gt;    &lt;NA&gt;         NA    145.0000       (140,210]   56.17228
+#&gt; 151:     (0,20]  (0,20]      FALSE    191.0000       (140,210]   14.00000
+#&gt; 152:     (0,20]  (0,20]      FALSE    131.0000        (70,140]   18.00000
+#&gt; 153:     (0,20]  (0,20]      FALSE    223.0000       (210,280]   20.00000
 #&gt;      Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix
-#&gt;   1:  41.000000  41.000000  41.000000  41.000000   41.00000      41.00000
-#&gt;   2:  36.000000  36.000000  36.000000  36.000000   36.00000      36.00000
-#&gt;   3:  12.000000  12.000000  12.000000  12.000000   12.00000      12.00000
-#&gt;   4:  18.000000  18.000000  18.000000  18.000000   18.00000      18.00000
-#&gt;   5:   4.833981   4.936433   7.672273   5.127981   28.56176      18.11205
+#&gt;   1:  41.000000  41.000000  41.000000  41.000000   41.00000     41.000000
+#&gt;   2:  36.000000  36.000000  36.000000  36.000000   36.00000     36.000000
+#&gt;   3:  12.000000  12.000000  12.000000  12.000000   12.00000     12.000000
+#&gt;   4:  18.000000  18.000000  18.000000  18.000000   18.00000     18.000000
+#&gt;   5:   3.516728   5.598183   5.400627   5.127981   12.82412      9.497359
 #&gt;  ---                                                                     
-#&gt; 149:  30.000000  30.000000  30.000000  30.000000   30.00000      30.00000
-#&gt; 150:  55.553663  27.773655  26.546060  24.046683   25.46112      34.06290
-#&gt; 151:  14.000000  14.000000  14.000000  14.000000   14.00000      14.00000
-#&gt; 152:  18.000000  18.000000  18.000000  18.000000   18.00000      18.00000
-#&gt; 153:  20.000000  20.000000  20.000000  20.000000   20.00000      20.00000
+#&gt; 149:  30.000000  30.000000  30.000000  30.000000   30.00000     30.000000
+#&gt; 150:  78.398901  26.958718  27.425165  24.046683   23.14869     39.358407
+#&gt; 151:  14.000000  14.000000  14.000000  14.000000   14.00000     14.000000
+#&gt; 152:  18.000000  18.000000  18.000000  18.000000   18.00000     18.000000
+#&gt; 153:  20.000000  20.000000  20.000000  20.000000   20.00000     20.000000
 #&gt;      Ozone_chac_imp
 #&gt;   1:        (40,60]
 #&gt;   2:        (20,40]
@@ -369,17 +366,17 @@ and for the lms models if number of independent variables is smaller than number
 #&gt; 4:    NA     266 14.9   58  26         1    26 1.0047912      5   (210,280]
 #&gt; 5:    NA      NA  8.0   57  27         1    27 0.9998296      5        &lt;NA&gt;
 #&gt;    Ozone_chac Ozone_f Ozone_high Solar_R_imp x_character_imp Ozone_imp1
-#&gt; 1:       &lt;NA&gt;    &lt;NA&gt;         NA    62.95815          (0,70]   57.53985
-#&gt; 2:       &lt;NA&gt;    &lt;NA&gt;         NA   194.00000       (140,210]   52.26800
-#&gt; 3:       &lt;NA&gt;    &lt;NA&gt;         NA    66.00000          (0,70]  137.73748
-#&gt; 4:       &lt;NA&gt;    &lt;NA&gt;         NA   266.00000       (210,280]  270.40316
-#&gt; 5:       &lt;NA&gt;    &lt;NA&gt;         NA    66.21173          (0,70]   14.02613
+#&gt; 1:       &lt;NA&gt;    &lt;NA&gt;         NA    115.9183          (0,70]   24.51652
+#&gt; 2:       &lt;NA&gt;    &lt;NA&gt;         NA    194.0000       (140,210]   10.16012
+#&gt; 3:       &lt;NA&gt;    &lt;NA&gt;         NA     66.0000          (0,70]   19.47480
+#&gt; 4:       &lt;NA&gt;    &lt;NA&gt;         NA    266.0000       (210,280]   32.37159
+#&gt; 5:       &lt;NA&gt;    &lt;NA&gt;         NA    124.3617          (0,70]   17.52436
 #&gt;    Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix
-#&gt; 1:   4.833981   4.936433   7.672273   5.127981  28.561758      18.11205
-#&gt; 2:  22.063051  26.399003  23.928795  20.388899  14.235716      26.54724
-#&gt; 3:  15.541932   4.903501   5.675248   5.311351   9.407458      29.76283
-#&gt; 4:   3.860326  12.801513   8.755920   5.663351  39.668638      56.85882
-#&gt; 5:   4.996627   8.824019   7.443813   6.391228   9.407458       8.51488
+#&gt; 1:   3.516728   5.598183   5.400627   5.127981  12.824118      9.497359
+#&gt; 2:  14.350020  25.513675  17.697538  20.388899  30.532943     19.773866
+#&gt; 3:  10.927387   4.705237   4.243214   5.311351  10.886165      9.258026
+#&gt; 4:   7.262435  10.755436   9.897469   5.663351  13.669493     13.269963
+#&gt; 5:  14.324226   8.376685   8.104440   6.391228   8.644043     10.560830
 #&gt;    Ozone_chac_imp
 #&gt; 1:         (0,20]
 #&gt; 2:        (40,60]
@@ -433,7 +430,7 @@ and for the lms models if number of independent variables is smaller than number
     posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
     w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
     logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
-    times <span class='op'>=</span> <span class='fl'>30</span>
+    k <span class='op'>=</span> <span class='fl'>30</span>
   <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Ozone_imp4 <span class='op'>=</span> <span class='fu'><a href='fill_NA_N.html'>fill_NA_N</a></span><span class='op'>(</span>
     x <span class='op'>=</span> <span class='va'>.</span>,
@@ -442,7 +439,7 @@ and for the lms models if number of independent variables is smaller than number
     posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span>, <span class='st'>"x_character_imp"</span>, <span class='st'>"Wind"</span>, <span class='st'>"Temp"</span><span class='op'>)</span>,
     w <span class='op'>=</span> <span class='va'>.</span><span class='op'>[[</span><span class='st'>"weights"</span><span class='op'>]</span><span class='op'>]</span>,
     logreg <span class='op'>=</span> <span class='cn'>TRUE</span>,
-    times <span class='op'>=</span> <span class='fl'>30</span>
+    k <span class='op'>=</span> <span class='fl'>30</span>
   <span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>groups</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/do.html'>do</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span><span class='va'>.</span>, Ozone_imp5 <span class='op'>=</span> <span class='fu'>fill_NA</span><span class='op'>(</span>
@@ -490,7 +487,7 @@ and for the lms models if number of independent variables is smaller than number
 
 <span class='co'># Sample of results</span>
 <span class='va'>air_miss</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>air_miss</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>]</span>, <span class='op'>]</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 5 x 23</span><span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5 x 23</span><span>
 #&gt;   Ozone Solar.R  Wind  Temp   Day Intercept index weights groups x_character
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      
 #&gt; </span><span style='color: #555555;'>1</span><span>    </span><span style='color: #BB0000;'>NA</span><span>      </span><span style='color: #BB0000;'>NA</span><span>  14.3    56     5         1     5   0.995 5      </span><span style='color: #BB0000;'>NA</span><span>         

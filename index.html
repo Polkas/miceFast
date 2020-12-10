@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.3</span>
       </span>
     </div>
 
@@ -121,6 +121,9 @@ Moreover there are offered a few functions built to work with popular R packages
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>
 
+<span class="co"># plot NA structure</span>
+<span class="fu"><a href="reference/upset_NA.html">upset_NA</a></span><span class="op">(</span><span class="va">air_miss</span>, <span class="fl">6</span><span class="op">)</span>
+
 <span class="fu"><a href="reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>
 
 <span class="co">#Check vigniette for an advance usage</span>
@@ -158,6 +161,14 @@ Moreover there are offered a few functions built to work with popular R packages
 <tr class="odd">
 <td><code><a href="reference/naive_fill_NA.html">naive_fill_NA()</a></code></td>
 <td>auto imputations</td>
+</tr>
+<tr class="even">
+<td><code>compare_imp</code></td>
+<td>comparing imputations</td>
+</tr>
+<tr class="odd">
+<td><code>upset_NA</code></td>
+<td>visualize NA structure - UpSetR::upset</td>
 </tr>
 </tbody>
 </table>

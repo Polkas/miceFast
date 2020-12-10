@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • miceFast</title>
+<title>sth — compare_imp • miceFast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="sth — compare_imp" />
+<meta property="og:description" content="sth" />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -116,18 +117,64 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>sth</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Polkas/miceFast/blob/master/R/plots.R'><code>R/plots.R</code></a></small>
+    <div class="hidden name"><code>compare_imp.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="miceFast-intro.html">miceFast - Introduction</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>sth</p>
     </div>
+
+    <pre class="usage"><span class='fu'>compare_imp</span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>origin</span>, <span class='va'>target</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>df</th>
+      <td><p>data.frame with origin variable and the new one with imputations</p></td>
+    </tr>
+    <tr>
+      <th>origin</th>
+      <td><p>character value the name of origin variable with values before any imputations</p></td>
+    </tr>
+    <tr>
+      <th>target</th>
+      <td><p>character vector names of variables with applied imputations</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>ggplot2 object</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>air_miss</span><span class='op'>)</span>
+<span class='va'>air_miss</span><span class='op'>$</span><span class='va'>Ozone_imp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fill_NA.html'>fill_NA</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>air_miss</span>,
+    model <span class='op'>=</span> <span class='st'>"lm_bayes"</span>,
+    posit_y <span class='op'>=</span> <span class='fl'>1</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fl'>6</span><span class='op'>)</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+<span class='va'>air_miss</span><span class='op'>$</span><span class='va'>Ozone_imp2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fill_NA_N.html'>fill_NA_N</a></span><span class='op'>(</span>
+    x <span class='op'>=</span> <span class='va'>air_miss</span>,
+    model <span class='op'>=</span> <span class='st'>"pmm"</span>,
+    posit_y <span class='op'>=</span> <span class='fl'>1</span>,
+    posit_x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fl'>6</span><span class='op'>)</span>,
+    logreg <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>compare_imp</span><span class='op'>(</span><span class='va'>air_miss</span>, origin <span class='op'>=</span> <span class='st'>"Ozone"</span>, <span class='st'>"Ozone_imp"</span><span class='op'>)</span>
+</div><div class='img'><img src='compare_imp-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>compare_imp</span><span class='op'>(</span><span class='va'>air_miss</span>, origin <span class='op'>=</span> <span class='st'>"Ozone"</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Ozone_imp"</span>, <span class='st'>'Ozone_imp2'</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='compare_imp-2.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 

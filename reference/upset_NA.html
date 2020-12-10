@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • miceFast</title>
+<title>upset plot for NA values — upset_NA • miceFast</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="upset plot for NA values — upset_NA" />
+<meta property="og:description" content="wrapper around UpSetR::upset for vizualization of NA values
+Visualization of set intersections using novel UpSet matrix design." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -116,18 +118,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>upset plot for NA values</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Polkas/miceFast/blob/master/R/plots.R'><code>R/plots.R</code></a></small>
+    <div class="hidden name"><code>upset_NA.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="miceFast-intro.html">miceFast - Introduction</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>wrapper around UpSetR::upset for vizualization of NA values</p>
+<p>Visualization of set intersections using novel UpSet matrix design.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>upset_NA</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>...</th>
+      <td><p>all arguments accepted by UpSetR::upset</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Visualization of set data in the layout described by Lex and Gehlenborg in <a href='http://www.nature.com/nmeth/journal/v11/n8/abs/nmeth.3033.html'>http://www.nature.com/nmeth/journal/v11/n8/abs/nmeth.3033.html</a>.
+UpSet also allows for visualization of queries on intersections and elements, along with custom queries queries implemented using
+Hadley Wickham's apply function. To further analyze the data contained in the intersections, the user may select additional attribute plots
+to be displayed alongside the UpSet plot. The user also has the the ability to pass their own plots into the function to further analyze
+data belonging to queries of interest. Most aspects of the UpSet plot are customizable, allowing the user to select the plot that best suits their style.
+Depending on how the features are selected, UpSet can display between 25-65 sets and between 40-100 intersections.</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>Data set must be formatted as described on the original UpSet github page: <a href='http://github.com/VCG/upset/wiki'>http://github.com/VCG/upset/wiki</a>.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Lex et al. (2014). UpSet: Visualization of Intersecting Sets
+IEEE Transactions on Visualization and Computer Graphics (Proceedings of InfoVis 2014), vol 20, pp. 1983-1992, (2014). <a href='http://people.seas.harvard.edu/~alex/papers/2014_infovis_upset.pdf'>http://people.seas.harvard.edu/~alex/papers/2014_infovis_upset.pdf</a></p>
+<p>Lex and Gehlenborg (2014). Points of view: Sets and intersections. Nature Methods 11, 779 (2014). <a href='http://www.nature.com/nmeth/journal/v11/n8/abs/nmeth.3033.html'>http://www.nature.com/nmeth/journal/v11/n8/abs/nmeth.3033.html</a></p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>upset_NA</span><span class='op'>(</span><span class='va'>airquality</span><span class='op'>)</span>
+</div><div class='img'><img src='upset_NA-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>upset_NA</span><span class='op'>(</span><span class='va'>air_miss</span>, <span class='fl'>6</span><span class='op'>)</span>
+</div><div class='img'><img src='upset_NA-2.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
