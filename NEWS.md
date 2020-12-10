@@ -1,3 +1,8 @@
+# 0.6.5
+
+* upset_NA based on UpSetR::upset
+* compare_imp
+
 # 0.6.2
 
 * R CRAN r-oldrel-windows-ix86+x86_64 problems

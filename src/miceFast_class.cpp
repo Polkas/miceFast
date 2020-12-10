@@ -319,7 +319,7 @@ Rcpp::List miceFast::impute(std::string s, int posit_y,arma::uvec posit_x){
 
   arma::uvec index_NA_return(x.n_rows,arma::fill::zeros);
 
-  index_NA_return.elem(index_NA).fill(1);
+    index_NA_return.elem(index_NA).fill(1);
 
   arma::uvec index_full_return(x.n_rows,arma::fill::zeros);
 

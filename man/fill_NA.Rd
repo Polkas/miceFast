@@ -71,7 +71,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
   posit_y = "Solar.R",
   posit_x = c("Wind", "Temp", "Intercept"),
   w = .SD[["weights"]],
-  times = 100
+  k = 100
 ), by = .(groups)] \%>\%
   # Imputations - discrete variable
   .[, x_character_imp := fill_NA(
@@ -107,7 +107,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )] \%>\%
   .[, Ozone_imp4 := fill_NA_N(
     x = .SD,
@@ -116,7 +116,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )] \%>\%
   .[, Ozone_imp5 := fill_NA(
     x = .SD,
@@ -210,7 +210,7 @@ air_miss <- air_miss \%>\%
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )) \%>\%
   mutate(Ozone_imp4 = fill_NA_N(
     x = .,
@@ -219,7 +219,7 @@ air_miss <- air_miss \%>\%
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )) \%>\%
   group_by(groups) \%>\%
   do(mutate(., Ozone_imp5 = fill_NA(

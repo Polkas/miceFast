@@ -308,15 +308,9 @@ air_miss <- air_miss %>%
 
 ```{r,echo=TRUE}
 # Distribution of imputations vs Distribution of initial data
-air_miss$Ozone_NA <- ifelse(is.na(air_miss$Ozone), "imputations", "complete")
-air_miss <- as.data.table(air_miss)
-
-air_miss[, c("Ozone", "Ozone_imp_mix", "Ozone_NA")] %>%
-  melt(id = c("Ozone_NA"), measure = c("Ozone", "Ozone_imp_mix")) %>%
-  .[(((Ozone_NA == "imputations") & (variable == "Ozone_imp_mix")) | ((Ozone_NA == "complete") & (variable == "Ozone"))), ] %>%
-  ggplot2::ggplot(., ggplot2::aes(x = value, fill = variable)) +
-  ggplot2::geom_density() +
-  ggplot2::facet_wrap(Ozone_NA ~ ., scales = "free")
+compare_imp(air_miss, origin = "Ozone", target = "Ozone_imp_mix")
+# or 
+compare_imp(air_miss, origin = "Ozone", target = c("Ozone_imp2", "Ozone_imp_mix"))
 ```
 
 \newpage

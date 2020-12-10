@@ -12,7 +12,6 @@
 #' @param posit_x an integer/character vector - positions/names of independent variables
 #' @param w  a numeric vector - a weighting variable - only positive values, Default: NULL
 #' @param k an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10
-#' @param times deprecated
 #' @param logreg a boolean - if dependent variable has log-normal distribution (numeric). If TRUE log-regression is evaluated and then returned exponential of results., Default: FALSE
 #' @param ridge a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5
 #'
@@ -25,8 +24,6 @@
 #' and for the lms models if number of variables is smaller than number of observations.
 #'
 #' @seealso \code{\link{fill_NA}} \code{\link{VIF}}
-#'
-#' @importFrom lifecycle deprecate_warn
 #'
 #' @examples
 #' library(miceFast)
@@ -46,7 +43,7 @@
 #'   posit_y = "Solar.R",
 #'   posit_x = c("Wind", "Temp", "Intercept"),
 #'   w = .SD[["weights"]],
-#'   times = 100
+#'   k = 100
 #' ), by = .(groups)] %>%
 #'   # Imputations - discrete variable
 #'   .[, x_character_imp := fill_NA(
@@ -82,7 +79,7 @@
 #'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
 #'     w = .SD[["weights"]],
 #'     logreg = TRUE,
-#'     times = 30
+#'     k = 30
 #'   )] %>%
 #'   .[, Ozone_imp4 := fill_NA_N(
 #'     x = .SD,
@@ -91,7 +88,7 @@
 #'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
 #'     w = .SD[["weights"]],
 #'     logreg = TRUE,
-#'     times = 30
+#'     k = 30
 #'   )] %>%
 #'   .[, Ozone_imp5 := fill_NA(
 #'     x = .SD,
@@ -185,7 +182,7 @@
 #'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
 #'     w = .[["weights"]],
 #'     logreg = TRUE,
-#'     times = 30
+#'     k = 30
 #'   )) %>%
 #'   mutate(Ozone_imp4 = fill_NA_N(
 #'     x = .,
@@ -194,7 +191,7 @@
 #'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
 #'     w = .[["weights"]],
 #'     logreg = TRUE,
-#'     times = 30
+#'     k = 30
 #'   )) %>%
 #'   group_by(groups) %>%
 #'   do(mutate(., Ozone_imp5 = fill_NA(
@@ -246,12 +243,8 @@
 #'
 #' @export
 
-fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
+fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
-    if (is_present(times)) {
-      deprecate_warn("0.6.0", "miceFast::fill_NA_N(times=)", "miceFast::fill_NA_N(k=)")
-      k <- times
-    }
     UseMethod("fill_NA_N")
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
@@ -260,7 +253,7 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 
 
 #' @describeIn fill_NA_N s3 method for data.frame
 
-fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
+fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
 
   if (posit_y %in% posit_x) {
@@ -355,7 +348,7 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for data.table
 
-fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
+fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
@@ -448,7 +441,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for matrix
 
-fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6, times = deprecated()) {
+fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")

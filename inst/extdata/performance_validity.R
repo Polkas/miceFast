@@ -109,7 +109,7 @@ m1 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lda", posit_y, posit_x)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 m1
 
@@ -221,7 +221,7 @@ m2 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lda", posit_y, posit_x)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 
 m2
@@ -255,7 +255,7 @@ m3 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lda", posit_y, posit_x)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 
 m3
@@ -290,7 +290,7 @@ m4 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lm_noise", posit_y, posit_x)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 m4
 
@@ -320,7 +320,7 @@ m5 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lm_bayes", posit_y, posit_x)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 m5
 
@@ -352,7 +352,7 @@ m6 <- microbenchmark::microbenchmark(
     model$set_data(data)
     pred_miceFast <- model$impute("lm_pred", posit_y, posit_x)
     rm(model)
-  }, times = iters
+  }, k = iters
 )
 
 m6
@@ -445,7 +445,7 @@ m7 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lm_pred", posit_y, posit_x)
     rm(model)
   },
-  times = iters,
+  k = iters,
   DT_mice = {
     pred_datatable <- data_disc_NA_sort_DT[, {
       im <- mice.impute.norm.predict(as.matrix(.SD[, 1]), !index_NA, as.matrix(.SD[, posit_x, with = F]))
@@ -492,7 +492,7 @@ m8 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute_N("lm_noise", posit_y, posit_x, 10)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 m8
 
@@ -524,7 +524,7 @@ m9 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute_N("lm_bayes", posit_y, posit_x, 10)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 m9
 
@@ -556,7 +556,7 @@ m10 <- microbenchmark::microbenchmark(
     vifs_miceFast <- model$vifs(posit_y, posit_x)
     rm(model)
   },
-  times = iters
+  k = iters
 )
 m10
 

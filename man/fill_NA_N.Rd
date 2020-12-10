@@ -15,8 +15,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
-  ridge = 1e-06,
-  times = deprecated()
+  ridge = 1e-06
 )
 
 \method{fill_NA_N}{data.frame}(
@@ -27,8 +26,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
-  ridge = 1e-06,
-  times = deprecated()
+  ridge = 1e-06
 )
 
 \method{fill_NA_N}{data.table}(
@@ -39,8 +37,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
-  ridge = 1e-06,
-  times = deprecated()
+  ridge = 1e-06
 )
 
 \method{fill_NA_N}{matrix}(
@@ -51,8 +48,7 @@ fill_NA_N(
   w = NULL,
   logreg = FALSE,
   k = 10,
-  ridge = 1e-06,
-  times = deprecated()
+  ridge = 1e-06
 )
 }
 \arguments{
@@ -71,8 +67,6 @@ fill_NA_N(
 \item{k}{an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10}
 
 \item{ridge}{a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5}
-
-\item{times}{deprecated}
 }
 \value{
 load imputations in a numeric/character/factor (similar to the input type) vector format
@@ -115,7 +109,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
   posit_y = "Solar.R",
   posit_x = c("Wind", "Temp", "Intercept"),
   w = .SD[["weights"]],
-  times = 100
+  k = 100
 ), by = .(groups)] \%>\%
   # Imputations - discrete variable
   .[, x_character_imp := fill_NA(
@@ -151,7 +145,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )] \%>\%
   .[, Ozone_imp4 := fill_NA_N(
     x = .SD,
@@ -160,7 +154,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )] \%>\%
   .[, Ozone_imp5 := fill_NA(
     x = .SD,
@@ -254,7 +248,7 @@ air_miss <- air_miss \%>\%
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )) \%>\%
   mutate(Ozone_imp4 = fill_NA_N(
     x = .,
@@ -263,7 +257,7 @@ air_miss <- air_miss \%>\%
     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
     w = .[["weights"]],
     logreg = TRUE,
-    times = 30
+    k = 30
   )) \%>\%
   group_by(groups) \%>\%
   do(mutate(., Ozone_imp5 = fill_NA(
