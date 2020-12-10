@@ -134,6 +134,8 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># airquality dataset with additional variables</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></code></pre></div>
+<p>NA structure</p>
+<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
 <div id="intro-data-table" class="section level3">
 <h3 class="hasAnchor">
@@ -378,11 +380,11 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Distribution of imputations vs Distribution of initial data</span>
 <span class="fu"><a href="../reference/compare_imp.html">compare_imp</a></span><span class="op">(</span><span class="va">air_miss</span>, origin <span class="op">=</span> <span class="st">"Ozone"</span>, target <span class="op">=</span> <span class="st">"Ozone_imp_mix"</span><span class="op">)</span></code></pre></div>
-<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># or </span>
 <span class="fu"><a href="../reference/compare_imp.html">compare_imp</a></span><span class="op">(</span><span class="va">air_miss</span>, origin <span class="op">=</span> <span class="st">"Ozone"</span>, target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Ozone_imp2"</span>, <span class="st">"Ozone_imp_mix"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
+<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-9-2.png" width="700"></p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
