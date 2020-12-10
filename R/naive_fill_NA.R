@@ -129,7 +129,7 @@ naive_fill_NA.data.frame <- function(x) {
 #' @describeIn naive_fill_NA S3 method for matrix
 
 naive_fill_NA.matrix <- function(x) {
-  stopifnot(is.numeric(x))
+  assert_that(is.numeric(x))
 
   na_col_p <- vapply(x, function(i) mean(is.na(i)), FUN.VALUE = numeric(1))
 

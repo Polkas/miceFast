@@ -1,7 +1,9 @@
 # 0.6.5
 
-* upset_NA based on UpSetR::upset
-* compare_imp
+* upset_NA based on UpSetR::upset plot function
+* compare_imp plot function
+* new logo
+* remove times argument
 
 # 0.6.2
 
