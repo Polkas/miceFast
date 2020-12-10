@@ -77,6 +77,12 @@ Usage of `fill_NA` and `fill_NA_N` functions from miceFast - this functions shou
 data(air_miss)
 ```
 
+NA structure
+
+```{r}
+upset_NA(air_miss, 6)
+```
+
 ### Intro: data.table
 
 ```{r,echo=TRUE}
