@@ -79,7 +79,7 @@ data(air_miss)
 
 NA structure
 
-```{r}
+```{r, echo=TRUE}
 upset_NA(air_miss, 6)
 ```
 

@@ -75,8 +75,9 @@ mice::complete(mice::mice(air_miss, printFlag = F))
 | `fill_NA_N()` |   multiple imputation - pmm,lm_bayes,lm_noise |
 | `VIF()` | Variance inflation factor |
 | `naive_fill_NA()` | auto imputations |  
-| `compare_imp` | comparing imputations| 
+| `compare_imp` | comparing imputations | 
 | `upset_NA` | visualize NA structure - UpSetR::upset|
+
 Summing up, miceFast offer a relevant reduction of a calculations time for:  
 
 - Linear Discriminant Analysis around **(x5)**
