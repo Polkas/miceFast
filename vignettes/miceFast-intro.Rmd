@@ -532,17 +532,17 @@ data_DT[, .(vifs = VIF(
 
 ## Bibliography
 
-URL: http://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf  
+URL: https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf  
 Title: Exposing C++ functions and classes with Rcpp modules Dirk Eddelbuettel and Romain François  
-Author: http://dirk.eddelbuettel.com and  https://purrple.cat/ 
+Author: https://dirk.eddelbuettel.com and  https://purrple.cat
 Date: March 8, 2018
 
-URL: http://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf  
+URL: https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf  
 Title: RcppArmadillo: Easily Extending R with High-Performance C++ Code  
 Author: Dirk Eddelbuettel and Conrad Sanderson  
 Date: July 1, 2012
 
-URL: http://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf  
+URL: https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf  
 Title: Extending R with C++: A Brief Introduction to Rcpp   
 Author: Dirk Eddelbuettel and James Joseph Balamuta  
 Date: March 8, 2018  
