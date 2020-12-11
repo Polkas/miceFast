@@ -534,7 +534,7 @@ data_DT[, .(vifs = VIF(
 
 URL: http://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf  
 Title: Exposing C++ functions and classes with Rcpp modules Dirk Eddelbuettel and Romain François  
-Author: http://dirk.eddelbuettel.com and  https://romain.rbind.io/   
+Author: http://dirk.eddelbuettel.com and  https://purrple.cat/ 
 Date: March 8, 2018
 
 URL: http://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf  

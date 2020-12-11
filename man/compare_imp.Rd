@@ -2,22 +2,22 @@
 % Please edit documentation in R/plots.R
 \name{compare_imp}
 \alias{compare_imp}
-\title{sth}
+\title{Comparing imputations and original data distributions}
 \usage{
 compare_imp(df, origin, target)
 }
 \arguments{
 \item{df}{data.frame with origin variable and the new one with imputations}
 
-\item{origin}{character value the name of origin variable with values before any imputations}
+\item{origin}{character value - the name of origin variable with values before any imputations}
 
-\item{target}{character vector names of variables with applied imputations}
+\item{target}{character vector - names of variables with applied imputations}
 }
 \value{
 ggplot2 object
 }
 \description{
-sth
+ggplot2 visualization to support which imputation method choose
 }
 \examples{
 data(air_miss)

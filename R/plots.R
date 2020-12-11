@@ -1,10 +1,9 @@
-#' sth
-#' @description sth
+#' Comparing imputations and original data distributions
+#' @description ggplot2 visualization to support which imputation method choose
 #' @param df data.frame with origin variable and the new one with imputations
-#' @param origin character value the name of origin variable with values before any imputations
-#' @param target character vector names of variables with applied imputations
+#' @param origin character value - the name of origin variable with values before any imputations
+#' @param target character vector - names of variables with applied imputations
 #' @return ggplot2 object
-#'
 #' @examples
 #' data(air_miss)
 #' air_miss$Ozone_imp <- fill_NA(
@@ -41,7 +40,7 @@ compare_imp = function(df, origin, target) {
 #' upset plot for NA values
 #' @description wrapper around UpSetR::upset for vizualization of NA values
 #' @description Visualization of set intersections using novel UpSet matrix design.
-#' @param ... all arguments accepted by UpSetR::upset
+#' @param ... all arguments accepted by UpSetR::upset where the first one is expected to be a data.
 #' @details Visualization of set data in the layout described by Lex and Gehlenborg in \url{https://www.nature.com/articles/nmeth.3033}.
 #' UpSet also allows for visualization of queries on intersections and elements, along with custom queries queries implemented using
 #' Hadley Wickham's apply function. To further analyze the data contained in the intersections, the user may select additional attribute plots

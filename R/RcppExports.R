@@ -51,3 +51,7 @@ pmm_weighted_neibo <- function(y, X, w, X1, k, ridge) {
     .Call(`_miceFast_pmm_weighted_neibo`, y, X, w, X1, k, ridge)
 }
 
+pmm_neibo <- function(y, X, X1, k, ridge) {
+    .Call(`_miceFast_pmm_neibo`, y, X, X1, k, ridge)
+}
+

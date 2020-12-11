@@ -1,6 +1,10 @@
+# 0.6.8
+
+* update broken vignette links
+
 # 0.6.6
 
-* solve UpSetR::upset reference links
+* solve broken UpSetR::upset reference links
 
 # 0.6.5
 

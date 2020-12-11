@@ -568,7 +568,7 @@ arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,a
 
     return yimp;
 }
-
+// [[Rcpp::export]]
 arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k, double ridge) {
 
   int N = X.n_rows; int C = X.n_cols; int C_NA = X1.n_cols;int N_NA = X1.n_rows;

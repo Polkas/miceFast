@@ -7,7 +7,7 @@
 upset_NA(...)
 }
 \arguments{
-\item{...}{all arguments accepted by UpSetR::upset}
+\item{...}{all arguments accepted by UpSetR::upset where the first one is expected to be a data.}
 }
 \description{
 wrapper around UpSetR::upset for vizualization of NA values
