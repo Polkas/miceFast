@@ -310,7 +310,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
 
   if (x_ncols > len_p_x_factor_character) {
     posit_ni <- setdiff(posit_x, posit_x[p_x_factor_character])
-    x_ni <- as.matrix(x[, posit_ni])
+    x_ni <- as.matrix(x[, posit_ni, drop = FALSE])
     xx[[2]] <- x_ni
   }
 

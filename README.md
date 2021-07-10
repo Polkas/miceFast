@@ -16,7 +16,7 @@ A new major improvement is one of the fastest predictive mean matching in the R 
 
 Performance benchmarks (check performance_validity.R file at extdata).
 
-[Advanced Usage - Vignette](https://cran.r-project.org/web/packages/miceFast/vignettes/miceFast-intro.html)
+[Advanced Usage - Vignette](https://CRAN.R-project.org/package=miceFast/vignettes/miceFast-intro.html)
 
 ## Installation
 
