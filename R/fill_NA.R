@@ -243,7 +243,7 @@
 
 fill_NA <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-6) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
-    UseMethod("fill_NA")
+    UseMethod("fill_NA", x)
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
   }
@@ -263,11 +263,16 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     posit_x <- pmatch(posit_x, cols)
     posit_x <- posit_x[!is.na(posit_x)]
     if (length(posit_x) == 0) stop("posit_x is empty")
+  } else {
+    stopifnot(posit_x %in% seq_along(x))
   }
 
   if (is.character(posit_y)) {
     posit_y <- pmatch(posit_y, cols)
+    posit_y <- posit_y[!is.na(posit_y)]
     if (length(posit_y) == 0) stop("posit_y is empty")
+  } else {
+    stopifnot(posit_y %in% seq_along(x))
   }
 
   yy <- x[[posit_y]]
@@ -298,7 +303,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
 
   if (len_p_x_factor_character > 0) {
     posit_fc <- posit_x[p_x_factor_character]
-    x_fc <- x[, posit_fc]
+    x_fc <- x[, posit_fc, drop = FALSE]
     x_fc <- model.matrix.lm(~., x_fc, na.action = "na.pass")[, -1]
     xx[[1]] <- x_fc
   }
@@ -354,11 +359,16 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     posit_x <- pmatch(posit_x, cols)
     posit_x <- posit_x[!is.na(posit_x)]
     if (length(posit_x) == 0) stop("posit_x is empty")
+  } else {
+    stopifnot(posit_x %in% seq_along(x))
   }
 
   if (is.character(posit_y)) {
     posit_y <- pmatch(posit_y, cols)
+    posit_y <- posit_y[!is.na(posit_y)]
     if (length(posit_y) == 0) stop("posit_y is empty")
+  } else {
+    stopifnot(posit_y %in% seq_along(x))
   }
 
   yy <- x[[posit_y]]
@@ -445,11 +455,16 @@ fill_NA.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE,
     posit_x <- pmatch(posit_x, cols)
     posit_x <- posit_x[!is.na(posit_x)]
     if (length(posit_x) == 0) stop("posit_x is empty")
+  } else {
+    stopifnot(posit_x %in% seq_len(dim(x)[2]))
   }
 
   if (is.character(posit_y)) {
     posit_y <- pmatch(posit_y, cols)
+    posit_y <- posit_y[!is.na(posit_y)]
     if (length(posit_y) == 0) stop("posit_y is empty")
+  } else {
+    stopifnot(posit_y %in% seq_len(dim(x)[2]))
   }
 
   all_pos_y <- !any(x[[posit_y]] < 0, na.rm = TRUE)

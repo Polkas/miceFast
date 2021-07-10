@@ -47,7 +47,7 @@
 
 VIF <- function(x, posit_y, posit_x, correct = FALSE) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
-    UseMethod("VIF")
+    UseMethod("VIF", x)
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
   }
@@ -79,6 +79,7 @@ VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
 
   if (is.character(posit_y)) {
     posit_y <- pmatch(posit_y, cols)
+    posit_y <- posit_y[!is.na(posit_y)]
     if (length(posit_y) == 0) stop("posit_y is empty")
   }
 
@@ -100,6 +101,7 @@ VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
 #' @describeIn  VIF
 
 VIF.data.table <- function(x, posit_y, posit_x, correct = FALSE) {
+
   if (posit_y %in% posit_x) {
     stop("the same variable is dependent and indepentent")
   }
@@ -120,6 +122,7 @@ VIF.data.table <- function(x, posit_y, posit_x, correct = FALSE) {
 
   if (is.character(posit_y)) {
     posit_y <- pmatch(posit_y, cols)
+    posit_y <- posit_y[!is.na(posit_y)]
     if (length(posit_y) == 0) stop("posit_y is empty")
   }
 
@@ -154,13 +157,18 @@ VIF.matrix <- function(x, posit_y, posit_x, correct = FALSE) {
     posit_x <- match(posit_x, cols)
     posit_x <- posit_x[!is.na(posit_x)]
     if (length(posit_x) == 0) stop("posit_x is empty")
+  } else {
+    stopifnot(posit_x %in% seq_len(dim(x)[2]))
   }
 
   if (length(posit_x) < 2) stop("at least two independent variables should be provided")
 
   if (is.character(posit_y)) {
     posit_y <- match(posit_y, cols)
+    posit_y <- posit_y[!is.na(posit_y)]
     if (length(posit_y) == 0) stop("posit_y is empty")
+  } else {
+    stopifnot(posit_y %in% seq_len(dim(x)[2]))
   }
 
   x_small <- x[, c(posit_y, posit_x)]

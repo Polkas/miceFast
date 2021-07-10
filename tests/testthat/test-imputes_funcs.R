@@ -131,6 +131,30 @@ test_that("imputes", {
   data_df$x3 <- as.character(round(pnorm(data_df$x3) * 5))
 
 
+  expect_error(fill_NA(
+    x = data_df,
+    model = "lm_pred",
+    posit_y = 111,
+    posit_x = c("Intercept", "x2", "x3", "x4"),
+    w = data_df[["weights"]]
+  ))
+
+  expect_error(fill_NA(
+    x = data_df,
+    model = "NOTEXISTS",
+    posit_y = 1,
+    posit_x = c("Intercept", "x2", "x3", "x4"),
+    w = data_df[["weights"]]
+  ))
+
+  expect_error(fill_NA(
+    x = data_df,
+    model = "lda",
+    posit_y = 1,
+    posit_x = c("Intercepty", "NOTEXITS"),
+    w = data_df[["weights"]]
+  ))
+
   data_df2 <- data_df %>%
     group_by(group) %>%
     do(mutate(., y_imp = fill_NA(
@@ -233,7 +257,7 @@ test_that("imputes", {
       x = .,
       model = "lm_noise",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[['weights']], k = 100
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]], k = 100
     ))
 
 
@@ -254,7 +278,7 @@ test_that("imputes", {
     "y_imp12",
     "y_imp13",
     "y_imp14",
-        "y_imp15",
+    "y_imp15",
     "y_imp16"
   )])[, 1] > 0.3)
 
@@ -356,7 +380,7 @@ test_that("imputes", {
       x = .SD,
       model = "lm_noise",
       posit_y = "y",
-      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[['weights']], k = 100
+      posit_x = c("Intercept", "x2", "x3", "x4"), w = .SD[["weights"]], k = 100
     )]
 
 
@@ -392,6 +416,34 @@ test_that("imputes", {
   data_df$x4_bhalf <- data_df$x4 > 0.5
 
   data_DT <- data.table(data_df)
+
+  expect_error(data_DT[, y_imp := fill_NA(
+    x = .SD,
+    model = "lda",
+    posit_y = "NOTEXISTS",
+    posit_x = c("x2", "x3", "x4", "x5")
+  ), by = .(group)])
+
+  expect_error(data_DT[, y_imp := fill_NA(
+    x = .SD,
+    model = "lda",
+    posit_y = 111,
+    posit_x = c("x2", "x3", "x4", "x5")
+  ), by = .(group)])
+
+  expect_error(data_DT[, y_imp := fill_NA(
+    x = .SD,
+    model = "lda",
+    posit_y = 1,
+    posit_x = c(123, 111)
+  ), by = .(group)])
+
+  expect_error(data_DT[, y_imp := fill_NA(
+    x = .SD,
+    model = "NOTEXISTS",
+    posit_y = 1,
+    posit_x = c("x2", "x3", "x4", "x5")
+  ), by = .(group)])
 
   data_DT[, y_imp := fill_NA(
     x = .SD,

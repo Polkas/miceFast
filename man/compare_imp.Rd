@@ -17,7 +17,7 @@ compare_imp(df, origin, target)
 ggplot2 object
 }
 \description{
-ggplot2 visualization to support which imputation method choose
+ggplot2 visualization to support which imputation method to choose
 }
 \examples{
 data(air_miss)

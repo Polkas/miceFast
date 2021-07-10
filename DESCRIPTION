@@ -1,13 +1,13 @@
 Package: miceFast
 Title: Fast Imputations Using 'Rcpp' and 'Armadillo'
-Version: 0.6.9
+Version: 0.7.0
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Description: 
   Fast imputations under the object-oriented programming paradigm. 	
   Moreover there are offered a few functions built to work with popular R packages such as 'data.table' or 'dplyr'.
-	The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
-	A single evaluation of a quantitative model for the multiple imputations is another major enhancement.
-	A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.
+  The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
+  A single evaluation of a quantitative model for the multiple imputations is another major enhancement.
+  A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.
 Depends: R (>= 3.6.0)
 License: GPL (>= 2)
 URL: https://github.com/Polkas/miceFast
@@ -24,7 +24,7 @@ Imports:
     tidyr,
     assertthat
 Suggests:
-	  knitr,
+    knitr,
     rmarkdown,
     pacman,
     testthat,
@@ -33,11 +33,11 @@ Suggests:
     car
 VignetteBuilder: knitr
 LinkingTo: 
-	Rcpp,
-	RcppArmadillo
-RcppModules: miceFast,corrData
+    Rcpp,
+    RcppArmadillo
+RcppModules: miceFast, corrData
 SystemRequirements: 
-	C++11
+    C++11
 NeedsCompilation: yes
 LazyData: true
 RoxygenNote: 7.1.1

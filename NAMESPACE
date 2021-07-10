@@ -25,50 +25,34 @@ importFrom(data.table, data.table)
 importFrom(data.table, as.data.table)
 importFrom(data.table, setDT)
 
-importFrom(stats, model.matrix.lm, "median", "na.omit", "prcomp")
+importFrom(stats, model.matrix.lm, median, na.omit, prcomp)
 
 useDynLib(miceFast,.registration=TRUE)
-
 export(corrData)
-
 export(miceFast)
 
-#exportPattern("^[[:alpha:]]+")
 
 export(neibo)
-
-export(upset_NA)
-
-export(compare_imp)
-
 export(neibo_index)
 
+export(upset_NA)
+export(compare_imp)
+
 export(naive_fill_NA)
-
 S3method(naive_fill_NA, data.frame)
-
 S3method(naive_fill_NA, matrix)
 
 export(fill_NA)
-
 S3method(fill_NA, data.frame)
-
 S3method(fill_NA, data.table)
-
 S3method(fill_NA, matrix)
 
 export(fill_NA_N)
-
 S3method(fill_NA_N, data.frame)
-
 S3method(fill_NA_N, data.table)
-
 S3method(fill_NA_N, matrix)
 
 export(VIF)
-
 S3method(VIF, data.table)
-
 S3method(VIF, data.frame)
-
 S3method(VIF,matrix)

@@ -216,13 +216,13 @@ std::string miceFast::get_models(int posit_y){
   std::string type;
 
   if(un_n == 2){
-    type = "recommended lda or (lm_pred,lm_bayes,lm_noise - round results)";
+    type = "recommended lda or (lm_pred,lm_bayes,lm_noise, pmm - round results)";
   }
   else if(un_n > 2 && un_n <= 15){
-    type = "recommended lda or (lm_pred,lm_bayes,lm_noise - remember to round results if needed)";
+    type = "recommended lda or (lm_pred,lm_bayes,lm_noise, pmm - remember to round results if needed)";
   }
   else if(un_n > 15){
-    type = "lm_pred or lm_bayes or lm_noise";
+    type = "lm_pred or lm_bayes or lm_noise or pmm";
   }
   else {type = "one unique value";}
 

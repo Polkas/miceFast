@@ -1,5 +1,5 @@
 #' Comparing imputations and original data distributions
-#' @description ggplot2 visualization to support which imputation method choose
+#' @description ggplot2 visualization to support which imputation method to choose
 #' @param df data.frame with origin variable and the new one with imputations
 #' @param origin character value - the name of origin variable with values before any imputations
 #' @param target character vector - names of variables with applied imputations

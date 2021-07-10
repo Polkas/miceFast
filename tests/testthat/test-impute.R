@@ -226,6 +226,8 @@ test_that("impute", {
 
   model <- new(miceFast)
   model$set_data(data)
+  expect_identical(model$get_model(posit_y), "lm_pred")
+  expect_identical( model$get_models(posit_y), "lm_pred or lm_bayes or lm_noise or pmm")
   pred_miceFast <- model$impute("lm_pred", posit_y, posit_x)
   model$set_ridge(1e-7)
   model$get_ridge
@@ -279,4 +281,7 @@ test_that("impute", {
   test_6 <- round(a) / sum(index_NA) < 0.5
 
   expect_true(all(c(test_0, test_1, test_2, test_3, test_4, test_5, test_6)))
+
+
+
 })
