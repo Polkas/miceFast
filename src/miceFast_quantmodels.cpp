@@ -5,6 +5,7 @@
 #include "miceFast.h"
 #include <stdlib.h>     /* rand */
 #include <algorithm>
+#include <vector>
 using namespace std;
 using namespace Rcpp;
 using namespace arma;
@@ -347,57 +348,6 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int k, doub
 
 //PMM
 
-int findCrossOver(arma::colvec arr, double low, double high, double x)
-{
-  if (arr[high] <= x)
-    return high;
-  if (arr[low] > x)
-    return low;
-
-
-  int mid = (low + high)/2;
-
-  if (arr[mid] <= x && arr[mid+1] > x)
-    return mid;
-
-  if(arr[mid] < x)
-    return findCrossOver(arr, mid+1, high, x);
-
-  return findCrossOver(arr, low, mid - 1, x);
-}
-
-
-arma::colvec Kclosestrand(arma::colvec arr, double x, int k)
-{
-  int n = arr.n_rows;
-
-  int l = findCrossOver(arr, 0, n-1, x);
-  int r = l;
-  int count = 0;
-  arma::colvec resus(k);
-
-  if (arr[l] == x) l--;
-
-  while (l >= 0 && r < n && count < k)
-  {
-    if (x - arr[l] < arr[r] - x)
-      resus[count] = arr[l--];
-    else
-      resus[count] = arr[r++];
-    count++;
-  }
-
-  while (count < k && l >= 0)
-    resus[count] = arr[l--], count++;
-
-  while (count < k && r < n)
-    resus[count] = arr[r++], count++;
-
-  return resus;
-
-}
-
-
 
 //' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
 //'
@@ -414,112 +364,63 @@ arma::colvec Kclosestrand(arma::colvec arr, double x, int k)
 //' @export
 // [[Rcpp::export]]
 arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
-
   int n_y = y.n_rows;
 
   k = (k <= n_y) ? k : n_y;
   k = (k >= 1) ? k : 1;
 
-  arma::colvec y_new = arma::sort(y);
-
   int n_miss = miss.n_rows;
 
-  arma::colvec resus(n_miss);
-  arma::colvec resus_temp(k);
+  arma::colvec res_f(n_miss);
 
   arma::vec which = floor(runif(n_miss, 0, k));
 
-
-    int subs;
-
-  for(int i=0; i<n_miss ;i++){
-    double mm = miss[i];
-    resus_temp = Kclosestrand(y_new,mm,k);
-    subs = (int) which[i];
-    resus[i] = resus_temp[subs];
-  }
-
-  return resus ;
-
-}
-
-
-
-arma::uvec Kclosestrand_index(arma::colvec arr, double x, int k)
-{
-  int n = arr.size();
-
-  int l = findCrossOver(arr, 0, n-1, x);
-  int r = l;
-  int count = 0;
-  arma::uvec resus(k);
-
-  if (arr[l] == x) l--;
-
-  while (l >= 0 && r < n && count < k)
-  {
-    if (x - arr[l] < arr[r] - x)
-      resus[count] = l--;
-    else
-      resus[count] = r++;
-    count++;
-  }
-
-  while (count < k && l >= 0)
-    resus[count] = l--, count++;
-
-  while (count < k && r < n)
-    resus[count] = r++, count++;
-
-  return resus;
-
-}
-
-
-
-//' Finding in random manner one of the k closets points in a certain vector for each value in a second vector
-//'
-//' @description this function using pre-sorting of a \code{y} and the by the binary search the one of the k closest value for each miss is returned.
-//'
-//' @param y numeric vector values to be look up
-//' @param miss numeric vector a values to be look for
-//' @param k integer a number of values which should be taken into account during sampling one of the k closest point
-//'
-//' @return a numeric vector
-//'
-//' @name neibo_index
-//'
-//' @export
-// [[Rcpp::export]]
-arma::uvec neibo_index(arma::colvec y, arma::colvec miss, int k) {
-  int n_y = y.n_rows;
-
-  k = (k <= n_y) ? k : n_y;
-  k = (k >= 1) ? k : 1;
-
-  arma::colvec y_new = arma::sort(y);
-
-  int n_miss = miss.n_rows;
-
-  arma::uvec resus(n_miss);
-  arma::uvec resus_temp(k);
-
-  arma::vec which = floor(runif(n_miss, 0, k));
-
+  std::vector<double> y_new_std = arma::conv_to< std::vector<double> >::from(y);
+  std::sort(y_new_std.begin(), y_new_std.end());
 
   int subs;
 
-  for(int i=0; i<n_miss ;i++){
+  for(unsigned int i=0; i<n_miss ;i++){
     double mm = miss[i];
-    resus_temp = Kclosestrand_index(y_new,mm,k);
-    subs = (int) which[i];
-    resus[i] = resus_temp[subs];
+
+    std::vector<double>::iterator iter_geq;
+    iter_geq = std::lower_bound(
+      y_new_std.begin(),
+      y_new_std.end(),
+      mm
+    );
+
+    double a = *(iter_geq - 1);
+    double b = *(iter_geq);
+
+    int r = iter_geq - y_new_std.begin();
+    int l = r-1;
+    int count = 0;
+    std::vector<int> resus(k);
+
+    if (y_new_std[l] == mm) l--;
+
+    while (l >= 0 && r < n_y && count < k)
+    {
+      if (mm - y_new_std[l] < y_new_std[r] - mm)
+        resus[count] = l--;
+      else
+        resus[count] = r++;
+      count++;
+    }
+
+    while (count < k && l >= 0)
+      resus[count] = l--, count++;
+
+    while (count < k && r < n_y)
+      resus[count] = r++, count++;
+
+    subs = (unsigned int) which[i];
+    res_f[i] = y_new_std[resus[subs]];
   }
 
-  return resus ;
-
+  return res_f ;
 }
-
 
 // [[Rcpp::export]]
 arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge) {
@@ -534,81 +435,78 @@ arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,a
     X2.col(h)=wq%X.col(h);
   }
 
+  arma::mat xtx = arma::mat(arma::trans(X2) * X2);
+  for (int ii=0;ii<C;ii++){
+      xtx(ii,ii)=xtx(ii,ii)+ridge;
+  }
+  arma::mat xinv = arma::inv( xtx );
+  arma::vec coef2 = arma::mat( xinv * arma::trans(X2) * y2 );
+  arma::colvec resid = arma::mat( y2 - X2*coef2 );
+  double res2 = arma::as_scalar(resid.t()*resid);
 
-    arma::mat xtx = arma::mat( arma::trans(X2) * X2);
-    for (int ii=0;ii<C;ii++){
-        xtx(ii,ii)=xtx(ii,ii)+ridge;
-    }
-    arma::mat xinv = arma::inv( xtx );
-    arma::vec coef2 = arma::mat( xinv * arma::trans(X2) * y2 );
-    arma::colvec resid = arma::mat( y2 - X2*coef2 );
-    double res2 = arma::as_scalar(resid.t()*resid);
+  double df = N - C;
 
-    double df = N - C;
+  double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
 
-    double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
+  double sigma_b = sqrt(res2/chi2);
 
-    double sigma_b = sqrt(res2/chi2);
+  arma::vec noise2(N_NA);
+  noise2.randn();
+  arma::colvec noise2b(C_NA);
+  noise2b.randn();
 
-    arma::vec noise2(N_NA);
-    noise2.randn();
-    arma::colvec noise2b(C_NA);
-    noise2b.randn();
+  arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
+  coef3.replace(datum::nan, 0);
 
-    arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
-    coef3.replace(datum::nan, 0);
+  arma::colvec ypred_mis = X1 * coef3 + noise2 * sigma_b;
 
-    arma::colvec ypred_mis = X1 * coef3 + noise2 * sigma_b;
+  arma::colvec ypred_full =  X * coef2;
 
-    arma::colvec ypred_full =  X * coef2;
+  arma::colvec y_full = arma::sort(ypred_full);
 
-    arma::colvec y_full = arma::sort(ypred_full);
+  arma::colvec yimp = neibo(y_full,ypred_mis,k);
 
-    arma::colvec yimp = neibo(y_full,ypred_mis,k);
-
-    return yimp;
+  return yimp;
 }
 // [[Rcpp::export]]
 arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k, double ridge) {
 
   int N = X.n_rows; int C = X.n_cols; int C_NA = X1.n_cols;int N_NA = X1.n_rows;
 
+  arma::mat xtx = arma::mat(arma::trans(X) * X);
+  xtx.diag() = xtx.diag() + ridge;
+  arma::mat xinv = arma::inv( xtx );
+  arma::vec coef2 =  xinv * arma::trans(X) * y ;
+  arma::colvec resid =  y - X*coef2 ;
+  double res2 = arma::as_scalar(resid.t() *resid);
 
-    arma::mat xtx = arma::mat( arma::trans(X) * X);
-    xtx.diag() = xtx.diag() + ridge;
-    arma::mat xinv = arma::inv( xtx );
-    arma::vec coef2 =  xinv * arma::trans(X) * y ;
-    arma::colvec resid =  y - X*coef2 ;
-    double res2 = arma::as_scalar(resid.t() *resid);
+  double df = N - C;
 
-    double df = N - C;
+  double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
 
-    double chi2 = Rcpp::as<double>(Rcpp::rchisq(1, df));
+  double sigma_b = sqrt(res2/chi2);
 
-    double sigma_b = sqrt(res2/chi2);
+  arma::vec noise2(N_NA);
+  noise2.randn();
+  arma::colvec noise2b(C_NA);
+  noise2b.randn();
 
-    arma::vec noise2(N_NA);
-    noise2.randn();
-    arma::colvec noise2b(C_NA);
-    noise2b.randn();
+  arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
+  coef3.replace(datum::nan, 0);
 
-    arma::colvec coef3 =  coef2 + arma::trans(arma::chol(xinv)) * noise2b * sigma_b;
-    coef3.replace(datum::nan, 0);
+  arma::colvec ypred_mis =  X1 * coef3 + noise2 * sigma_b;
 
-    arma::colvec ypred_mis =  X1 * coef3 + noise2 * sigma_b;
+  arma::colvec ypred_full =  X * coef2;
 
-    arma::colvec ypred_full =  X * coef2;
+  arma::colvec y_full = arma::sort(ypred_full);
 
-    arma::colvec y_full = arma::sort(ypred_full);
+  arma::colvec yimp = neibo(y_full,ypred_mis,k);
 
-    arma::colvec yimp = neibo(y_full,ypred_mis,k);
-
-    return yimp;
+  return yimp;
 }
 
 static R_CallMethodDef callMethods[]  = {
   {"neibo", (DL_FUNC) &neibo, 3},
-  {"neibo_index", (DL_FUNC) &neibo_index, 3},
   {"pmm_neibo", (DL_FUNC) &pmm_neibo, 4},
   {"pmm_weighted_neibo", (DL_FUNC) &pmm_weighted_neibo, 5},
   {NULL, NULL, 0}

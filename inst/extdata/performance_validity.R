@@ -17,8 +17,11 @@ p_load(
 )
 
 set.seed(1234)
+
+base_path <- "/Users/maciejnasinski/miceFast"
+
 # parameters
-power <- 6 # power of 10 - number of observations - should be adjusted to a computer capabilities
+power <- 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
 nr_var <- 10 # CHANGE - only if you generate a bigger corr matrix:  number of variables - independent and one dependent
 grs <- max(c(10**(power - 3), 10)) # grouping variable - number of groups
 iters <- 30 # number of iterations for benchmarking
@@ -87,7 +90,6 @@ colnames(data_bin_NA) <- c("y", paste0("x", posit_x), "weights", "group", "index
 colnames(data_disc_NA) <- c("y", paste0("x", posit_x), "weights", "group", "index_NA", "index")
 colnames(data_con_NA) <- c("y", paste0("x", posit_x), "weights", "group", "index_NA", "index")
 
-
 ###################### Discrete
 
 mice.impute.lda <- mice.impute.lda(data_disc[, posit_y], !index_NA, data_disc[, posit_x])
@@ -109,13 +111,13 @@ m1 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lda", posit_y, posit_x)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 m1
 
 g1 <- autoplot(m1, log = FALSE) + theme_economist() + ggtitle("LDA discrete - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g1.png", g1)
+ggsave(sprintf("%s/inst/extdata/images/g1.png", base_path), g1)
 
 ### grouping variable
 
@@ -139,13 +141,13 @@ for (i in unique(data_disc_NA_sort[, posit_grs])) {
 
 table(pred_Rbase, true_y)
 
-pred_dplyr <- data_disc_NA_sort_DF %>%
+pred_dplyr <- tibble(data_disc_NA_sort_DF) %>%
   group_by(group) %>%
   do(im = mice.impute.lda(as.matrix(.[, posit_y]), !.$index_NA, as.matrix(.[, posit_x]))) %>%
-  tidy(im) %>%
+  unnest(im) %>%
   arrange(group) %>%
   ungroup() %>%
-  select(x) %>%
+  select(im) %>%
   unlist()
 
 table(pred_dplyr, true_y)
@@ -190,9 +192,9 @@ m2 <- microbenchmark::microbenchmark(
     pred_dplyr <- data_disc_NA_sort_DF %>%
       group_by(group) %>%
       do(im = mice.impute.lda(as.matrix(.[, posit_y]), !.$index_NA, as.matrix(.[, posit_x]))) %>%
-      tidy(im) %>%
+      unnest(im) %>%
       ungroup() %>%
-      select(x) %>%
+      select(im) %>%
       unlist()
   },
   DT_mice = {
@@ -221,14 +223,14 @@ m2 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lda", posit_y, posit_x)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 
 m2
 
 g2 <- autoplot(m2, log = FALSE) + theme_economist() + ggtitle("LDA discrete - with grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g2.png", g2)
+ggsave(sprintf("%s/inst/extdata/images/g2.png", base_path), g2)
 
 
 ####################### Binom
@@ -255,14 +257,14 @@ m3 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lda", posit_y, posit_x)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 
 m3
 
 g3 <- autoplot(m3, log = FALSE) + theme_economist() + ggtitle("LDA binom - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g3.png", g3)
+ggsave(sprintf("%s/inst/extdata/images/g3.png", base_path), g3)
 
 
 ##################### Continous - LM Noise
@@ -290,13 +292,13 @@ m4 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lm_noise", posit_y, posit_x)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 m4
 
 g4 <- autoplot(m4, log = FALSE) + theme_economist() + ggtitle("linear regression noise - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g4.png", g4)
+ggsave(sprintf("%s/inst/extdata/images/g4.png", base_path), g4)
 
 ##################### Continous - LM Bayes
 
@@ -320,13 +322,13 @@ m5 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lm_bayes", posit_y, posit_x)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 m5
 
 g5 <- autoplot(m5, log = FALSE) + theme_economist() + ggtitle("linear regression bayes - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g5.png", g5)
+ggsave(sprintf("%s/inst/extdata/images/g5.png", base_path), g5)
 
 ##################### Continous - LM Predict
 
@@ -352,14 +354,14 @@ m6 <- microbenchmark::microbenchmark(
     model$set_data(data)
     pred_miceFast <- model$impute("lm_pred", posit_y, posit_x)
     rm(model)
-  }, k = iters
+  }, times = iters
 )
 
 m6
 
 g6 <- autoplot(m6, log = FALSE) + theme_economist() + ggtitle("linear regression predict - without grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g6.png", g6)
+ggsave(sprintf("%s/inst/extdata/images/g6.png", base_path), g6)
 
 
 ## grouping variable
@@ -382,9 +384,9 @@ pred_dplyr <- data_con_NA_sort %>%
   as.data.frame() %>%
   group_by(group) %>%
   do(im = mice.impute.norm.predict(as.matrix(.[, posit_y]), !.$index_NA, as.matrix(.[, posit_x]))) %>%
-  tidy(im) %>%
+  unnest(im) %>%
   ungroup() %>%
-  select(x) %>%
+  select(im) %>%
   unlist() %>%
   as.numeric()
 
@@ -423,9 +425,9 @@ m7 <- microbenchmark::microbenchmark(
       as.data.frame() %>%
       group_by(group) %>%
       do(im = mice.impute.norm.predict(as.matrix(.[, posit_y]), !.$index_NA, as.matrix(.[, posit_x]))) %>%
-      tidy(im) %>%
+      unnest(im) %>%
       ungroup() %>%
-      select(x) %>%
+      select(im) %>%
       unlist() %>%
       as.numeric()
   },
@@ -445,7 +447,7 @@ m7 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute("lm_pred", posit_y, posit_x)
     rm(model)
   },
-  k = iters,
+  times = iters,
   DT_mice = {
     pred_datatable <- data_disc_NA_sort_DT[, {
       im <- mice.impute.norm.predict(as.matrix(.SD[, 1]), !index_NA, as.matrix(.SD[, posit_x, with = F]))
@@ -464,7 +466,7 @@ g7 <- autoplot(m7, log = FALSE) +
   theme_economist() +
   ggtitle("linear regression predict - with grouping")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g7.png", g7)
+ggsave(sprintf("%s/inst/extdata/images/g7.png", base_path), g7)
 
 ####
 #### Multiple Imputations
@@ -492,13 +494,13 @@ m8 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute_N("lm_noise", posit_y, posit_x, 10)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 m8
 
 g8 <- autoplot(m8, log = FALSE) + theme_economist() + ggtitle("linear regression noise - without grouping - multiple 10")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g8.png", g8)
+ggsave(sprintf("%s/inst/extdata/images/g8.png", base_path), g8)
 
 ##################### Continous - LM Bayes - multiple
 
@@ -524,13 +526,13 @@ m9 <- microbenchmark::microbenchmark(
     pred_miceFast <- model$impute_N("lm_bayes", posit_y, posit_x, 10)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 m9
 
 g9 <- autoplot(m9, log = FALSE) + theme_economist() + ggtitle("linear regression bayes - without grouping - multiple 10")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g9.png", g9)
+ggsave(sprintf("%s/inst/extdata/images/g9.png", base_path), g9)
 
 ##################### Continous - VIFS
 
@@ -556,13 +558,45 @@ m10 <- microbenchmark::microbenchmark(
     vifs_miceFast <- model$vifs(posit_y, posit_x)
     rm(model)
   },
-  k = iters
+  times = iters
 )
 m10
 
 g10 <- autoplot(m10, log = FALSE) + theme_economist() + ggtitle("vifs")
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g10.png", g10)
+ggsave(sprintf("%s/inst/extdata/images/g10.png", base_path), g10)
+
+##################### PMM
+
+data <- data_con_NA[, c(posit_y, posit_x)]
+
+model <- new(miceFast)
+model$set_data(data)
+pmm_miceFast <- model$impute_N("pmm", posit_y, posit_x, k = 5)
+rm(model)
+
+mice.impute.pmm <- mice.impute.pmm(data_con[, posit_y], !index_NA, data_con[, posit_x])
+
+sum((pmm_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
+sum((mice.impute.pmm - data_con[index_NA, posit_y])^2)
+
+m11 <- microbenchmark::microbenchmark(
+  mice = {
+    mice.impute.pmm(data_con[, posit_y], !index_NA, data_con[, posit_x])
+  },
+  miceFast = {
+    model <- new(miceFast)
+    model$set_data(data)
+    pmm_miceFast <- model$impute_N("pmm", posit_y, posit_x, k = 5)
+    rm(model)
+  },
+  times = iters
+)
+m11
+
+g11 <- autoplot(m10, log = FALSE) + theme_economist() + ggtitle("pmm")
+
+ggsave(sprintf("%s/inst/extdata/images/g11.png", base_path), g11)
 
 # plot for README/Intro
 
@@ -575,7 +609,9 @@ dats <- bind_rows(list(
   data.frame(m6) %>% mutate(model = "linear regression predict - without grouping"),
   data.frame(m7) %>% mutate(model = "linear regression predict - with grouping"),
   data.frame(m8) %>% mutate(model = "linear regression noise - without grouping - multiple 10"),
-  data.frame(m9) %>% mutate(model = "linear regression bayes - without grouping - multiple 10")
+  data.frame(m9) %>% mutate(model = "linear regression bayes - without grouping - multiple 10"),
+  data.frame(m10) %>% mutate(model = "VIF"),
+  data.frame(m11) %>% mutate(model = "pmm")
 ))
 
 dats_plot <- dats %>%
@@ -590,4 +626,4 @@ g_summary <- ggplot(dats_plot, aes(model, relative_time, fill = package)) +
   theme(axis.text.x = element_text(angle = 90)) +
   ggtitle(paste0("Benchmarks - 10^", power, "obs (20% NA) ", nr_var, "vars - 10^", grs, " groups"))
 
-ggsave("C:/Users/user/Desktop/own_R_packages/miceFast/inst/extdata/images/g_summary.png", g_summary)
+ggsave(sprintf("%s/inst/extdata/images/g_summary.png", base_path), g_summary)

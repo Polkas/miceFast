@@ -7,6 +7,7 @@ Maciej Nasinski
 [![R build status](https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg)](https://github.com/polkas/miceFast/actions)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
 [![codecov](https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg)](https://codecov.io/gh/Polkas/miceFast)
+[![Dependencies](https://tinyverse.netlify.com/badge/miceFast)](https://cran.r-project.org/package=miceFast)
 
 Fast imputations under the object-oriented programming paradigm. 	
 Moreover there are offered a few functions built to work with popular R packages such as 'data.table' or 'dplyr'.
@@ -78,7 +79,7 @@ mice::complete(mice::mice(air_miss, printFlag = F))
 | `compare_imp()` | comparing imputations | 
 | `upset_NA()` | visualize NA structure - UpSetR::upset|
 
-Summing up, miceFast offer a relevant reduction of a calculations time for:  
+Summing up, `miceFast` offer a relevant reduction of a calculations time for:  
 
 - Linear Discriminant Analysis around **(x5)**
 - where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable

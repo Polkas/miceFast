@@ -3,37 +3,18 @@ import(Rcpp)
 import(methods)
 
 importFrom(assertthat, assert_that)
-
-importFrom(ggplot2, ggplot)
-importFrom(ggplot2, geom_density)
-importFrom(ggplot2, aes_string)
-
-importFrom(magrittr, `%>%`)
-
-importFrom(UpSetR, upset)
-
-importFrom(dplyr, mutate)
-importFrom(dplyr, do)
-importFrom(dplyr, ungroup)
-importFrom(dplyr, group_by)
-importFrom(dplyr, all_of)
-
-importFrom(tidyr, pivot_longer)
+importFrom(stats, model.matrix.lm, median, na.omit, prcomp)
 
 importFrom(data.table, `:=`)
 importFrom(data.table, data.table)
 importFrom(data.table, as.data.table)
 importFrom(data.table, setDT)
 
-importFrom(stats, model.matrix.lm, median, na.omit, prcomp)
-
 useDynLib(miceFast,.registration=TRUE)
 export(corrData)
 export(miceFast)
 
-
 export(neibo)
-export(neibo_index)
 
 export(upset_NA)
 export(compare_imp)

@@ -32,109 +32,6 @@
 #' ### Data
 #' # airquality dataset with additional variables
 #' data(air_miss)
-#'
-#' ### Intro: data.table
-#' # IMPUTATIONS
-#' # Imputations with a grouping option (models are separately assessed for each group)
-#' # taking into account provided weights
-#' air_miss[, Solar_R_imp := fill_NA_N(
-#'   x = .SD,
-#'   model = "lm_bayes",
-#'   posit_y = "Solar.R",
-#'   posit_x = c("Wind", "Temp", "Intercept"),
-#'   w = .SD[["weights"]],
-#'   k = 100
-#' ), by = .(groups)] %>%
-#'   # Imputations - discrete variable
-#'   .[, x_character_imp := fill_NA(
-#'     x = .SD,
-#'     model = "lda",
-#'     posit_y = "x_character",
-#'     posit_x = c("Wind", "Temp", "groups")
-#'   )] %>%
-#'   # logreg was used because almost log-normal distribution of Ozone
-#'   # imputations around mean
-#'   .[, Ozone_imp1 := fill_NA(
-#'     x = .SD,
-#'     model = "lm_bayes",
-#'     posit_y = "Ozone",
-#'     posit_x = c("Intercept"),
-#'     logreg = TRUE
-#'   )] %>%
-#'   # imputations using positions - Intercept, Temp
-#'   .[, Ozone_imp2 := fill_NA(
-#'     x = .SD,
-#'     model = "lm_bayes",
-#'     posit_y = 1,
-#'     posit_x = c(4, 6),
-#'     logreg = TRUE
-#'   )] %>%
-#'   # model with a factor independent variable
-#'   # multiple imputations (average of x30 imputations)
-#'   # with a factor independent variable, weights and logreg options
-#'   .[, Ozone_imp3 := fill_NA_N(
-#'     x = .SD,
-#'     model = "lm_noise",
-#'     posit_y = "Ozone",
-#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-#'     w = .SD[["weights"]],
-#'     logreg = TRUE,
-#'     k = 30
-#'   )] %>%
-#'   .[, Ozone_imp4 := fill_NA_N(
-#'     x = .SD,
-#'     model = "lm_bayes",
-#'     posit_y = "Ozone",
-#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-#'     w = .SD[["weights"]],
-#'     logreg = TRUE,
-#'     k = 30
-#'   )] %>%
-#'   .[, Ozone_imp5 := fill_NA(
-#'     x = .SD,
-#'     model = "lm_pred",
-#'     posit_y = "Ozone",
-#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-#'     w = .SD[["weights"]],
-#'     logreg = TRUE
-#'   ), .(groups)] %>%
-#'   .[, Ozone_imp6 := fill_NA_N(
-#'     x = .SD,
-#'     model = "pmm",
-#'     posit_y = "Ozone",
-#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-#'     w = .SD[["weights"]],
-#'     logreg = TRUE,
-#'     k = 10
-#'   ), .(groups)] %>%
-#'
-#'   # Average of a few methods
-#'   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] %>%
-#'
-#'   # Protecting against collinearity or low number of observations - across small groups
-#'   # Be carful when using a data.table grouping option
-#'   # because of lack of protection against collinearity or low number of observations.
-#'   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
-#'
-#'   .[, Ozone_chac_imp := tryCatch(fill_NA(
-#'     x = .SD,
-#'     model = "lda",
-#'     posit_y = "Ozone_chac",
-#'     posit_x = c(
-#'       "Intercept",
-#'       "Month",
-#'       "Day",
-#'       "Temp",
-#'       "x_character_imp"
-#'     ),
-#'     w = .SD[["weights"]]
-#'   ),
-#'   error = function(e) .SD[["Ozone_chac"]]
-#'   ), .(groups)]
-#'
-#' # Sample of results
-#' air_miss[which(is.na(air_miss[, 1]))[1:5], ]
-#'
 #' ### Intro: dplyr
 #' # IMPUTATIONS
 #' air_miss <- air_miss %>%
@@ -239,15 +136,142 @@
 #'
 #' # Sample of results
 #' air_miss[which(is.na(air_miss[, 1]))[1:5], ]
+#'
+#' ### Intro: data.table
+#' # IMPUTATIONS
+#' # Imputations with a grouping option (models are separately assessed for each group)
+#' # taking into account provided weights
+#' data(air_miss)
+#' setDT(air_miss)
+#' air_miss[, Solar_R_imp := fill_NA_N(
+#'   x = .SD,
+#'   model = "lm_bayes",
+#'   posit_y = "Solar.R",
+#'   posit_x = c("Wind", "Temp", "Intercept"),
+#'   w = .SD[["weights"]],
+#'   k = 100
+#' ), by = .(groups)] %>%
+#'   # Imputations - discrete variable
+#'   .[, x_character_imp := fill_NA(
+#'     x = .SD,
+#'     model = "lda",
+#'     posit_y = "x_character",
+#'     posit_x = c("Wind", "Temp", "groups")
+#'   )] %>%
+#'   # logreg was used because almost log-normal distribution of Ozone
+#'   # imputations around mean
+#'   .[, Ozone_imp1 := fill_NA(
+#'     x = .SD,
+#'     model = "lm_bayes",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept"),
+#'     logreg = TRUE
+#'   )] %>%
+#'   # imputations using positions - Intercept, Temp
+#'   .[, Ozone_imp2 := fill_NA(
+#'     x = .SD,
+#'     model = "lm_bayes",
+#'     posit_y = 1,
+#'     posit_x = c(4, 6),
+#'     logreg = TRUE
+#'   )] %>%
+#'   # model with a factor independent variable
+#'   # multiple imputations (average of x30 imputations)
+#'   # with a factor independent variable, weights and logreg options
+#'   .[, Ozone_imp3 := fill_NA_N(
+#'     x = .SD,
+#'     model = "lm_noise",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+#'     w = .SD[["weights"]],
+#'     logreg = TRUE,
+#'     k = 30
+#'   )] %>%
+#'   .[, Ozone_imp4 := fill_NA_N(
+#'     x = .SD,
+#'     model = "lm_bayes",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+#'     w = .SD[["weights"]],
+#'     logreg = TRUE,
+#'     k = 30
+#'   )] %>%
+#'   .[, Ozone_imp5 := fill_NA(
+#'     x = .SD,
+#'     model = "lm_pred",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+#'     w = .SD[["weights"]],
+#'     logreg = TRUE
+#'   ), .(groups)] %>%
+#'   .[, Ozone_imp6 := fill_NA_N(
+#'     x = .SD,
+#'     model = "pmm",
+#'     posit_y = "Ozone",
+#'     posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+#'     w = .SD[["weights"]],
+#'     logreg = TRUE,
+#'     k = 10
+#'   ), .(groups)] %>%
+#'
+#'   # Average of a few methods
+#'   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] %>%
+#'
+#'   # Protecting against collinearity or low number of observations - across small groups
+#'   # Be carful when using a data.table grouping option
+#'   # because of lack of protection against collinearity or low number of observations.
+#'   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
+#'
+#'   .[, Ozone_chac_imp := tryCatch(fill_NA(
+#'     x = .SD,
+#'     model = "lda",
+#'     posit_y = "Ozone_chac",
+#'     posit_x = c(
+#'       "Intercept",
+#'       "Month",
+#'       "Day",
+#'       "Temp",
+#'       "x_character_imp"
+#'     ),
+#'     w = .SD[["weights"]]
+#'   ),
+#'   error = function(e) .SD[["Ozone_chac"]]
+#'   ), .(groups)]
+#'
+#' # Sample of results
+#' air_miss[which(is.na(air_miss[, 1]))[1:5], ]
+#'
 #' @name fill_NA_N
 #'
 #' @export
 
 fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
+    if (posit_y %in% posit_x) {
+      stop("the same variable is dependent and indepentent")
+    }
+    model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
+
+    cols <- colnames(x)
+
+    if (is.character(posit_x)) {
+      posit_x <- pmatch(posit_x, cols)
+      posit_x <- posit_x[!is.na(posit_x)]
+      if (length(posit_x) == 0) stop("posit_x is empty")
+    } else {
+      stopifnot(posit_x %in% seq_along(x))
+    }
+
+    if (is.character(posit_y)) {
+      posit_y <- pmatch(posit_y, cols)
+      if (length(posit_y) == 0) stop("posit_y is empty")
+    } else {
+      stopifnot(posit_y %in% seq_along(x))
+    }
+
     UseMethod("fill_NA_N", x)
   } else {
-    stop("wrong data type - it should be data.frame, matrix or data.table")
+    stop("wrong data type - it should be data.frame, matrix or data.table (where data.table has to be installed)")
   }
 }
 
@@ -255,29 +279,6 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 
 
 fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
-
-  if (posit_y %in% posit_x) {
-    stop("the same variable is dependent and indepentent")
-  }
-  model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
-
-
-  cols <- colnames(x)
-
-  if (is.character(posit_x)) {
-    posit_x <- pmatch(posit_x, cols)
-    posit_x <- posit_x[!is.na(posit_x)]
-    if (length(posit_x) == 0) stop("posit_x is empty")
-  } else {
-    stopifnot(posit_x %in% seq_along(x))
-  }
-
-  if (is.character(posit_y)) {
-    posit_y <- pmatch(posit_y, cols)
-    if (length(posit_y) == 0) stop("posit_y is empty")
-  } else {
-    stopifnot(posit_y %in% seq_along(x))
-  }
 
   yy <- x[[posit_y]]
 
@@ -329,10 +330,9 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- factor(yy)
+    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy))))  else factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
-    yy <- yy
     f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
@@ -345,36 +345,13 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     }
   }
 
-  attr(ff, "dim") <- attributes(ff)$dim[1]
-
-  return(ff)
+  return(as.vector(ff))
 }
 
 #' @describeIn fill_NA_N S3 method for data.table
 
 fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
-  if (posit_y %in% posit_x) {
-    stop("the same variable is dependent and indepentent")
-  }
-  model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
-
-  cols <- colnames(x)
-
-  if (is.character(posit_x)) {
-    posit_x <- pmatch(posit_x, cols)
-    posit_x <- posit_x[!is.na(posit_x)]
-    if (length(posit_x) == 0) stop("posit_x is empty")
-  } else {
-    stopifnot(posit_x %in% seq_along(x))
-  }
-
-  if (is.character(posit_y)) {
-    posit_y <- pmatch(posit_y, cols)
-    if (length(posit_y) == 0) stop("posit_y is empty")
-  } else {
-    stopifnot(posit_y %in% seq_along(x))
-  }
 
   yy <- x[[posit_y]]
 
@@ -426,7 +403,7 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- factor(yy)
+    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy))))  else factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
     yy <- yy
@@ -442,36 +419,13 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
     }
   }
 
-  attr(ff, "dim") <- attributes(ff)$dim[1]
-
-  return(ff)
+  return(as.vector(ff))
 }
 
 #' @describeIn fill_NA_N S3 method for matrix
 
 fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
-  if (posit_y %in% posit_x) {
-    stop("the same variable is dependent and indepentent")
-  }
-  model <- match.arg(model, c("lm_bayes", "lm_noise", "pmm"))
-
-  cols <- colnames(x)
-
-  if (is.character(posit_x)) {
-    posit_x <- pmatch(posit_x, cols)
-    posit_x <- posit_x[!is.na(posit_x)]
-    if (length(posit_x) == 0) stop("posit_x is empty")
-  } else {
-    stopifnot(posit_x %in% seq_len(dim(x)[2]))
-  }
-
-  if (is.character(posit_y)) {
-    posit_y <- pmatch(posit_y, cols)
-    if (length(posit_y) == 0) stop("posit_y is empty")
-  } else {
-    stopifnot(posit_y %in% seq_len(dim(x)[2]))
-  }
 
   all_pos_y <- !any(x[[posit_y]] < 0, na.rm = TRUE)
   logreg_con <- logreg && all_pos_y && (model != "lda")
@@ -484,7 +438,5 @@ fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALS
     ff <- exp(ff)
   }
 
-  attr(ff, "dim") <- attributes(ff)$dim[1]
-
-  return(ff)
+  return(as.vector(ff))
 }

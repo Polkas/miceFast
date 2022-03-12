@@ -1,3 +1,11 @@
+# miceFast 0.8.1.9000
+
+* `tinyverse` world, less dependencies.
+* fixed imputations for character variables under linear models.
+* speed up the `pmm` model.
+* more tests, higher `covr`.
+* rerun performance tests.
+
 # miceFast 0.7.1
 
 * update URL inside README.

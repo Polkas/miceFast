@@ -60,109 +60,6 @@ library(data.table)
 ### Data
 # airquality dataset with additional variables
 data(air_miss)
-
-### Intro: data.table
-# IMPUTATIONS
-# Imputations with a grouping option (models are separately assessed for each group)
-# taking into account provided weights
-air_miss[, Solar_R_imp := fill_NA_N(
-  x = .SD,
-  model = "lm_bayes",
-  posit_y = "Solar.R",
-  posit_x = c("Wind", "Temp", "Intercept"),
-  w = .SD[["weights"]],
-  k = 100
-), by = .(groups)] \%>\%
-  # Imputations - discrete variable
-  .[, x_character_imp := fill_NA(
-    x = .SD,
-    model = "lda",
-    posit_y = "x_character",
-    posit_x = c("Wind", "Temp", "groups")
-  )] \%>\%
-  # logreg was used because almost log-normal distribution of Ozone
-  # imputations around mean
-  .[, Ozone_imp1 := fill_NA(
-    x = .SD,
-    model = "lm_bayes",
-    posit_y = "Ozone",
-    posit_x = c("Intercept"),
-    logreg = TRUE
-  )] \%>\%
-  # imputations using positions - Intercept, Temp
-  .[, Ozone_imp2 := fill_NA(
-    x = .SD,
-    model = "lm_bayes",
-    posit_y = 1,
-    posit_x = c(4, 6),
-    logreg = TRUE
-  )] \%>\%
-  # model with a factor independent variable
-  # multiple imputations (average of x30 imputations)
-  # with a factor independent variable, weights and logreg options
-  .[, Ozone_imp3 := fill_NA_N(
-    x = .SD,
-    model = "lm_noise",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE,
-    k = 30
-  )] \%>\%
-  .[, Ozone_imp4 := fill_NA_N(
-    x = .SD,
-    model = "lm_bayes",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE,
-    k = 30
-  )] \%>\%
-  .[, Ozone_imp5 := fill_NA(
-    x = .SD,
-    model = "lm_pred",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE
-  ), .(groups)] \%>\%
-  .[, Ozone_imp6 := fill_NA_N(
-    x = .SD,
-    model = "pmm",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE,
-    k = 10
-  ), .(groups)] \%>\%
-
-  # Average of a few methods
-  .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] \%>\%
-
-  # Protecting against collinearity or low number of observations - across small groups
-  # Be carful when using a data.table grouping option
-  # because of lack of protection against collinearity or low number of observations.
-  # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
-
-  .[, Ozone_chac_imp := tryCatch(fill_NA(
-    x = .SD,
-    model = "lda",
-    posit_y = "Ozone_chac",
-    posit_x = c(
-      "Intercept",
-      "Month",
-      "Day",
-      "Temp",
-      "x_character_imp"
-    ),
-    w = .SD[["weights"]]
-  ),
-  error = function(e) .SD[["Ozone_chac"]]
-  ), .(groups)]
-
-# Sample of results
-air_miss[which(is.na(air_miss[, 1]))[1:5], ]
-
 ### Intro: dplyr
 # IMPUTATIONS
 air_miss <- air_miss \%>\%
@@ -267,6 +164,111 @@ air_miss <- air_miss \%>\%
 
 # Sample of results
 air_miss[which(is.na(air_miss[, 1]))[1:5], ]
+
+### Intro: data.table
+# IMPUTATIONS
+# Imputations with a grouping option (models are separately assessed for each group)
+# taking into account provided weights
+data(air_miss)
+setDT(air_miss)
+air_miss[, Solar_R_imp := fill_NA_N(
+  x = .SD,
+  model = "lm_bayes",
+  posit_y = "Solar.R",
+  posit_x = c("Wind", "Temp", "Intercept"),
+  w = .SD[["weights"]],
+  k = 100
+), by = .(groups)] \%>\%
+  # Imputations - discrete variable
+  .[, x_character_imp := fill_NA(
+    x = .SD,
+    model = "lda",
+    posit_y = "x_character",
+    posit_x = c("Wind", "Temp", "groups")
+  )] \%>\%
+  # logreg was used because almost log-normal distribution of Ozone
+  # imputations around mean
+  .[, Ozone_imp1 := fill_NA(
+    x = .SD,
+    model = "lm_bayes",
+    posit_y = "Ozone",
+    posit_x = c("Intercept"),
+    logreg = TRUE
+  )] \%>\%
+  # imputations using positions - Intercept, Temp
+  .[, Ozone_imp2 := fill_NA(
+    x = .SD,
+    model = "lm_bayes",
+    posit_y = 1,
+    posit_x = c(4, 6),
+    logreg = TRUE
+  )] \%>\%
+  # model with a factor independent variable
+  # multiple imputations (average of x30 imputations)
+  # with a factor independent variable, weights and logreg options
+  .[, Ozone_imp3 := fill_NA_N(
+    x = .SD,
+    model = "lm_noise",
+    posit_y = "Ozone",
+    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    w = .SD[["weights"]],
+    logreg = TRUE,
+    k = 30
+  )] \%>\%
+  .[, Ozone_imp4 := fill_NA_N(
+    x = .SD,
+    model = "lm_bayes",
+    posit_y = "Ozone",
+    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    w = .SD[["weights"]],
+    logreg = TRUE,
+    k = 30
+  )] \%>\%
+  .[, Ozone_imp5 := fill_NA(
+    x = .SD,
+    model = "lm_pred",
+    posit_y = "Ozone",
+    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    w = .SD[["weights"]],
+    logreg = TRUE
+  ), .(groups)] \%>\%
+  .[, Ozone_imp6 := fill_NA_N(
+    x = .SD,
+    model = "pmm",
+    posit_y = "Ozone",
+    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    w = .SD[["weights"]],
+    logreg = TRUE,
+    k = 10
+  ), .(groups)] \%>\%
+
+  # Average of a few methods
+  .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] \%>\%
+
+  # Protecting against collinearity or low number of observations - across small groups
+  # Be carful when using a data.table grouping option
+  # because of lack of protection against collinearity or low number of observations.
+  # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
+
+  .[, Ozone_chac_imp := tryCatch(fill_NA(
+    x = .SD,
+    model = "lda",
+    posit_y = "Ozone_chac",
+    posit_x = c(
+      "Intercept",
+      "Month",
+      "Day",
+      "Temp",
+      "x_character_imp"
+    ),
+    w = .SD[["weights"]]
+  ),
+  error = function(e) .SD[["Ozone_chac"]]
+  ), .(groups)]
+
+# Sample of results
+air_miss[which(is.na(air_miss[, 1]))[1:5], ]
+
 }
 \seealso{
 \code{\link{fill_NA_N}}  \code{\link{VIF}}

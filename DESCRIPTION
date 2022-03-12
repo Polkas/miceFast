@@ -1,6 +1,6 @@
 Package: miceFast
 Title: Fast Imputations Using 'Rcpp' and 'Armadillo'
-Version: 0.7.1
+Version: 0.8.1.9000
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Description: 
   Fast imputations under the object-oriented programming paradigm. 	
@@ -15,14 +15,9 @@ BugReports: https://github.com/Polkas/miceFast/issues
 Encoding: UTF-8
 Imports:
     methods,
-    data.table,
-    dplyr,
-    magrittr,
     Rcpp (>= 0.12.12),
-    UpSetR,
-    ggplot2,
-    tidyr,
-    assertthat
+    assertthat,
+    data.table
 Suggests:
     knitr,
     rmarkdown,
@@ -30,7 +25,11 @@ Suggests:
     testthat,
     mice,
     broom,
-    car
+    car,
+    magrittr,
+    ggplot2,
+    UpSetR,
+    dplyr
 VignetteBuilder: knitr
 LinkingTo: 
     Rcpp,
@@ -40,4 +39,4 @@ SystemRequirements:
     C++11
 NeedsCompilation: yes
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

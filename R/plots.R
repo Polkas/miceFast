@@ -29,12 +29,18 @@ compare_imp = function(df, origin, target) {
   assert_that(inherits(origin, "character"))
   assert_that(inherits(target, "character"))
 
-  data = as.data.frame(df)
-  data$origin_NA <- ifelse(is.na(data[[origin]]) , "missing", "complete")
-  data_long <- tidyr::pivot_longer(data[,c(origin, "origin_NA", target)], !all_of("origin_NA"))
-  data_final <- data_long[(((data_long$origin_NA == "missing") & (data_long$name %in% target)) | ((data_long$origin_NA == "complete") & (data_long$name == origin))), ]
-  ggplot2::ggplot(data_final, ggplot2::aes_string(x = "value", fill = "name", group = "name")) +
-  ggplot2::geom_density(alpha = 0.4)
+  if (suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))) {
+    data <- as.data.frame(df)
+    data$origin_NA <- ifelse(is.na(data[[origin]]) , "missing", "complete")
+    data_long <- utils::stack(data[, c(origin, target)])
+    data_long <- cbind(data_long, origin_NA = rep(data$origin_NA, length(c(origin, target))))
+    colnames(data_long) <- c("value", "name", "origin_NA")
+    data_final <- data_long[(((data_long$origin_NA == "missing") & (data_long$name %in% target)) | ((data_long$origin_NA == "complete") & (data_long$name == origin))), ]
+    ggplot2::ggplot(data_final, ggplot2::aes_string(x = "value", fill = "name", group = "name")) +
+      ggplot2::geom_density(alpha = 0.4)
+  } else {
+    stop("Please install ggplot2 package to use the compare_imp function.")
+  }
 }
 
 #' upset plot for NA values
@@ -58,6 +64,10 @@ compare_imp = function(df, origin, target) {
 upset_NA <- function(...) {
   args <- list(...)
   assert_that(inherits(args[[1]], "data.frame"))
-  args[[1]] <- data.frame(Map(function(x) as.integer(is.na(x)), args[[1]]))
-  do.call(UpSetR::upset, args)
+  if (requireNamespace("UpSetR", quietly = TRUE)) {
+    args[[1]] <- data.frame(Map(function(x) as.integer(is.na(x)), args[[1]]))
+    do.call(UpSetR::upset, args)
+  } else {
+    stop("Please install UpSetR package to use the upset_NA function.")
+  }
 }
