@@ -1,4 +1,4 @@
-# miceFast 0.8.1.9000
+# miceFast 0.8.1
 
 * `tinyverse` world, less dependencies.
 * fixed imputations for character variables under linear models.
