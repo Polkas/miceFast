@@ -111,8 +111,9 @@
 <li>where a grouping variable have to be used <strong>(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)</strong> because of pre-sorting by grouping variable</li>
 <li>multiple imputations is faster around <strong>x(a number of multiple imputations)</strong> because the core of a model is evaluated only ones.</li>
 <li>Variance inflation factors (VIF) <strong>(x5)</strong> because the unnecessary linear regression is not evaluated - we need only inverse of X’X</li>
-<li>Predictive mean matching (PMM) <strong>(x100)</strong> because of pre-sorting and binary search If you are interested about the procedure of testing performance check performance_validity.R file at the extdata folder.</li>
+<li>Predictive mean matching (PMM) <strong>(x3)</strong> because of pre-sorting and binary search (<code>mice</code> algorithm was improved too).</li>
 </ul>
+<p>If you are interested about the procedure of testing performance check performance_validity.R file at the extdata folder.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"performance_validity.R"</span>, package <span class="op">=</span> <span class="st">"miceFast"</span><span class="op">)</span></code></pre></div>
 <p>Additional plots for simulations with certain parameters (but feel free to change them) are located:</p>
@@ -680,7 +681,7 @@ Date: Fall 2013</p>
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p>Environment: R 4.1.2 i7 9750HQ and 16GB DDR4.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>Environment: R 4.1.3 i7 9750HQ.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>

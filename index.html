@@ -89,7 +89,7 @@
 <p>Maciej Nasinski</p>
 <p>pkgdown: <a href="https://polkas.github.io/miceFast/index.html" class="external-link uri">https://polkas.github.io/miceFast/index.html</a></p>
 <p><a href="https://CRAN.R-project.org/package=miceFast" class="external-link"><strong>Check the R CRAN for more details</strong></a></p>
-<p><a href="https://github.com/polkas/miceFast/actions" class="external-link"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://codecov.io/gh/Polkas/miceFast" class="external-link"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="https://tinyverse.netlify.com/badge/miceFast" alt="Dependencies"></a></p>
+<p><a href="https://github.com/polkas/miceFast/actions" class="external-link"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://app.codecov.io/gh/Polkas/miceFast" class="external-link"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="https://tinyverse.netlify.com/badge/miceFast" alt="Dependencies"></a></p>
 <p>Fast imputations under the object-oriented programming paradigm.<br>
 Moreover there are offered a few functions built to work with popular R packages such as ‘data.table’ or ‘dplyr’. The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used. A single evaluation of a quantitative model for the multiple imputations is another major enhancement. A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.</p>
 <p>Performance benchmarks (check performance_validity.R file at extdata).</p>
@@ -181,9 +181,10 @@ Moreover there are offered a few functions built to work with popular R packages
 <li>where a grouping variable have to be used <strong>(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)</strong> because of pre-sorting by grouping variable</li>
 <li>multiple imputations is faster around <strong>x(a number of multiple imputations)</strong> because the core of a model is evaluated only ones.</li>
 <li>Variance inflation factors (VIF) <strong>(x5)</strong> because the unnecessary linear regression is not evaluated - we need only inverse of X’X</li>
-<li>Predictive mean matching (PMM) <strong>(x100)</strong> because of pre-sorting and binary search</li>
+<li>Predictive mean matching (PMM) <strong>(x3)</strong> because of pre-sorting and binary search (<code>mice</code> algorithm was improved too).</li>
 </ul>
 <p><img src="reference/figures/g_summary.png"></p>
+<p>Environment: R 4.1.3 i7 9750HQ</p>
 <p>If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.</p>
 </div>
 </div>
