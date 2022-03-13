@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(naive_fill_NAast)
+#' library(miceFast)
 #' data(air_miss)
 #' naive_fill_NA(air_miss)
 #' }

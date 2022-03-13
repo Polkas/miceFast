@@ -36,7 +36,7 @@ this is a very simple and fast solution but not recommended, for more complex so
 }
 \examples{
 \dontrun{
-library(naive_fill_NAast)
+library(miceFast)
 data(air_miss)
 naive_fill_NA(air_miss)
 }

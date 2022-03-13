@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE)
 Loading the package and setting a seed:
 
 ```{r, echo=TRUE,message=FALSE,warning=FALSE}
-pkgs <- c("miceFast", "mice", "car", "ggplot2", "dplyr", "data.table")
+pkgs <- c("miceFast", "mice", "ggplot2", "dplyr", "data.table")
 inst <- lapply(pkgs, library, character.only = TRUE)
 ```
 
