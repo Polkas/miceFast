@@ -16,7 +16,6 @@ Encoding: UTF-8
 Imports:
     methods,
     Rcpp (>= 0.12.12),
-    assertthat,
     data.table
 Suggests:
     knitr,

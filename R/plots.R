@@ -27,10 +27,10 @@
 #' compare_imp(air_miss, origin = "Ozone", c("Ozone_imp", 'Ozone_imp2'))
 #'
 compare_imp = function(df, origin, target) {
-  assert_that(inherits(df, "data.frame"))
-  assert_that(inherits(origin, "character"))
-  assert_that(inherits(target, "character"))
-  assert_that(all(c(origin, target) %in% colnames(df)))
+  stopifnot(inherits(df, "data.frame"))
+  stopifnot(inherits(origin, "character"))
+  stopifnot(inherits(target, "character"))
+  stopifnot(all(c(origin, target) %in% colnames(df)))
 
   if (suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))) {
     data <- as.data.frame(df)
@@ -68,7 +68,7 @@ compare_imp = function(df, origin, target) {
 #'
 upset_NA <- function(...) {
   args <- list(...)
-  assert_that(inherits(args[[1]], "data.frame"))
+  stopifnot(inherits(args[[1]], "data.frame"))
   if (requireNamespace("UpSetR", quietly = TRUE)) {
     args[[1]] <- data.frame(Map(function(x) as.integer(is.na(x)), args[[1]]))
     do.call(UpSetR::upset, args)

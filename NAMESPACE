@@ -2,7 +2,6 @@ import(Rcpp)
 
 import(methods)
 
-importFrom(assertthat, assert_that)
 importFrom(stats, model.matrix.lm, median, na.omit, prcomp)
 
 importFrom(data.table, `:=`)

@@ -10,9 +10,9 @@ testthat::test_that("compare_imp", {
 
   testthat::expect_silent(compare_imp(air_miss, origin = "Ozone", "Ozone_imp"))
 
-  testthat::expect_error(compare_imp(air_miss, origin = "WRONG", "Ozone_imp"), "Elements 1 of")
-  testthat::expect_error(compare_imp(2, origin = "WRONG", "Ozone_imp"), "df does not inherit from class data.frame")
-  testthat::expect_error(compare_imp(air_miss, origin = 2, "Ozone_imp"), "origin does not inherit from class character")
+  testthat::expect_error(compare_imp(air_miss, origin = "WRONG", "Ozone_imp"))
+  testthat::expect_error(compare_imp(2, origin = "WRONG", "Ozone_imp"))
+  testthat::expect_error(compare_imp(air_miss, origin = 2, "Ozone_imp"))
 })
 
 testthat::test_that("upset_NA", {
@@ -20,5 +20,5 @@ testthat::test_that("upset_NA", {
 })
 
 testthat::test_that("upset_NA error", {
-  testthat::expect_error(upset_NA(2), "does not inherit from class data.frame")
+  testthat::expect_error(upset_NA(2))
 })
