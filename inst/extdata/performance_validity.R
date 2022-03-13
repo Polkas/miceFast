@@ -624,6 +624,6 @@ dats_plot <- dats %>%
 g_summary <- ggplot(dats_plot, aes(model, relative_time, fill = package)) +
   geom_bar(stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle = 90)) +
-  ggtitle(paste0("Benchmarks - 10^", power, "obs (20% NA) ", nr_var, "vars - 10^", grs, " groups"))
+  ggtitle(paste0("Benchmarks - 10^", power, "obs (20% NA) ", nr_var, "vars and ", grs, " groups"))
 
 ggsave(sprintf("%s/inst/extdata/images/g_summary.png", base_path), g_summary)

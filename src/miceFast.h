@@ -70,25 +70,25 @@ const double ridge = 0.00001;
 arma::colvec fastLm_pred(arma::colvec &y, arma::mat &X, arma::mat &X1, int k, double ridge);
 
 //Weighted linear regression
-arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X,arma::colvec &w, arma::mat &X1, int k, double ridge);
+arma::colvec fastLm_weighted(arma::colvec &y, arma::mat &X, arma::colvec &w, arma::mat &X1, int k, double ridge);
 
 //weighted linear regression - noise
-arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge);
+arma::colvec fastLm_weighted_noise(arma::colvec &y, arma::mat &X, arma::colvec &w, arma::mat &X1,int k, double ridge);
 
 //weighted linear regression - bayes
-arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1, int k, double ridge);
+arma::colvec fastLm_weighted_bayes(arma::colvec &y, arma::mat &X, arma::colvec &w, arma::mat &X1, int k, double ridge);
 
 //linear regression - bayes
 arma::colvec fastLm_bayes(arma::colvec &y, arma::mat &X, arma::mat &X1, int k, double ridge);
 
 //Linear regression with noise
-arma::colvec fastLm_noise(arma::colvec &y,arma::mat &X, arma::mat &X1, int k, double ridge);
+arma::colvec fastLm_noise(arma::colvec &y, arma::mat &X, arma::mat &X1, int k, double ridge);
 
 //LDA prediction model
-arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int k, double ridge);
+arma::colvec fastLda(arma::colvec &y, arma::mat &X, arma::mat &X1, int k, double ridge);
 
 //PMM
-arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,arma::mat &X1,int k, double ridge);
+arma::colvec pmm_weighted_neibo(arma::colvec &y, arma::mat &X, arma::colvec &w, arma::mat &X1, int k, double ridge);
 
 arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k, double ridge );
 
@@ -115,23 +115,18 @@ arma::mat sym(arma::mat x);
 //R interface
 //
 
-arma::uvec get_index_full_R(arma::mat &x,int posit_y, arma::uvec posit_x);
+arma::uvec get_index_full_R(arma::mat &x, int posit_y, arma::uvec posit_x);
 
-arma::uvec get_index_NA_R(arma::mat &x,int posit_y, arma::uvec posit_x);
+arma::uvec get_index_NA_R(arma::mat &x, int posit_y, arma::uvec posit_x);
 
-arma::colvec impute_raw_R(arma::mat &x,std::string s, int posit_y,arma::uvec posit_x,int k, double ridge);
+arma::colvec impute_raw_R(arma::mat &x, std::string s, int posit_y, arma::uvec posit_x, int k, double ridge);
 
-arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x,arma::colvec w,int k, double ridge);
+arma::colvec imputeW_R(arma::mat &x, std::string s, int posit_y, arma::uvec posit_x, arma::colvec w,int k, double ridge);
 
-arma::vec VIF(arma::mat &x,int posit_y,arma::uvec posit_x);
+arma::vec VIF(arma::mat &x,int posit_y, arma::uvec posit_x);
 
-arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x,arma::colvec w,int k, double ridge);
+arma::colvec fill_NA_N(arma::mat &x, std::string model, int posit_y,arma::uvec posit_x, arma::colvec w, int k, double ridge);
 
-arma::colvec fill_NA(arma::mat &x,std::string model, int posit_y,arma::uvec posit_x,arma::colvec w, double ridge);
+arma::colvec fill_NA(arma::mat &x, std::string model, int posit_y, arma::uvec posit_x, arma::colvec w, double ridge);
 
-arma::uvec neibo_index(arma::colvec y, arma::colvec miss, int k);
-
-arma::colvec neibo(arma::colvec y, arma::colvec miss, int k);
-
-
-
+arma::colvec neibo(arma::colvec &y, arma::colvec &miss, int k);

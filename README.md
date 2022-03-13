@@ -7,7 +7,7 @@ pkgdown: https://polkas.github.io/miceFast/index.html
 
 [![R build status](https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg)](https://github.com/polkas/miceFast/actions)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
-[![codecov](https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg)](https://codecov.io/gh/Polkas/miceFast)
+[![codecov](https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg)](https://app.codecov.io/gh/Polkas/miceFast)
 [![Dependencies](https://tinyverse.netlify.com/badge/miceFast)](https://cran.r-project.org/package=miceFast)
 
 Fast imputations under the object-oriented programming paradigm. 	
@@ -86,8 +86,10 @@ Summing up, `miceFast` offer a relevant reduction of a calculations time for:
 - where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable
 - multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
 - Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
-- Predictive mean matching (PMM) **(x100)** because of pre-sorting and binary search
+- Predictive mean matching (PMM) **(x3)** because of pre-sorting and binary search (`mice` algorithm was improved too).
 
 ![](man/figures/g_summary.png)
+
+Environment: R 4.1.3 i7 9750HQ
 
 If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.

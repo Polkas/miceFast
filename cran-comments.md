@@ -1,12 +1,17 @@
-  ## Test environments
+## Test environments
   
-  github actions:
+github actions:
   
-  * Ubuntu R version 4.1.0 (2021-05-18) x86_64-pc-linux-gnu (64-bit)
-  * Windows R version 4.1.0 (2021-05-18) x86_64-w64-mingw32 (64-bit)
-  * macOS R version 4.1.0 (2021-05-18) x86_64-apple-darwin17.0 (64-bit)
-  * win-builder: R-devel
+* {os: macOS-latest,   r: 'release'}
+* {os: windows-latest, r: 'release'}
+* {os: windows-latest, r: '3.6'}
+* {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
+* {os: ubuntu-18.04,   r: 'release'}
   
-  ## R CMD check results
+and:
 
-  There were no errors, warnings and 1 note (size of the package because of a compiled code)
+* win-builder: R-devel
+  
+## R CMD check results
+  
+There were no errors, warnings or notes

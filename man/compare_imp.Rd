@@ -20,6 +20,8 @@ ggplot2 object
 ggplot2 visualization to support which imputation method to choose
 }
 \examples{
+library(miceFast)
+library(ggplot2)
 data(air_miss)
 air_miss$Ozone_imp <- fill_NA(
     x = air_miss,

@@ -363,7 +363,7 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int k, doub
 //'
 //' @export
 // [[Rcpp::export]]
-arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
+arma::colvec neibo(arma::colvec &y, arma::colvec &miss, int k) {
   int n_y = y.n_rows;
   int n_miss = miss.n_rows;
 
@@ -372,15 +372,17 @@ arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
 
   arma::colvec result_final(n_miss);
 
-  arma::vec which = floor(runif(n_miss, 0, k));
+  arma::vec which_n = floor(runif(n_miss, 0, k));
+  arma::uvec which = arma::conv_to< arma::uvec >::from(which_n);
 
   std::vector<double> y_new_std = arma::conv_to< std::vector<double> >::from(y);
   std::sort(y_new_std.begin(), y_new_std.end());
 
-  size_t subs;
-
-  for(unsigned int i=0; i<n_miss ;i++){
+  for(int i=0; i<n_miss ;i++){
     double mm = miss[i];
+    int count = 0;
+
+    std::vector<int> resus(k);
 
     std::vector<double>::iterator iter_geq;
     iter_geq = std::lower_bound(
@@ -391,10 +393,6 @@ arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
 
     int r = iter_geq - y_new_std.begin();
     int l = r-1;
-    int count = 0;
-    std::vector<int> resus(k);
-
-    if (y_new_std[l] == mm) l--;
 
     while (l >= 0 && r < n_y && count < k)
     {
@@ -411,8 +409,9 @@ arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
     while (count < k && r < n_y)
       resus[count] = r++, count++;
 
-    subs = (size_t) which[i];
-    result_final[i] = y_new_std[resus[subs]];
+    int subs = which[i];
+    int indx = resus[subs];
+    result_final[i] = y_new_std[indx];
   }
 
   return result_final;
@@ -458,9 +457,7 @@ arma::colvec pmm_weighted_neibo( arma::colvec &y, arma::mat &X,arma::colvec &w,a
 
   arma::colvec ypred_full =  X * coef2;
 
-  arma::colvec y_full = arma::sort(ypred_full);
-
-  arma::colvec yimp = neibo(y_full,ypred_mis,k);
+  arma::colvec yimp = neibo(ypred_full, ypred_mis,k);
 
   return yimp;
 }
@@ -494,9 +491,7 @@ arma::colvec pmm_neibo( arma::colvec &y, arma::mat &X,arma::mat &X1,int k, doubl
 
   arma::colvec ypred_full =  X * coef2;
 
-  arma::colvec y_full = arma::sort(ypred_full);
-
-  arma::colvec yimp = neibo(y_full,ypred_mis,k);
+  arma::colvec yimp = neibo(ypred_full,ypred_mis,k);
 
   return yimp;
 }

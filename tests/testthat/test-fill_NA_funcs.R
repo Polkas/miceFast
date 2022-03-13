@@ -152,7 +152,7 @@ testthat::test_that("fill_NA error", {
     posit_y = 111,
     posit_x = c("Intercept", "x2", "x3", "x4"),
     w = data_df[["weights"]]
-  ), "posit_y %in%")
+  ))
 
   expect_error(fill_NA(
     x = data_df,
@@ -160,7 +160,7 @@ testthat::test_that("fill_NA error", {
     posit_y = 1,
     posit_x = 111,
     w = data_df[["weights"]]
-  ), "posit_x %in%")
+  ))
 
   expect_error(fill_NA(
     x = data_df,
@@ -168,7 +168,7 @@ testthat::test_that("fill_NA error", {
     posit_y = 1,
     posit_x = c("Intercept", "x2", "x3", "x4"),
     w = data_df[["weights"]]
-  ), "'arg' should be one of .lm_pred., .lda., .lm_bayes., .lm_noise.")
+  ), "'arg' should be one of")
 
   expect_error(fill_NA(
     x = data_df,
@@ -176,7 +176,7 @@ testthat::test_that("fill_NA error", {
     posit_y = 1,
     posit_x = c("Intercepty", "NOTEXITS"),
     w = data_df[["weights"]]
-  ), "posit_x is empty")
+  ))
 
   expect_error(fill_NA(
     x = 1:10,
@@ -211,7 +211,7 @@ testthat::test_that("fill_NA_N error", {
     posit_y = 111,
     posit_x = c("Intercept", "x2", "x3", "x4"),
     w = data_df[["weights"]]
-  ), "posit_y %in%")
+  ))
 
   expect_error(fill_NA_N(
     x = data_df,
@@ -219,7 +219,7 @@ testthat::test_that("fill_NA_N error", {
     posit_y = 1,
     posit_x = 111,
     w = data_df[["weights"]]
-  ), "posit_x %in%")
+  ))
 
   expect_error(fill_NA_N(
     x = data_df,
@@ -227,7 +227,7 @@ testthat::test_that("fill_NA_N error", {
     posit_y = 1,
     posit_x = c("Intercept", "x2", "x3", "x4"),
     w = data_df[["weights"]]
-  ), "'arg' should be one of .lm_bayes., .lm_noise., .pmm.")
+  ), "'arg' should be one of")
 
   expect_error(fill_NA_N(
     x = data_df,
