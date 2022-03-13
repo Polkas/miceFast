@@ -6,9 +6,9 @@
 #' For numeric columns with any missing data a simple bayesian mean will be used.
 #' Next all numeric variables will be utilized to impute character/factoer variables by Linear Discriminant Analysis.
 #'
-#' @param x a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables
+#' @param x a numeric matrix or data.frame (factor/character/numeric/logical)  - variables
 #'
-#' @return load imputations in a similar to the input type
+#' @return load imputations in a similar to the input type.
 #'
 #' @note this is a very simple and fast solution but not recommended, for more complex solutions check the vignette
 #'
@@ -26,7 +26,7 @@
 #' @export
 naive_fill_NA <- function(x) {
   if (inherits(x, "data.frame") || inherits(x, "matrix")) {
-    UseMethod("naive_fill_NA")
+    UseMethod("naive_fill_NA", x)
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
   }
@@ -131,20 +131,20 @@ naive_fill_NA.data.frame <- function(x) {
 naive_fill_NA.matrix <- function(x) {
   assert_that(is.numeric(x))
 
-  na_col_p <- vapply(x, function(i) mean(is.na(i)), FUN.VALUE = numeric(1))
+  na_col_p <- apply(x, 2, function(i) mean(is.na(i)))
 
   col_names <- colnames(x)
 
   mm <- match(c("weights", "wei", "weis", "w"), tolower(colnames(x)))
 
-  ww <- if (all(is.na(mm))) vector() else x[[na.omit(mm)[1]]]
+  ww <- if (all(is.na(mm))) vector() else x[, na.omit(mm)[1]]
 
   ww <- if (any(is.na(ww))) vector() else ww
 
   nn <- col_names[(na_col_p > 0)]
 
   for (posit_y in nn) {
-    yy <- x[[posit_y]]
+    yy <- x[, posit_y]
 
     all_pos_y <- !any(yy < 0, na.rm = TRUE)
 
@@ -161,7 +161,7 @@ naive_fill_NA.matrix <- function(x) {
       ff <- fill_NA_(data_temp, "lm_bayes", 1, 2, ww)
     }
 
-    x[[posit_y]] <- as.vector(ff)
+    x[, posit_y] <- as.vector(ff)
   }
 
   return(x)

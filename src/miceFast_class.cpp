@@ -28,25 +28,21 @@ void miceFast::set_data(arma::mat & _x){
   index = arma::regspace<arma::uvec>(0,N_rows - 1) + 1;
 }
 
-void miceFast::set_data_sparse(arma::sp_mat & _x){
-  x_sp = _x;
-  N_rows = x_sp.n_rows;
-  N_cols = x_sp.n_cols;
-  index = arma::regspace<arma::uvec>(0,N_rows - 1) + 1;
-}
-
 void miceFast::set_g(arma::colvec & _g){
   if(x.is_empty()){Rcpp::stop("There is no data provided");}
   unsigned int n_elems = _g.n_rows;
   if(N_rows!=n_elems){Rcpp::stop("Wrong number of elements");}
+  if(_g.has_nan()){Rcpp::stop("There are NA values for weights");}
   g = arma::colvec(_g.begin(),n_elems,false,false);  //g = arma::uvec(_g.begin(),_g.n_elem,false,false); - not work for uvec - unit not equal to int
   sorted = g.is_sorted();
 }
 
 void miceFast::set_w(arma::colvec & _w){
   if(x.is_empty()){Rcpp::stop("There is no data provided");}
-  unsigned int n_elems = _w.n_rows;
+  size_t n_elems = _w.n_rows;
   if(N_rows!=n_elems){Rcpp::stop("Wrong number of elements");}
+  if(_w.has_nan()){Rcpp::stop("There are NA values for weights");}
+  if(arma::any(_w<0)){Rcpp::stop("There are negative values for the weights variable");}
   w = arma::colvec(_w.begin(),n_elems,false,false);
 }
 
@@ -415,8 +411,7 @@ arma::colvec miceFast::imputeby(std::string s, int posit_y,arma::uvec posit_x, i
 
   //if(!Y.has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
 
-  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
-  if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There are no NA values for the dependent variable");}
 
   arma::uvec g_int(N_rows);
 
@@ -508,9 +503,7 @@ arma::colvec miceFast::imputeW(std::string s,int posit_y,arma::uvec posit_x,int 
   index_full = miceFast::get_index_full(posit_y, posit_x);
   index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
-  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
-  if(w.has_nan()){Rcpp::stop("There is NA values for weights");}
-  if(arma::any(w<0)){Rcpp::stop("There are ngative values for the weights variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There are no NA values for the dependent variable");}
 
   //dividing data to NA and full
 
@@ -548,9 +541,7 @@ arma::colvec miceFast::imputebyW(std::string s,int posit_y,arma::uvec posit_x,in
   index_full = miceFast::get_index_full(posit_y, posit_x);
   index_NA = miceFast::get_index_NA(posit_y, posit_x);
 
-  if(!x.col(posit_y).has_nan()){Rcpp::stop("There is no NA values for the dependent variable");}
-  if(w.has_nan()){Rcpp::stop("There is NA values for weights variable");}
-  if(g.has_nan()){Rcpp::stop("There is NA values for the grouping variable");}
+  if(!x.col(posit_y).has_nan()){Rcpp::stop("There are no NA values for the dependent variable");}
 
   arma::uvec g_int(N_rows);
 

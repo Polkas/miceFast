@@ -92,9 +92,6 @@ arma::colvec imputeW_R(arma::mat &x,std::string s,int posit_y,arma::uvec posit_x
   arma::uvec index_full = get_index_full_R(x,posit_y, posit_x);
   arma::uvec index_NA = get_index_NA_R(x,posit_y, posit_x);
 
-  if(w.has_nan()){Rcpp::stop("There is NA values for weights");}
-  if(arma::any(w<0)){Rcpp::stop("There are negative values for the weights variable");}
-
   arma::colvec pred = x(index_NA,posit_y_uvec);
 
   if((!(index_NA.n_elem==0)) && ((index_full.n_elem>15 && s=="lda")|| (index_full.n_elem>posit_x.n_elem && s!="lda"))){

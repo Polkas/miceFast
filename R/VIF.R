@@ -21,9 +21,6 @@
 #' library(data.table)
 #'
 #' airquality2 <- airquality
-#' airquality2$Temp2 <- airquality2$Temp**2
-#' # install.packages("car")
-#' # car::vif(lm(Ozone ~ ., data=airquality2))
 #'
 #' data_DT <- data.table(airquality2)
 #' data_DT[, .(vifs = VIF(
@@ -47,6 +44,35 @@
 
 VIF <- function(x, posit_y, posit_x, correct = FALSE) {
   if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
+    stopifnot(is.logical(correct))
+
+    if (posit_y %in% posit_x) {
+      stop("the same variable is dependent and indepentent")
+    }
+
+    cols <- colnames(x)
+    # posit as character vector
+    if (is.character(posit_x)) {
+      posit_x <- match(posit_x, cols)
+      posit_x <- posit_x[!is.na(posit_x)]
+      if (length(posit_x) == 0) stop("posit_x is empty")
+    } else {
+      stopifnot(posit_x %in% seq_len(dim(x)[2]))
+    }
+
+    if (length(posit_x) < 2) stop("at least two independent variables should be provided")
+
+    #contains_intercept <- any(unlist(apply(x[, posit_x], 2, function(i) all(duplicated(i)[-1L]))))
+    #if (contains_intercept) stop("Do not include an intercept")
+
+    if (is.character(posit_y)) {
+      posit_y <- match(posit_y, cols)
+      posit_y <- posit_y[!is.na(posit_y)]
+      if (length(posit_y) == 0) stop("posit_y is empty")
+    } else {
+      stopifnot(posit_y %in% seq_len(dim(x)[2]))
+    }
+
     UseMethod("VIF", x)
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
@@ -57,123 +83,29 @@ VIF <- function(x, posit_y, posit_x, correct = FALSE) {
 #' @describeIn  VIF
 
 VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
-  is_DT <- inherits(x, "data.table")
-
-  if (posit_y %in% posit_x) {
-    stop("the same variable is dependent and indepentent")
-  }
-
-  # contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
-  # if(contains_intercept){stop("Do not include an intercept");}
-
-  cols <- colnames(x)
-  # posit as character vector
-  if (is.character(posit_x)) {
-    posit_x <- pmatch(posit_x, cols)
-    posit_x <- posit_x[!is.na(posit_x)]
-    if (length(posit_x) == 0) stop("posit_x is empty")
-  }
-
-  if (length(posit_x) < 2) stop("at least two independent variables should be provided")
-
-
-  if (is.character(posit_y)) {
-    posit_y <- pmatch(posit_y, cols)
-    posit_y <- posit_y[!is.na(posit_y)]
-    if (length(posit_y) == 0) stop("posit_y is empty")
-  }
-
-
-
-  x_small <- if (is_DT) x[, c(posit_y, posit_x), with = FALSE] else x[, c(posit_y, posit_x)]
-
+  x_small <- x[, c(posit_y, posit_x)]
   x_small[[1]] <- as.numeric(x_small[[1]])
-
   xx <- model.matrix.lm(~., x_small, na.action = "na.pass")
-
   aa <- attributes(xx)$assign
-
   ll <- 3:ncol(xx)
-
   VIF_(xx, 2, ll, aa[ll], correct)
 }
 
 #' @describeIn  VIF
 
 VIF.data.table <- function(x, posit_y, posit_x, correct = FALSE) {
-
-  if (posit_y %in% posit_x) {
-    stop("the same variable is dependent and indepentent")
-  }
-
-  # contains_intercept = any(unlist(lapply(x_small,function(i) all(duplicated(i)[-1L]))))
-  # if(contains_intercept){stop("Do not include an intercept");}
-
-  cols <- colnames(x)
-  # posit as character vector
-  if (is.character(posit_x)) {
-    posit_x <- pmatch(posit_x, cols)
-    posit_x <- posit_x[!is.na(posit_x)]
-    if (length(posit_x) == 0) stop("posit_x is empty")
-  }
-
-  if (length(posit_x) < 2) stop("at least two independent variables should be provided")
-
-
-  if (is.character(posit_y)) {
-    posit_y <- pmatch(posit_y, cols)
-    posit_y <- posit_y[!is.na(posit_y)]
-    if (length(posit_y) == 0) stop("posit_y is empty")
-  }
-
-
-
   x_small <- x[, c(posit_y, posit_x), with = FALSE]
-
   x_small[[1]] <- as.numeric(x_small[[1]])
-
   xx <- model.matrix.lm(~., x_small, na.action = "na.pass")
-
   aa <- attributes(xx)$assign
-
   ll <- 3:ncol(xx)
-
   VIF_(xx, 2, ll, aa[ll], correct)
 }
 
 #' @describeIn  VIF
 
 VIF.matrix <- function(x, posit_y, posit_x, correct = FALSE) {
-  if (posit_y %in% posit_x) {
-    stop("the same variable is dependent and indepentent")
-  }
-
-  # contains_intercept = any(unlist(apply(x[,posit_x],2,function(i) all(duplicated(i)[-1L]))))
-  # if(contains_intercept){stop("Do not include an intercept");}
-
-  cols <- colnames(x)
-  # posit as character vector
-  if (is.character(posit_x)) {
-    posit_x <- match(posit_x, cols)
-    posit_x <- posit_x[!is.na(posit_x)]
-    if (length(posit_x) == 0) stop("posit_x is empty")
-  } else {
-    stopifnot(posit_x %in% seq_len(dim(x)[2]))
-  }
-
-  if (length(posit_x) < 2) stop("at least two independent variables should be provided")
-
-  if (is.character(posit_y)) {
-    posit_y <- match(posit_y, cols)
-    posit_y <- posit_y[!is.na(posit_y)]
-    if (length(posit_y) == 0) stop("posit_y is empty")
-  } else {
-    stopifnot(posit_y %in% seq_len(dim(x)[2]))
-  }
-
   x_small <- x[, c(posit_y, posit_x)]
-
   ncol_x <- ncol(x_small)
-
   VIF_(x_small, 1, 2:ncol_x, 2:ncol_x, correct)
 }

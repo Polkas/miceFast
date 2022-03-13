@@ -365,20 +365,19 @@ arma::colvec fastLda( arma::colvec &y,  arma::mat &X, arma::mat &X1, int k, doub
 // [[Rcpp::export]]
 arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
   int n_y = y.n_rows;
+  int n_miss = miss.n_rows;
 
   k = (k <= n_y) ? k : n_y;
   k = (k >= 1) ? k : 1;
 
-  int n_miss = miss.n_rows;
-
-  arma::colvec res_f(n_miss);
+  arma::colvec result_final(n_miss);
 
   arma::vec which = floor(runif(n_miss, 0, k));
 
   std::vector<double> y_new_std = arma::conv_to< std::vector<double> >::from(y);
   std::sort(y_new_std.begin(), y_new_std.end());
 
-  int subs;
+  size_t subs;
 
   for(unsigned int i=0; i<n_miss ;i++){
     double mm = miss[i];
@@ -389,9 +388,6 @@ arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
       y_new_std.end(),
       mm
     );
-
-    double a = *(iter_geq - 1);
-    double b = *(iter_geq);
 
     int r = iter_geq - y_new_std.begin();
     int l = r-1;
@@ -415,11 +411,11 @@ arma::colvec neibo(arma::colvec y, arma::colvec miss, int k) {
     while (count < k && r < n_y)
       resus[count] = r++, count++;
 
-    subs = (unsigned int) which[i];
-    res_f[i] = y_new_std[resus[subs]];
+    subs = (size_t) which[i];
+    result_final[i] = y_new_std[resus[subs]];
   }
 
-  return res_f ;
+  return result_final;
 }
 
 // [[Rcpp::export]]

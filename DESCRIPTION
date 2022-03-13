@@ -24,8 +24,6 @@ Suggests:
     pacman,
     testthat,
     mice,
-    broom,
-    car,
     magrittr,
     ggplot2,
     UpSetR,

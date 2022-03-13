@@ -50,9 +50,6 @@ library(miceFast)
 library(data.table)
 
 airquality2 <- airquality
-airquality2$Temp2 <- airquality2$Temp**2
-# install.packages("car")
-# car::vif(lm(Ozone ~ ., data=airquality2))
 
 data_DT <- data.table(airquality2)
 data_DT[, .(vifs = VIF(

@@ -37,11 +37,13 @@ new(miceFast)
 \section{Methods}{
   \describe{
     \item{\code{set_data(...)}:}{ providing data by a reference - a numeric matrix}
-    \item{\code{set_g(...)}:}{ providing a grouping variable by a reference - a numeric vector - positive values}
-    \item{\code{set_w(...)}:}{ providing a weightinh variable by a reference - a numeric vector - positive values}
+    \item{\code{set_g(...)}:}{ providing a grouping variable by a reference - a numeric vector WITOUT NA values - positive values}
+    \item{\code{set_w(...)}:}{ providing a weightinh variable by a reference - a numeric vector WITOUT NA values - positive values}
+    \item{\code{set_ridge(...)}:}{ providing a ridge i.e. the disturbance to diag of XX, default 1e-6}
     \item{\code{get_data(...)}:}{ retrieving the data }
     \item{\code{get_w(...)}:}{ retrieving the weighting variable }
     \item{\code{get_g(...)}:}{ retireiving the grouping variable }
+    \item{\code{get_ridge(...)}:}{ retireiving the ridge disturbance }
     \item{\code{get_index(...)}:}{ getting the index }
     \item{\code{impute(...)}:}{ impute data under characterstics from the object like a optional grouping or weighting variable }
     \item{\code{impute_N(...)}:}{ multiple imputations - impute data under characterstics from the object like a optional grouping or weighting variable }

@@ -63,7 +63,10 @@ colnames(data_bin_NA) <- c("y", paste0("x", posit_x), "weights", "group", "index
 colnames(data_disc_NA) <- c("y", paste0("x", posit_x), "weights", "group", "index_NA")
 colnames(data_con_NA) <- c("y", paste0("x", posit_x), "weights", "group", "index_NA")
 
-testthat::test_that("fill_NA lm_bayes accuracy", {
+
+#################################
+
+testthat::test_that("fill_NA lm_bayes accuracy - matrix", {
   pred_lm_bayes <- fill_NA(
     x = as.matrix(data_con_NA),
     model = "lm_bayes",
@@ -132,32 +135,6 @@ test_that("VIF", {
   cc <- collin_x(data_con_NA[, 1] * 5, data_con_NA[, c(2, 3, 4)] * 5)
 
   testthat::expect_true(all(cor(cbind(vifs, cc[[1]], cc[[2]]))[1, ] > 0.95))
-})
-
-data <- cbind(y_true = data_con[, 1], data_con_NA, Intercept = 1, index = 1:nrow(data_con))
-
-data_df <- data.frame(data)
-data_df$x2 <- round(pnorm(data_df$x2) * 10)
-data_df$x22 <- data_df$x2**2
-data_df$x23 <- data_df$x2**3
-
-data_DT <- data.table(data_df)
-
-test_that("VIF correct", {
-  vi1 <- data_DT[, .(VIF(
-    x = .SD,
-    posit_y = "y",
-    posit_x = c("x2", "x3", "x4", "x22", "x23"), correct = FALSE
-  ))]
-
-
-  vi2 <- data_DT[, .(VIF(
-    x = .SD,
-    posit_y = "y",
-    posit_x = c("x2", "x3", "x4", "x22", "x23"), correct = TRUE
-  ))][["V1"]]
-
-  testthat::expect_true(all(vi1 > vi2)) && (any(vi1 > 7))
 })
 
 data <- cbind(y_true = data_con[, 1], data_con_NA, Intercept = 1, index = 1:nrow(data_con))
@@ -627,4 +604,3 @@ testthat::test_that("data.table pipeline fill_NA/fill_NA_N accuracy - disc", {
                               .[, lapply(.SD, function(x) 100 * mean(y_true == x))] > 10))
 
 })
-

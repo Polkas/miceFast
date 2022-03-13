@@ -581,7 +581,7 @@ sum((pmm_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
 sum((mice.impute.pmm - data_con[index_NA, posit_y])^2)
 
 m11 <- microbenchmark::microbenchmark(
-  mice = {
+  R_mice = {
     mice.impute.pmm(data_con[, posit_y], !index_NA, data_con[, posit_x])
   },
   miceFast = {

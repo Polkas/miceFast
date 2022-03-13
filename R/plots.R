@@ -28,6 +28,7 @@ compare_imp = function(df, origin, target) {
   assert_that(inherits(df, "data.frame"))
   assert_that(inherits(origin, "character"))
   assert_that(inherits(target, "character"))
+  assert_that(all(c(origin, target) %in% colnames(df)))
 
   if (suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))) {
     data <- as.data.frame(df)

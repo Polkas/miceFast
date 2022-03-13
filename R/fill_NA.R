@@ -420,11 +420,11 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
 fill_NA.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge = 1e-6) {
   ww <- if (is.null(w)) vector() else w
 
-  all_pos_y <- !any(x[[posit_y]] < 0, na.rm = TRUE)
+  all_pos_y <- !any(x[, posit_y] < 0, na.rm = TRUE)
   logreg_con <- logreg && all_pos_y && (model != "lda")
 
   if (logreg_con) {
-    x[[posit_y]] <- log(x[[posit_y]] + 1e-8)
+    x[, posit_y] <- log(x[, posit_y] + 1e-8)
   }
   ff <- fill_NA_(x, model, posit_y, posit_x, ww, ridge)
   if (logreg_con) {
