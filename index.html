@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9000</span>
       </span>
     </div>
 
@@ -48,7 +48,7 @@
   <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -65,7 +65,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/Polkas/miceFast/">
+  <a href="https://github.com/Polkas/miceFast/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -82,21 +82,21 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="micefast-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#micefast-" class="anchor" aria-hidden="true"></a>miceFast <a href="https://github.com/polkas/miceFast" class="external-link"><img src="reference/figures/miceFast_logo.png" align="right" height="200"></a>
+<div class="section level1">
+<div class="page-header"><h1 id="micefast-">miceFast <a href="https://github.com/polkas/miceFast" class="external-link"><img src="reference/figures/miceFast_logo.png" align="right" height="200"></a>
+<a class="anchor" aria-label="anchor" href="#micefast-"></a>
 </h1></div>
-<p>Maciej Nasinski<br>
-pkgdown: <a href="https://polkas.github.io/miceFast/index.html" class="external-link uri">https://polkas.github.io/miceFast/index.html</a></p>
+<p>Maciej Nasinski</p>
+<p>pkgdown: <a href="https://polkas.github.io/miceFast/index.html" class="external-link uri">https://polkas.github.io/miceFast/index.html</a></p>
 <p><a href="https://CRAN.R-project.org/package=miceFast" class="external-link"><strong>Check the R CRAN for more details</strong></a></p>
-<p><a href="https://github.com/polkas/miceFast/actions" class="external-link"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://codecov.io/gh/Polkas/miceFast" class="external-link"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a></p>
+<p><a href="https://github.com/polkas/miceFast/actions" class="external-link"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://codecov.io/gh/Polkas/miceFast" class="external-link"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="https://tinyverse.netlify.com/badge/miceFast" alt="Dependencies"></a></p>
 <p>Fast imputations under the object-oriented programming paradigm.<br>
 Moreover there are offered a few functions built to work with popular R packages such as ‘data.table’ or ‘dplyr’. The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used. A single evaluation of a quantitative model for the multiple imputations is another major enhancement. A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.</p>
 <p>Performance benchmarks (check performance_validity.R file at extdata).</p>
 <p><a href="https://CRAN.R-project.org/package=miceFast/vignettes/miceFast-intro.html" class="external-link">Advanced Usage - Vignette</a></p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'miceFast'</span><span class="op">)</span></code></pre></div>
 <p>or</p>
@@ -114,9 +114,9 @@ Moreover there are offered a few functions built to work with popular R packages
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="bu">cd</span> /Library/Frameworks/R.framework/Resources/lib</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">ln</span> -sf /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib</span></code></pre></div>
 </div>
-<div id="quick-implementation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quick-implementation" class="anchor" aria-hidden="true"></a>Quick Implementation</h2>
+<div class="section level2">
+<h2 id="quick-implementation">Quick Implementation<a class="anchor" aria-label="anchor" href="#quick-implementation"></a>
+</h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Polkas/miceFast" class="external-link">miceFast</a></span><span class="op">)</span>
 
@@ -128,7 +128,7 @@ Moreover there are offered a few functions built to work with popular R packages
 
 <span class="fu"><a href="reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>
 
-<span class="co">#Check vigniette for an advance usage</span>
+<span class="co">#Check vignette for an advance usage</span>
 <span class="co">#there is required a thorough examination</span>
 
 <span class="co">#Other packages - popular simple solutions</span>
@@ -146,7 +146,7 @@ Moreover there are offered a few functions built to work with popular R packages
 <tbody>
 <tr class="odd">
 <td><code>new(miceFast)</code></td>
-<td>OOP instance with bunch of methods - check vigniette</td>
+<td>OOP instance with bunch of methods - check vignette</td>
 </tr>
 <tr class="even">
 <td><code><a href="reference/fill_NA.html">fill_NA()</a></code></td>
@@ -174,7 +174,7 @@ Moreover there are offered a few functions built to work with popular R packages
 </tr>
 </tbody>
 </table>
-<p>Summing up, miceFast offer a relevant reduction of a calculations time for:</p>
+<p>Summing up, <code>miceFast</code> offer a relevant reduction of a calculations time for:</p>
 <ul>
 <li>Linear Discriminant Analysis around <strong>(x5)</strong>
 </li>
@@ -183,6 +183,7 @@ Moreover there are offered a few functions built to work with popular R packages
 <li>Variance inflation factors (VIF) <strong>(x5)</strong> because the unnecessary linear regression is not evaluated - we need only inverse of X’X</li>
 <li>Predictive mean matching (PMM) <strong>(x100)</strong> because of pre-sorting and binary search</li>
 </ul>
+<p><img src="reference/figures/g_summary.png"></p>
 <p>If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.</p>
 </div>
 </div>
@@ -192,12 +193,9 @@ Moreover there are offered a few functions built to work with popular R packages
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=miceFast">https://​cloud.r-project.org/​package=miceFast</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/Polkas/miceFast/">https://​github.com/​Polkas/​miceFast/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/Polkas/miceFast/issues">https://​github.com/​Polkas/​miceFast/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=miceFast" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/Polkas/miceFast/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/Polkas/miceFast/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -208,6 +206,13 @@ Moreover there are offered a few functions built to work with popular R packages
 </ul>
 </div>
 
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing miceFast</a></li>
+</ul>
+</div>
 
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
@@ -229,7 +234,7 @@ Moreover there are offered a few functions built to work with popular R packages
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer>
