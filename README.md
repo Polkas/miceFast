@@ -1,4 +1,4 @@
-# miceFast <a href='https://github.com/polkas/miceFast'><img src='man/figures/miceFast_logo.png' align="right" height="200" /></a>
+# miceFast <a href='https://github.com/polkas/miceFast'><img src='man/figures/miceFast_logo.png' align="right" width="200" /></a>
 Maciej Nasinski  
 
 pkgdown: https://polkas.github.io/miceFast/index.html

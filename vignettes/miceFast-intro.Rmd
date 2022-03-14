@@ -208,6 +208,7 @@ compare_imp(air_miss, origin = "Ozone", target = "Ozone_imp_mix")
 # or 
 compare_imp(air_miss, origin = "Ozone", target = c("Ozone_imp2", "Ozone_imp_mix"))
 ```
+
 ### Intro: data.table
 
 ```{r,echo=TRUE}
