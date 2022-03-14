@@ -1,9 +1,7 @@
 # miceFast <a href='https://github.com/polkas/miceFast'><img src='man/figures/miceFast_logo.png' align="right" width="200" /></a>
 Maciej Nasinski  
 
-pkgdown: https://polkas.github.io/miceFast/index.html
-
-[**Check the R CRAN for more details**](https://CRAN.R-project.org/package=miceFast)
+[**Check the miceFats website for more details**](https://polkas.github.io/miceFast/index.html)
 
 [![R build status](https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg)](https://github.com/polkas/miceFast/actions)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
@@ -18,7 +16,7 @@ A new major improvement is one of the fastest predictive mean matching in the R 
 
 Performance benchmarks (check performance_validity.R file at extdata).
 
-[Advanced Usage - Vignette](https://CRAN.R-project.org/package=miceFast/vignettes/miceFast-intro.html)
+[Advanced Usage - Vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html)
 
 ## Installation
 
