@@ -88,6 +88,6 @@ Summing up, `miceFast` offer a relevant reduction of a calculations time for:
 
 ![](man/figures/g_summary.png)
 
-Environment: R 4.1.3 i7 9750HQ
+Environment: R 4.1.3 Mac M1
 
 If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.
