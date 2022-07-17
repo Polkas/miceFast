@@ -1,7 +1,7 @@
 # miceFast <a href='https://github.com/polkas/miceFast'><img src='man/figures/miceFast_logo.png' align="right" width="200" /></a>
 Maciej Nasinski  
 
-[**Check the miceFats website for more details**](https://polkas.github.io/miceFast/index.html)
+[**Check the miceFast website for more details**](https://polkas.github.io/miceFast/index.html)
 
 [![R build status](https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg)](https://github.com/polkas/miceFast/actions)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
