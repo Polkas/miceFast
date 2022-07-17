@@ -87,7 +87,7 @@
 <a class="anchor" aria-label="anchor" href="#micefast-"></a>
 </h1></div>
 <p>Maciej Nasinski</p>
-<p><a href="https://polkas.github.io/miceFast/index.html" class="external-link"><strong>Check the miceFats website for more details</strong></a></p>
+<p><a href="https://polkas.github.io/miceFast/index.html" class="external-link"><strong>Check the miceFast website for more details</strong></a></p>
 <p><a href="https://github.com/polkas/miceFast/actions" class="external-link"><img src="https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="http://www.r-pkg.org/badges/version/miceFast" alt="CRAN"></a> <a href="https://app.codecov.io/gh/Polkas/miceFast" class="external-link"><img src="https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://cran.r-project.org/package=miceFast" class="external-link"><img src="https://tinyverse.netlify.com/badge/miceFast" alt="Dependencies"></a></p>
 <p>Fast imputations under the object-oriented programming paradigm.<br>
 Moreover there are offered a few functions built to work with popular R packages such as ‘data.table’ or ‘dplyr’. The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used. A single evaluation of a quantitative model for the multiple imputations is another major enhancement. A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.</p>
@@ -97,11 +97,11 @@ Moreover there are offered a few functions built to work with popular R packages
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'miceFast'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'miceFast'</span><span class="op">)</span></span></code></pre></div>
 <p>or</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"polkas/miceFast"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"polkas/miceFast"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Recommended to download boosted BLAS library, even x100 faster:</strong></p>
 <ul>
 <li>Windows Users recommended to download MRO MKL: <a href="https://mran.microsoft.com/download" class="external-link uri">https://mran.microsoft.com/download</a>
@@ -117,25 +117,25 @@ Moreover there are offered a few functions built to work with popular R packages
 <h2 id="quick-implementation">Quick Implementation<a class="anchor" aria-label="anchor" href="#quick-implementation"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Polkas/miceFast" class="external-link">miceFast</a></span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>
-
-<span class="co"># plot NA structure</span>
-<span class="fu"><a href="reference/upset_NA.html">upset_NA</a></span><span class="op">(</span><span class="va">air_miss</span>, <span class="fl">6</span><span class="op">)</span>
-
-<span class="fu"><a href="reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>
-
-<span class="co">#Check vignette for an advance usage</span>
-<span class="co">#there is required a thorough examination</span>
-
-<span class="co">#Other packages - popular simple solutions</span>
-<span class="co">#Hmisc</span>
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">Hmisc</span><span class="fu">::</span><span class="fu">impute</span><span class="op">(</span><span class="va">x</span>,<span class="st">'random'</span><span class="op">)</span>, <span class="va">air_miss</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">#mice</span>
-<span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/complete.mids.html" class="external-link">complete</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">air_miss</span>, printFlag <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Polkas/miceFast" class="external-link">miceFast</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot NA structure</span></span>
+<span><span class="fu"><a href="reference/upset_NA.html">upset_NA</a></span><span class="op">(</span><span class="va">air_miss</span>, <span class="fl">6</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#Check vignette for an advance usage</span></span>
+<span><span class="co">#there is required a thorough examination</span></span>
+<span></span>
+<span><span class="co">#Other packages - popular simple solutions</span></span>
+<span><span class="co">#Hmisc</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">Hmisc</span><span class="fu">::</span><span class="fu">impute</span><span class="op">(</span><span class="va">x</span>,<span class="st">'random'</span><span class="op">)</span>, <span class="va">air_miss</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#mice</span></span>
+<span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">complete</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">air_miss</span>, printFlag <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Quick Reference Table</strong></p>
 <table class="table">
 <thead><tr class="header">
@@ -234,7 +234,7 @@ Moreover there are offered a few functions built to work with popular R packages
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer>

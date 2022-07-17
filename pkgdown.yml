@@ -1,7 +1,7 @@
 pandoc: 2.7.3
-pkgdown: 2.0.2.9000
-pkgdown_sha: 98d5a5c735eb244cb98b2e6bab1d54bb27c0af95
+pkgdown: 2.0.6.9000
+pkgdown_sha: 956f076f661eb2de9413f64ea24a580cf444466d
 articles:
   miceFast-intro: miceFast-intro.html
-last_built: 2022-03-29T19:54Z
+last_built: 2022-07-17T20:00Z
 

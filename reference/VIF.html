@@ -67,32 +67,41 @@ You have to decide which variable should be delete. Values higher than 10 signal
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for data.frame</span>
-<span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for data.table</span>
-<span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for matrix</span>
-<span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for data.frame</span></span>
+<span><span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for data.table</span></span>
+<span><span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for matrix</span></span>
+<span><span class="fu">VIF</span><span class="op">(</span><span class="va">x</span>, <span class="va">posit_y</span>, <span class="va">posit_x</span>, correct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>a numeric matrix or data.frame/data.table (factor/character/numeric) - variables</p></dd>
+
+
 <dt>posit_y</dt>
 <dd><p>an integer/character - a position/name of dependent variable</p></dd>
+
+
 <dt>posit_x</dt>
 <dd><p>an integer/character vector - positions/names of independent variables</p></dd>
+
+
 <dt>correct</dt>
 <dd><p>a boolean - basic or corrected - Default: FALSE</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>load a numeric vector with VIF for all variables provided by posit_x</p>
+    
+
+<p>load a numeric vector with VIF for all variables provided by posit_x</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
@@ -112,28 +121,28 @@ You have to decide which variable should be delete. Values higher than 10 signal
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Polkas/miceFast" class="external-link">miceFast</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">airquality2</span> <span class="op">&lt;-</span> <span class="va">airquality</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">data_DT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">airquality2</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu">VIF</span><span class="op">(</span></span>
-<span class="r-in">  x <span class="op">=</span> <span class="va">.SD</span>,</span>
-<span class="r-in">  posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span class="r-in">  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp2"</span><span class="op">)</span>,</span>
-<span class="r-in">  correct <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span class="r-in"><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">[[</span><span class="st">"vifs"</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu">VIF</span><span class="op">(</span></span>
-<span class="r-in">  x <span class="op">=</span> <span class="va">.SD</span>,</span>
-<span class="r-in">  posit_y <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span class="r-in">  correct <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span class="r-in"><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">[[</span><span class="st">"vifs"</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Polkas/miceFast" class="external-link">miceFast</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">airquality2</span> <span class="op">&lt;-</span> <span class="va">airquality</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">data_DT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">airquality2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu">VIF</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">.SD</span>,</span></span>
+<span class="r-in"><span>  posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span></span>
+<span class="r-in"><span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  correct <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">[[</span><span class="st">"vifs"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu">VIF</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">.SD</span>,</span></span>
+<span class="r-in"><span>  posit_y <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  correct <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">[[</span><span class="st">"vifs"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -148,7 +157,7 @@ You have to decide which variable should be delete. Values higher than 10 signal
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>
