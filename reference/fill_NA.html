@@ -260,17 +260,19 @@ and for the lms models if number of independent variables is smaller than number
 <span class="r-in"><span><span class="co"># Sample of results</span></span></span>
 <span class="r-in"><span><span class="va">air_miss</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, <span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 23</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Ozone Solar.R  Wind  Temp   Day Intercept index weights groups x_character</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>  14.3    56     5         1     5   0.995 5      <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    <span style="color: #BB0000;">NA</span>     194   8.6    69    10         1    10   0.995 5      (140,210]  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>    <span style="color: #BB0000;">NA</span>      66  16.6    57    25         1    25   1.01  5      (0,70]     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>    <span style="color: #BB0000;">NA</span>     266  14.9    58    26         1    26   1.00  5      (210,280]  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   8      57    27         1    27   1.00  5      <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 13 more variables: Ozone_chac &lt;chr&gt;, Ozone_f &lt;fct&gt;, Ozone_high &lt;lgl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Solar_R_imp &lt;dbl&gt;, x_character_imp &lt;chr&gt;, Ozone_imp1 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Ozone_imp2 &lt;dbl&gt;, Ozone_imp3 &lt;dbl&gt;, Ozone_imp4 &lt;dbl&gt;, Ozone_imp5 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Ozone_imp6 &lt;dbl&gt;, Ozone_imp_mix &lt;dbl&gt;, Ozone_chac_imp &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Ozone Solar.R  Wind  Temp   Day Intercept index weights groups x_cha…¹ Ozone…²</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>  14.3    56     5         1     5   0.995 5      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    <span style="color: #BB0000;">NA</span>     194   8.6    69    10         1    10   0.995 5      (140,2… <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>    <span style="color: #BB0000;">NA</span>      66  16.6    57    25         1    25   1.01  5      (0,70]  <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>    <span style="color: #BB0000;">NA</span>     266  14.9    58    26         1    26   1.00  5      (210,2… <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   8      57    27         1    27   1.00  5      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 12 more variables: Ozone_f &lt;fct&gt;, Ozone_high &lt;lgl&gt;, Solar_R_imp &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   x_character_imp &lt;chr&gt;, Ozone_imp1 &lt;dbl&gt;, Ozone_imp2 &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Ozone_imp3 &lt;dbl&gt;, Ozone_imp4 &lt;dbl&gt;, Ozone_imp5 &lt;dbl&gt;, Ozone_imp6 &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Ozone_imp_mix &lt;dbl&gt;, Ozone_chac_imp &lt;chr&gt;, and abbreviated variable names</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ¹​x_character, ²​Ozone_chac</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ Use `colnames()` to see all variable names</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### Intro: data.table</span></span></span>
 <span class="r-in"><span><span class="co"># IMPUTATIONS</span></span></span>
@@ -385,29 +387,29 @@ and for the lms models if number of independent variables is smaller than number
 <span class="r-out co"><span class="r-pr">#&gt;</span> 152:    18     131  8.0   76  29         1   152 0.9968826      9    (70,140]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 153:    20     223 11.5   68  30         1   153 1.0056592      9   (210,280]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone_chac Ozone_f Ozone_high Solar_R_imp x_character_imp Ozone_imp1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1:    (40,60] (40,60]      FALSE   190.00000       (140,210]   41.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    (20,40] (20,40]      FALSE   118.00000        (70,140]   36.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3:     (0,20]  (0,20]      FALSE   149.00000       (140,210]   12.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   4:     (0,20]  (0,20]      FALSE   313.00000       (280,350]   18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   5:       &lt;NA&gt;    &lt;NA&gt;         NA    96.82677          (0,70]   62.07255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:    (40,60] (40,60]      FALSE    190.0000       (140,210]   41.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    (20,40] (20,40]      FALSE    118.0000        (70,140]   36.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:     (0,20]  (0,20]      FALSE    149.0000       (140,210]   12.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:     (0,20]  (0,20]      FALSE    313.0000       (280,350]   18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:       &lt;NA&gt;    &lt;NA&gt;         NA    101.4328          (0,70]   25.24942</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149:    (20,40] (20,40]      FALSE   193.00000       (140,210]   30.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150:       &lt;NA&gt;    &lt;NA&gt;         NA   145.00000       (140,210]   46.91794</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151:     (0,20]  (0,20]      FALSE   191.00000       (140,210]   14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152:     (0,20]  (0,20]      FALSE   131.00000        (70,140]   18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153:     (0,20]  (0,20]      FALSE   223.00000       (210,280]   20.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:    (20,40] (20,40]      FALSE    193.0000       (140,210]   30.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150:       &lt;NA&gt;    &lt;NA&gt;         NA    145.0000       (140,210]   96.18615</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 151:     (0,20]  (0,20]      FALSE    191.0000       (140,210]   14.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 152:     (0,20]  (0,20]      FALSE    131.0000        (70,140]   18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 153:     (0,20]  (0,20]      FALSE    223.0000       (210,280]   20.00000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1:  41.000000  41.000000  41.000000  41.000000   41.00000      41.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2:  36.000000  36.000000  36.000000  36.000000   36.00000      36.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3:  12.000000  12.000000  12.000000  12.000000   12.00000      12.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   4:  18.000000  18.000000  18.000000  18.000000   18.00000      18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   5:   6.015812   5.822634   4.860686   5.127981   16.06883      16.66142</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:  41.000000  41.000000  41.000000  41.000000  41.000000      41.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:  36.000000  36.000000  36.000000  36.000000  36.000000      36.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:  12.000000  12.000000  12.000000  12.000000  12.000000      12.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:  18.000000  18.000000  18.000000  18.000000  18.000000      18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:   4.560791   4.933669   5.881791   5.127981   6.219253       8.66215</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149:  30.000000  30.000000  30.000000  30.000000   30.00000      30.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150:  64.426964  27.778455  28.551942  24.046683   28.23020      36.65870</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151:  14.000000  14.000000  14.000000  14.000000   14.00000      14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152:  18.000000  18.000000  18.000000  18.000000   18.00000      18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153:  20.000000  20.000000  20.000000  20.000000   20.00000      20.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:  30.000000  30.000000  30.000000  30.000000  30.000000      30.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150:  53.446125  26.476223  23.228795  24.046683  60.317142      47.28352</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 151:  14.000000  14.000000  14.000000  14.000000  14.000000      14.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 152:  18.000000  18.000000  18.000000  18.000000  18.000000      18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 153:  20.000000  20.000000  20.000000  20.000000  20.000000      20.00000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone_chac_imp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1:        (40,60]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   2:        (20,40]</span>
@@ -430,17 +432,17 @@ and for the lms models if number of independent variables is smaller than number
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:    NA     266 14.9   58  26         1    26 1.0047912      5   (210,280]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:    NA      NA  8.0   57  27         1    27 0.9998296      5        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Ozone_chac Ozone_f Ozone_high Solar_R_imp x_character_imp Ozone_imp1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       &lt;NA&gt;    &lt;NA&gt;         NA    96.82677          (0,70]  62.072552</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       &lt;NA&gt;    &lt;NA&gt;         NA   194.00000       (140,210]   8.415908</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:       &lt;NA&gt;    &lt;NA&gt;         NA    66.00000          (0,70]  16.825313</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       &lt;NA&gt;    &lt;NA&gt;         NA   266.00000       (210,280] 142.068412</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:       &lt;NA&gt;    &lt;NA&gt;         NA   124.99797          (0,70]  86.418784</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       &lt;NA&gt;    &lt;NA&gt;         NA    101.4328          (0,70]   25.24942</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       &lt;NA&gt;    &lt;NA&gt;         NA    194.0000       (140,210]   32.99766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:       &lt;NA&gt;    &lt;NA&gt;         NA     66.0000          (0,70]   44.64681</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       &lt;NA&gt;    &lt;NA&gt;         NA    266.0000       (210,280]   77.91781</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:       &lt;NA&gt;    &lt;NA&gt;         NA    132.6237          (0,70]   34.02949</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   6.015812   5.822634   4.860686   5.127981  16.068827     16.661415</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  18.621995  21.946044  21.054299  20.388899  10.886165     16.885552</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  11.540023   5.152371   5.896790   5.311351  10.886165      9.268669</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   8.825779   9.221831   9.202030   5.663351  10.886165     30.977928</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   9.352189   9.986433   6.276378   6.391228   6.910572     20.889264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   4.560791   4.933669   5.881791   5.127981   6.219253       8.66215</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   9.073065  21.756250  21.087999  20.388899  30.532943      22.63947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   4.078576   5.287515   5.086203   5.311351  11.800281      12.70179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   8.165505  10.387344  10.226416   5.663351  16.068827      21.40488</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   5.685889   8.163951   7.562276   6.391228   6.219253      11.34201</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Ozone_chac_imp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:           &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:           &lt;NA&gt;</span>
