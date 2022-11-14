@@ -127,15 +127,15 @@ Moreover there are offered a few functions built to work with popular R packages
 <span></span>
 <span><span class="fu"><a href="reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Check vignette for an advance usage</span></span>
-<span><span class="co"># there is required a thorough examination</span></span>
+<span><span class="co"># Check out the vignette for an advance usage</span></span>
+<span><span class="co"># There is required a thorough examination</span></span>
 <span></span>
 <span><span class="co"># Other packages - popular simple solutions</span></span>
 <span><span class="co"># Hmisc</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">Hmisc</span><span class="fu">::</span><span class="fu">impute</span><span class="op">(</span><span class="va">x</span>,<span class="st">'random'</span><span class="op">)</span>, <span class="va">air_miss</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">Hmisc</span><span class="fu">::</span><span class="fu">impute</span><span class="op">(</span><span class="va">x</span>, <span class="st">'random'</span><span class="op">)</span>, <span class="va">air_miss</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#mice</span></span>
-<span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">complete</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">air_miss</span>, printFlag <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">complete</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">air_miss</span>, printFlag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Quick Reference Table</strong></p>
 <table class="table">
 <colgroup>
@@ -149,7 +149,7 @@ Moreover there are offered a few functions built to work with popular R packages
 <tbody>
 <tr class="odd">
 <td><code>new(miceFast)</code></td>
-<td>OOP instance with bunch of methods - check vignette</td>
+<td>OOP instance with bunch of methods - check out vignette</td>
 </tr>
 <tr class="even">
 <td><code><a href="reference/fill_NA.html">fill_NA()</a></code></td>
