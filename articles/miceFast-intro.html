@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9000</span>
       </span>
     </div>
 
@@ -75,13 +75,14 @@
 
       
 
-      </header><script src="miceFast-intro_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>miceFast - Introduction</h1>
-                        <h4 data-toc-skip class="author">Maciej Nasinski</h4>
+                        <h4 data-toc-skip class="author">Maciej
+Nasinski</h4>
             
-            <h4 data-toc-skip class="date">2022-07-19</h4>
+            <h4 data-toc-skip class="date">2022-11-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/Polkas/miceFast/blob/HEAD/vignettes/miceFast-intro.Rmd" class="external-link"><code>vignettes/miceFast-intro.Rmd</code></a></small>
       <div class="hidden name"><code>miceFast-intro.Rmd</code></div>
@@ -99,38 +100,70 @@
 <div class="section level2">
 <h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
 </h2>
-<p>Fast imputations under the object-oriented programming paradigm. There were quantitative models with a closed-form solution. This package is based on linear algebra operations. The biggest improvement in time performance could be achieved for a calculation where a grouping variable has to be used. A single evaluation of a quantitative model for the multiple imputations is another major enhancement. Moreover there are a few functions built to work with popular R packages.</p>
+<p>Fast imputations under the object-oriented programming paradigm.
+There were quantitative models with a closed-form solution. This package
+is based on linear algebra operations. The biggest improvement in time
+performance could be achieved for a calculation where a grouping
+variable has to be used. A single evaluation of a quantitative model for
+the multiple imputations is another major enhancement. Moreover there
+are a few functions built to work with popular R packages.</p>
 </div>
 <div class="section level2">
 <h2 id="performance">Performance<a class="anchor" aria-label="anchor" href="#performance"></a>
 </h2>
-<p>miceFast was compared<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> with the mice package. For the grouping option there was used a basic R looping and popular dplyr/data.table packages. Summing up, miceFast offer a relevant reduction of a calculations time for:</p>
+<p>miceFast was compared<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> with the mice package. For the grouping
+option there was used a basic R looping and popular dplyr/data.table
+packages. Summing up, miceFast offer a relevant reduction of a
+calculations time for:</p>
 <ul>
 <li>Linear Discriminant Analysis around <strong>(x5)</strong>
 </li>
-<li>where a grouping variable have to be used <strong>(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)</strong> because of pre-sorting by grouping variable</li>
-<li>multiple imputations is faster around <strong>x(a number of multiple imputations)</strong> because the core of a model is evaluated only ones.</li>
-<li>Variance inflation factors (VIF) <strong>(x5)</strong> because the unnecessary linear regression is not evaluated - we need only inverse of X’X</li>
-<li>Predictive mean matching (PMM) <strong>(x3)</strong> because of pre-sorting and binary search (<code>mice</code> algorithm was improved too).</li>
+<li>where a grouping variable have to be used <strong>(around x10
+depending on data dimensions and number of groups and even more than
+x100 although compared to data.table only a few k faster or even the
+same)</strong> because of pre-sorting by grouping variable</li>
+<li>multiple imputations is faster around <strong>x(a number of multiple
+imputations)</strong> because the core of a model is evaluated only
+ones.</li>
+<li>Variance inflation factors (VIF) <strong>(x5)</strong> because the
+unnecessary linear regression is not evaluated - we need only inverse of
+X’X</li>
+<li>Predictive mean matching (PMM) <strong>(x3)</strong> because of
+pre-sorting and binary search (<code>mice</code> algorithm was improved
+too).</li>
 </ul>
-<p>If you are interested about the procedure of testing performance check performance_validity.R file at the extdata folder.</p>
+<p>If you are interested about the procedure of testing performance
+check performance_validity.R file at the extdata folder.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"performance_validity.R"</span>, package <span class="op">=</span> <span class="st">"miceFast"</span><span class="op">)</span></span></code></pre></div>
-<p>Additional plots for simulations with certain parameters (but feel free to change them) are located:</p>
+<p>Additional plots for simulations with certain parameters (but feel
+free to change them) are located:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"images"</span>, package <span class="op">=</span> <span class="st">"miceFast"</span><span class="op">)</span></span></code></pre></div>
-<p>Moreover there are offered a few functions built to work with the popular R packages such as ‘data.table’.</p>
+<p>Moreover there are offered a few functions built to work with the
+popular R packages such as ‘data.table’.</p>
 </div>
 <div class="section level2">
 <h2 id="motivations">Motivations<a class="anchor" aria-label="anchor" href="#motivations"></a>
 </h2>
-<p>Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will somek deteriorate the quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate missing observations for a dependent variable. R or Python language are user-friendly for data manipulation but parallely brings slower computations. Languages such as C++ give us an opportunity to boost our applications or projects.</p>
+<p>Missing data is a common problem. The easiest solution is to delete
+observations for which a certain variable is missing. However this will
+somek deteriorate the quality of a project. Another solution will be to
+use methods such as multiple/regular imputations to fill the missing
+data. Non missing independent variables could be used to approximate
+missing observations for a dependent variable. R or Python language are
+user-friendly for data manipulation but parallely brings slower
+computations. Languages such as C++ give us an opportunity to boost our
+applications or projects.</p>
 <div style="page-break-after: always;"></div>
 </div>
 <div class="section level2">
-<h2 id="introduction-for-data-tabledplyr-users---using-additional-functions-from-micefast">Introduction for data.table/dplyr users - using additional functions from miceFast:<a class="anchor" aria-label="anchor" href="#introduction-for-data-tabledplyr-users---using-additional-functions-from-micefast"></a>
+<h2 id="introduction-for-data-tabledplyr-users---using-additional-functions-from-micefast">Introduction for data.table/dplyr users - using additional functions
+from miceFast:<a class="anchor" aria-label="anchor" href="#introduction-for-data-tabledplyr-users---using-additional-functions-from-micefast"></a>
 </h2>
-<p>Usage of <code>fill_NA</code> and <code>fill_NA_N</code> functions from miceFast - this functions should be resistant to glitches from an user activity perspective and a data structure.</p>
+<p>Usage of <code>fill_NA</code> and <code>fill_NA_N</code> functions
+from miceFast - this functions should be resistant to glitches from an
+user activity perspective and a data structure.</p>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h3>
@@ -243,20 +276,20 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="co"># Average of a few methods</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp_mix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"Ozone_imp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span></span>
 <span>  <span class="co"># Protecting against collinearity or low number of observations - across small groups</span></span>
 <span>  <span class="co"># Be carful when using a data.table grouping option</span></span>
 <span>  <span class="co"># because of lack of protection against collinearity or low number of observations.</span></span>
 <span>  <span class="co"># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_chac_imp <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">.</span>,</span>
-<span>    model <span class="op">=</span> <span class="st">"lda"</span>,</span>
-<span>    posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
-<span>    w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_chac_imp <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">.</span>,</span>
+<span>      model <span class="op">=</span> <span class="st">"lda"</span>,</span>
+<span>      posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
+<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
+<span>      w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -268,7 +301,7 @@
 <span><span class="fu"><a href="../reference/compare_imp.html">compare_imp</a></span><span class="op">(</span><span class="va">air_miss</span>, origin <span class="op">=</span> <span class="st">"Ozone"</span>, target <span class="op">=</span> <span class="st">"Ozone_imp_mix"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="miceFast-intro_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># or </span></span>
+<code class="sourceCode R"><span><span class="co"># or</span></span>
 <span><span class="fu"><a href="../reference/compare_imp.html">compare_imp</a></span><span class="op">(</span><span class="va">air_miss</span>, origin <span class="op">=</span> <span class="st">"Ozone"</span>, target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone_imp2"</span>, <span class="st">"Ozone_imp_mix"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="miceFast-intro_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
 </div>
@@ -374,23 +407,22 @@
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    k <span class="op">=</span> <span class="fl">10</span></span>
 <span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span></span>
 <span>  <span class="co"># Average of a few methods</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp_mix</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>, .SDcols <span class="op">=</span> <span class="va">Ozone_imp1</span><span class="op">:</span><span class="va">Ozone_imp6</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span></span>
 <span>  <span class="co"># Protecting against collinearity or low number of observations - across small groups</span></span>
 <span>  <span class="co"># Be careful when using a data.table grouping option</span></span>
 <span>  <span class="co"># because of lack of protection against collinearity or low number of observations.</span></span>
 <span>  <span class="co"># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span></span>
 <span></span>
-<span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_chac_imp</span> <span class="op">:=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
-<span>    model <span class="op">=</span> <span class="st">"lda"</span>,</span>
-<span>    posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
-<span>    w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_chac_imp</span> <span class="op">:=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">.SD</span>,</span>
+<span>      model <span class="op">=</span> <span class="st">"lda"</span>,</span>
+<span>      posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
+<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
+<span>      w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -404,7 +436,8 @@
 <p>where:</p>
 <ul>
 <li>
-<code>nr_cat</code> : number of categories for discrete dependent variable</li>
+<code>nr_cat</code> : number of categories for discrete dependent
+variable</li>
 <li>
 <code>n_obs</code> : number of observations</li>
 <li>
@@ -415,9 +448,12 @@
 <p>relevant class methods:</p>
 <ul>
 <li>
-<code>fill("type")</code> : generating data [return a numeric matrix] - data with correlated variables where first variable is of binomial,discrete or continuous type.</li>
+<code>fill("type")</code> : generating data [return a numeric
+matrix] - data with correlated variables where first variable is of
+binomial,discrete or continuous type.</li>
 </ul>
-<p><code>type</code>:character - possible options (“contin”,“binom”,“discrete”)</p>
+<p><code>type</code>:character - possible options
+(“contin”,“binom”,“discrete”)</p>
 </div>
 <div class="section level2">
 <h2 id="imputing-data-with-the-micefast-module">Imputing data with the miceFast Module:<a class="anchor" aria-label="anchor" href="#imputing-data-with-the-micefast-module"></a>
@@ -427,47 +463,97 @@
 <p>relevant class methods:</p>
 <ul>
 <li>
-<code>set_data(x)</code> - providing the data by a reference - a numeric matrix [void]</li>
+<code>set_data(x)</code> - providing the data by a reference - a
+numeric matrix [void]</li>
 <li>
-<code>get_data()</code> - retrieving the data [return a numeric matrix] - the same values as provided by reference x, recommended to use x directly</li>
+<code>get_data()</code> - retrieving the data [return a numeric
+matrix] - the same values as provided by reference x, recommended to use
+x directly</li>
 <li>
-<code>set_g(g)</code> - providing the grouping variable by a reference - a numeric vector WITOUT NA values - positive values [void]</li>
+<code>set_g(g)</code> - providing the grouping variable by a
+reference - a numeric vector WITOUT NA values - positive values
+[void]</li>
 <li>
-<code>get_g()</code> - retrieving the grouping variable [return a numeric vector] - the same values as provided by reference g, recommended to use g directly</li>
+<code>get_g()</code> - retrieving the grouping variable [return a
+numeric vector] - the same values as provided by reference g,
+recommended to use g directly</li>
 <li>
-<code>set_w(w)</code> - providing the weighting variable by a reference - a numeric vector WITOUT NA values - positive values</li>
+<code>set_w(w)</code> - providing the weighting variable by a
+reference - a numeric vector WITOUT NA values - positive values</li>
 <li>
-<code>get_w()</code> - retrieving the weighting variable [return a numeric vector] - the same values as provided by reference w, recommended to use w directly</li>
+<code>get_w()</code> - retrieving the weighting variable [return a
+numeric vector] - the same values as provided by reference w,
+recommended to use w directly</li>
 <li>
-<code>get_index()</code> - getting the index [return a integer vector] - useful after automatic sorting procedure</li>
+<code>get_index()</code> - getting the index [return a integer
+vector] - useful after automatic sorting procedure</li>
 <li>
-<code>set_ridge(ridge)</code> - providing a ridge i.e. the disturbance to diag of XX, default 1e-6</li>
+<code>set_ridge(ridge)</code> - providing a ridge i.e. the
+disturbance to diag of XX, default 1e-6</li>
 <li>
 <code>get_ridge()</code> - getting a ridge</li>
 <li>
-<code>impute("model",posit_y,posit_x)</code> - impute data under characteristics form object like a optional grouping or weighting variable [return a list with 3 vectors: a numeric vector “imputations” dependent variable with replaced Na values, a integer vector “index_imputed” positions where data was imputed, a integer vector “index_full” positions which were used to assess the model]</li>
+<code>impute("model",posit_y,posit_x)</code> - impute data under
+characteristics form object like a optional grouping or weighting
+variable [return a list with 3 vectors: a numeric vector “imputations”
+dependent variable with replaced Na values, a integer vector
+“index_imputed” positions where data was imputed, a integer vector
+“index_full” positions which were used to assess the model]</li>
 <li>
-<code>impute_N("model2",posit_y,posit_x,k)</code> - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for (“lm_bayes”,“lm_noise”, “pmm”) - [return a list with 3 vectors: a numeric vector “imputations” dependent variable with replaced Na values by average of N results, a integer vector “index_imputed” positions where data was imputed, a integer vector “index_full” positions which were used to assess the model]</li>
+<code>impute_N("model2",posit_y,posit_x,k)</code> - multiple
+imputations - impute data under characteristics form object like a
+optional grouping or weighting variable - works for
+(“lm_bayes”,“lm_noise”, “pmm”) - [return a list with 3 vectors: a
+numeric vector “imputations” dependent variable with replaced Na values
+by average of N results, a integer vector “index_imputed” positions
+where data was imputed, a integer vector “index_full” positions which
+were used to assess the model]</li>
 <li>
-<code>update_var(posit_y,imputations)</code> - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters. [void]</li>
+<code>update_var(posit_y,imputations)</code> - permanently update
+variable at the object and data. WARNING, use it only if you are sure
+about model parameters. [void]</li>
 <li>
-<code>get_models()</code> - possible quantitative models for a certain type of dependent variable [return a character vector: recommended models for impute and impute_N methods]</li>
+<code>get_models()</code> - possible quantitative models for a
+certain type of dependent variable [return a character vector:
+recommended models for impute and impute_N methods]</li>
 <li>
-<code>get_model()</code> - a recommended quantitative model for a certain type of dependent variable [return a character: recommended model for impute and impute_N methods] - useful while looping</li>
+<code>get_model()</code> - a recommended quantitative model for a
+certain type of dependent variable [return a character: recommended
+model for impute and impute_N methods] - useful while looping</li>
 <li>
-<code>which_updated()</code> - which variables were modified by update_var at the object (and data) [return a integer vector: positions at provided data at which variables were update by update_var method]</li>
+<code>which_updated()</code> - which variables were modified by
+update_var at the object (and data) [return a integer vector: positions
+at provided data at which variables were update by update_var
+method]</li>
 <li>
-<code>sort_byg()</code> - sort data by the grouping variable [void]</li>
+<code>sort_byg()</code> - sort data by the grouping variable
+[void]</li>
 <li>
-<code>is_sorted_byg()</code> - is data sorted by the grouping variable [void]</li>
+<code>is_sorted_byg()</code> - is data sorted by the grouping
+variable [void]</li>
 <li>
-<code>vifs(posit_y,posit_x)</code> - Variance inflation factors (VIF) [return a numeric vector: VIF for all variables provided by posit_x] <code>x</code> : numeric matrix - variables<br><code>g</code> : numeric vector - you could build it form several discrete variables<br><code>w</code>: numeric vector with positive values - weights for weighted linear regressions<br><code>model</code>: character - a possible options (“lda”,“lm_pred”,“lm_bayes”,“lm_noise”)<br><code>model2</code>: character - a possible options (“lm_bayes”,“lm_noise”, “pmm”) <code>posit_y</code>: integer - a position of dependent variable<br><code>posit_x</code>: integer vector - positions of independent variables<br><code>imputations</code> : numeric vector - imputations<br><code>k</code> : integer - number of multiple imputations or k-nearest for pmm</li>
+<code>vifs(posit_y,posit_x)</code> - Variance inflation factors
+(VIF) [return a numeric vector: VIF for all variables provided by
+posit_x] <code>x</code> : numeric matrix - variables<br><code>g</code> : numeric vector - you could build it form several
+discrete variables<br><code>w</code>: numeric vector with positive values - weights for
+weighted linear regressions<br><code>model</code>: character - a possible options
+(“lda”,“lm_pred”,“lm_bayes”,“lm_noise”)<br><code>model2</code>: character - a possible options
+(“lm_bayes”,“lm_noise”, “pmm”) <code>posit_y</code>: integer - a
+position of dependent variable<br><code>posit_x</code>: integer vector - positions of independent
+variables<br><code>imputations</code> : numeric vector - imputations<br><code>k</code> : integer - number of multiple imputations or k-nearest
+for pmm</li>
 </ul>
-<p><em>For a simple mean imputations add intercept to data and use “lm_pred”</em><br><em>The lda model is assessed only if there are more than 15 complete observations and for the lms models if the number of independent variables is smaller than the number of observations.</em></p>
+<p><em>For a simple mean imputations add intercept to data and use
+“lm_pred”</em><br><em>The lda model is assessed only if there are more than 15 complete
+observations and for the lms models if the number of independent
+variables is smaller than the number of observations.</em></p>
 <div style="page-break-after: always;"></div>
 <p>###Imputations</p>
 <p><strong>miceFast module usage:</strong></p>
-<p>Remember that a matrix could be build only under a one data type so factor variables have to be melted use <code>model.matrix</code> to get numeric matrix from <code>data.frame</code> - see Tips in this document</p>
+<p>Remember that a matrix could be build only under a one data type so
+factor variables have to be melted use <code>model.matrix</code> to get
+numeric matrix from <code>data.frame</code> - see Tips in this
+document</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("mice")</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span><span class="op">)</span></span>
@@ -516,7 +602,8 @@
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
 <div style="page-break-after: always;"></div>
-<p><strong>Model with additional parameters:</strong> - data sorted by the grouping variable</p>
+<p><strong>Model with additional parameters:</strong> - data sorted by
+the grouping variable</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span> <span class="co"># a numeric vector - positive values</span></span>
@@ -561,7 +648,8 @@
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
 <div style="page-break-after: always;"></div>
-<p><strong>Model with additional parameters:</strong> - data not sorted by the grouping variable</p>
+<p><strong>Model with additional parameters:</strong> - data not sorted
+by the grouping variable</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span> <span class="co"># a numeric vector - positive values</span></span>
@@ -617,7 +705,10 @@
 <h3 id="tips">Tips<a class="anchor" aria-label="anchor" href="#tips"></a>
 </h3>
 <p><strong>matrix from data.frame</strong></p>
-<p>Remember that a matrix could be built only under a one data type so factor/character variables have to be melted. Sb could use <code>model.matrix</code> to get numeric matrix from a <code>data.frame</code>:</p>
+<p>Remember that a matrix could be built only under a one data type so
+factor/character variables have to be melted. Sb could use
+<code>model.matrix</code> to get numeric matrix from a
+<code>data.frame</code>:</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># str(mtcars)</span></span>
 <span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span><span class="op">)</span></span>
@@ -625,7 +716,11 @@
 <span><span class="va">mtcars_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix.lm</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span>, <span class="va">mtcars</span>, na.action <span class="op">=</span> <span class="st">"na.pass"</span><span class="op">)</span></span>
 <span><span class="co"># str(mtcars_mat)</span></span></code></pre></div>
 <p><strong>Variance inflation factors (VIF)</strong></p>
-<p>VIF measures how much the variance of the estimated regression coefficients are inflated. It helps to identify when the predictor variables are linearly related. You have to decide which variable should be deleted. Values higher than 10 signal a potential collinearity problem.</p>
+<p>VIF measures how much the variance of the estimated regression
+coefficients are inflated. It helps to identify when the predictor
+variables are linearly related. You have to decide which variable should
+be deleted. Values higher than 10 signal a potential collinearity
+problem.</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">airquality2</span> <span class="op">&lt;-</span> <span class="va">airquality</span></span>
 <span><span class="va">airquality2</span><span class="op">$</span><span class="va">Temp2</span> <span class="op">&lt;-</span> <span class="va">airquality2</span><span class="op">$</span><span class="va">Temp</span><span class="op">**</span><span class="fl">2</span></span>
@@ -665,10 +760,13 @@
 <h2 id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <p>URL: <a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf" class="external-link uri">https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf</a><br>
-Title: Exposing C++ functions and classes with Rcpp modules Dirk Eddelbuettel and Romain François<br>
-Author: <a href="https://dirk.eddelbuettel.com" class="external-link uri">https://dirk.eddelbuettel.com</a> and <a href="https://purrple.cat" class="external-link uri">https://purrple.cat</a> Date: March 8, 2018</p>
+Title: Exposing C++ functions and classes with Rcpp modules Dirk
+Eddelbuettel and Romain François<br>
+Author: <a href="https://dirk.eddelbuettel.com" class="external-link uri">https://dirk.eddelbuettel.com</a> and <a href="https://purrple.cat" class="external-link uri">https://purrple.cat</a> Date:
+March 8, 2018</p>
 <p>URL: <a href="https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf" class="external-link uri">https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf</a><br>
-Title: RcppArmadillo: Easily Extending R with High-Performance C++ Code<br>
+Title: RcppArmadillo: Easily Extending R with High-Performance C++
+Code<br>
 Author: Dirk Eddelbuettel and Conrad Sanderson<br>
 Date: July 1, 2012</p>
 <p>URL: <a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf" class="external-link uri">https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf</a><br>
@@ -682,7 +780,7 @@ Date: 2013</p>
 Author: Ricardo Gutierrez-Osuna<br>
 Date: Fall 2013</p>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr>
 <ol>
 <li id="fn1"><p>Environment: R 4.1.3 Mac M1.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>

@@ -19,7 +19,7 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9000</span>
       </span>
     </div>
 
@@ -158,9 +158,9 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>data.frame</code>: s3 method for data.frame</p></li>
-<li><p><code>data.table</code>: S3 method for data.table</p></li>
-<li><p><code>matrix</code>: S3 method for matrix</p></li>
+<ul><li><p><code>fill_NA_N(data.frame)</code>: s3 method for data.frame</p></li>
+<li><p><code>fill_NA_N(data.table)</code>: S3 method for data.table</p></li>
+<li><p><code>fill_NA_N(matrix)</code>: S3 method for matrix</p></li>
 </ul></div>
     <div id="note">
     <h2>Note</h2>
@@ -261,26 +261,26 @@ and for the lms models if number of variables is smaller than number of observat
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="co"># Average of a few methods</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp_mix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"Ozone_imp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Protecting against collinearity or low number of observations - across small groups</span></span></span>
 <span class="r-in"><span>  <span class="co"># Be carful when using a grouping option</span></span></span>
 <span class="r-in"><span>  <span class="co"># because of lack of protection against collinearity or low number of observations.</span></span></span>
 <span class="r-in"><span>  <span class="co"># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_chac_imp <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu"><a href="fill_NA.html">fill_NA</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">.</span>,</span></span>
-<span class="r-in"><span>    model <span class="op">=</span> <span class="st">"lda"</span>,</span></span>
-<span class="r-in"><span>    posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span></span>
-<span class="r-in"><span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      <span class="st">"Intercept"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"Month"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"Day"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"Temp"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"x_character_imp"</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_chac_imp <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="fill_NA.html">fill_NA</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      x <span class="op">=</span> <span class="va">.</span>,</span></span>
+<span class="r-in"><span>      model <span class="op">=</span> <span class="st">"lda"</span>,</span></span>
+<span class="r-in"><span>      posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span></span>
+<span class="r-in"><span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="st">"Intercept"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Month"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Day"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Temp"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"x_character_imp"</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span>,</span></span>
+<span class="r-in"><span>      w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -299,7 +299,6 @@ and for the lms models if number of variables is smaller than number of observat
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Ozone_imp3 &lt;dbl&gt;, Ozone_imp4 &lt;dbl&gt;, Ozone_imp5 &lt;dbl&gt;, Ozone_imp6 &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Ozone_imp_mix &lt;dbl&gt;, Ozone_chac_imp &lt;chr&gt;, and abbreviated variable names</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ¹​x_character, ²​Ozone_chac</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ Use `colnames()` to see all variable names</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### Intro: data.table</span></span></span>
 <span class="r-in"><span><span class="co"># IMPUTATIONS</span></span></span>
@@ -377,29 +376,28 @@ and for the lms models if number of variables is smaller than number of observat
 <span class="r-in"><span>    logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    k <span class="op">=</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Average of a few methods</span></span></span>
 <span class="r-in"><span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp_mix</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>, .SDcols <span class="op">=</span> <span class="va">Ozone_imp1</span><span class="op">:</span><span class="va">Ozone_imp6</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Protecting against collinearity or low number of observations - across small groups</span></span></span>
 <span class="r-in"><span>  <span class="co"># Be carful when using a data.table grouping option</span></span></span>
 <span class="r-in"><span>  <span class="co"># because of lack of protection against collinearity or low number of observations.</span></span></span>
 <span class="r-in"><span>  <span class="co"># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_chac_imp</span> <span class="op">:=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu"><a href="fill_NA.html">fill_NA</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">.SD</span>,</span></span>
-<span class="r-in"><span>    model <span class="op">=</span> <span class="st">"lda"</span>,</span></span>
-<span class="r-in"><span>    posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span></span>
-<span class="r-in"><span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      <span class="st">"Intercept"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"Month"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"Day"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"Temp"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"x_character_imp"</span></span></span>
+<span class="r-in"><span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_chac_imp</span> <span class="op">:=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="fill_NA.html">fill_NA</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      x <span class="op">=</span> <span class="va">.SD</span>,</span></span>
+<span class="r-in"><span>      model <span class="op">=</span> <span class="st">"lda"</span>,</span></span>
+<span class="r-in"><span>      posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span></span>
+<span class="r-in"><span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="st">"Intercept"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Month"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Day"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Temp"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"x_character_imp"</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span>,</span></span>
+<span class="r-in"><span>      w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone Solar.R Wind Temp Day Intercept index   weights groups x_character</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1:    41     190  7.4   67   1         1     1 1.0186350      5   (140,210]</span>
@@ -414,29 +412,29 @@ and for the lms models if number of variables is smaller than number of observat
 <span class="r-out co"><span class="r-pr">#&gt;</span> 152:    18     131  8.0   76  29         1   152 0.9968826      9    (70,140]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 153:    20     223 11.5   68  30         1   153 1.0056592      9   (210,280]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone_chac Ozone_f Ozone_high Solar_R_imp x_character_imp Ozone_imp1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1:    (40,60] (40,60]      FALSE     190.000       (140,210]   41.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    (20,40] (20,40]      FALSE     118.000        (70,140]   36.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3:     (0,20]  (0,20]      FALSE     149.000       (140,210]   12.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   4:     (0,20]  (0,20]      FALSE     313.000       (280,350]   18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   5:       &lt;NA&gt;    &lt;NA&gt;         NA     106.099          (0,70]   13.24349</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:    (40,60] (40,60]      FALSE    190.0000       (140,210]   41.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    (20,40] (20,40]      FALSE    118.0000        (70,140]   36.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:     (0,20]  (0,20]      FALSE    149.0000       (140,210]   12.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:     (0,20]  (0,20]      FALSE    313.0000       (280,350]   18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:       &lt;NA&gt;    &lt;NA&gt;         NA    100.2582          (0,70]   67.33209</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149:    (20,40] (20,40]      FALSE     193.000       (140,210]   30.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150:       &lt;NA&gt;    &lt;NA&gt;         NA     145.000       (140,210]   79.67613</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151:     (0,20]  (0,20]      FALSE     191.000       (140,210]   14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152:     (0,20]  (0,20]      FALSE     131.000        (70,140]   18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153:     (0,20]  (0,20]      FALSE     223.000       (210,280]   20.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:    (20,40] (20,40]      FALSE    193.0000       (140,210]   30.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150:       &lt;NA&gt;    &lt;NA&gt;         NA    145.0000       (140,210]   17.36016</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 151:     (0,20]  (0,20]      FALSE    191.0000       (140,210]   14.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 152:     (0,20]  (0,20]      FALSE    131.0000        (70,140]   18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 153:     (0,20]  (0,20]      FALSE    223.0000       (210,280]   20.00000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1:  41.000000  41.000000  41.000000  41.000000   41.00000     41.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2:  36.000000  36.000000  36.000000  36.000000   36.00000     36.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3:  12.000000  12.000000  12.000000  12.000000   12.00000     12.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   4:  18.000000  18.000000  18.000000  18.000000   18.00000     18.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   5:   9.097744   5.143498   5.736501   5.127981   12.82412      8.528888</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:   41.00000   41.00000  41.000000  41.000000   41.00000      41.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:   36.00000   36.00000  36.000000  36.000000   36.00000      36.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:   12.00000   12.00000  12.000000  12.000000   12.00000      12.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:   18.00000   18.00000  18.000000  18.000000   18.00000      18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:   10.49034    4.67194   5.586753   5.127981   11.80028      17.50156</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149:  30.000000  30.000000  30.000000  30.000000   30.00000     30.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150:  28.366084  21.366049  24.439478  24.046683   71.59211     41.581089</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151:  14.000000  14.000000  14.000000  14.000000   14.00000     14.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152:  18.000000  18.000000  18.000000  18.000000   18.00000     18.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153:  20.000000  20.000000  20.000000  20.000000   20.00000     20.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:   30.00000   30.00000  30.000000  30.000000   30.00000      30.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150:   55.74167   26.39658  22.995661  24.046683   13.56426      26.68417</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 151:   14.00000   14.00000  14.000000  14.000000   14.00000      14.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 152:   18.00000   18.00000  18.000000  18.000000   18.00000      18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 153:   20.00000   20.00000  20.000000  20.000000   20.00000      20.00000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Ozone_chac_imp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1:        (40,60]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   2:        (20,40]</span>
@@ -459,17 +457,17 @@ and for the lms models if number of variables is smaller than number of observat
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:    NA     266 14.9   58  26         1    26 1.0047912      5   (210,280]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:    NA      NA  8.0   57  27         1    27 0.9998296      5        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Ozone_chac Ozone_f Ozone_high Solar_R_imp x_character_imp Ozone_imp1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       &lt;NA&gt;    &lt;NA&gt;         NA    106.0990          (0,70]   13.24349</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       &lt;NA&gt;    &lt;NA&gt;         NA    194.0000       (140,210]   36.76747</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:       &lt;NA&gt;    &lt;NA&gt;         NA     66.0000          (0,70]   23.02953</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       &lt;NA&gt;    &lt;NA&gt;         NA    266.0000       (210,280]   21.13298</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:       &lt;NA&gt;    &lt;NA&gt;         NA    103.1096          (0,70]  116.14644</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       &lt;NA&gt;    &lt;NA&gt;         NA    100.2582          (0,70]  67.332086</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       &lt;NA&gt;    &lt;NA&gt;         NA    194.0000       (140,210]  27.359917</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:       &lt;NA&gt;    &lt;NA&gt;         NA     66.0000          (0,70]  34.343884</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       &lt;NA&gt;    &lt;NA&gt;         NA    266.0000       (210,280]   8.143102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:       &lt;NA&gt;    &lt;NA&gt;         NA    117.7011          (0,70]  31.825737</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Ozone_imp2 Ozone_imp3 Ozone_imp4 Ozone_imp5 Ozone_imp6 Ozone_imp_mix</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   9.097744   5.143498   5.736501   5.127981  12.824118      8.528888</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   8.611988  19.964010  22.286117  20.388899  28.561758     22.763373</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   2.186952   4.998624   5.069020   5.311351   6.910572      7.917674</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   8.267740   9.901959  10.318286   5.663351  13.669493     11.492301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   9.264072   8.301730   7.868312   6.391228  13.669493     26.940212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  10.490345   4.671940   5.586753   5.127981  11.800281      17.50156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  24.192452  26.289199  20.228350  20.388899  13.669493      22.02139</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   8.686001   5.269187   5.468095   5.311351  14.235716      12.21904</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  12.854035  11.762180  10.022647   5.663351  17.664394      11.01828</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   5.563046   6.974202   7.499422   6.391228   6.910572      10.86070</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Ozone_chac_imp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:           &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:           &lt;NA&gt;</span>

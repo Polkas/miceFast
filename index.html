@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9000</span>
       </span>
     </div>
 
@@ -110,8 +110,8 @@ Moreover there are offered a few functions built to work with popular R packages
 </li>
 <li>Apple vecLib BLAS:</li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="bu">cd</span> /Library/Frameworks/R.framework/Resources/lib</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">ln</span> -sf /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /Library/Frameworks/R.framework/Resources/lib</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-sf</span> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-implementation">Quick Implementation<a class="anchor" aria-label="anchor" href="#quick-implementation"></a>
@@ -127,17 +127,21 @@ Moreover there are offered a few functions built to work with popular R packages
 <span></span>
 <span><span class="fu"><a href="reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Check vignette for an advance usage</span></span>
-<span><span class="co">#there is required a thorough examination</span></span>
+<span><span class="co"># Check vignette for an advance usage</span></span>
+<span><span class="co"># there is required a thorough examination</span></span>
 <span></span>
-<span><span class="co">#Other packages - popular simple solutions</span></span>
-<span><span class="co">#Hmisc</span></span>
+<span><span class="co"># Other packages - popular simple solutions</span></span>
+<span><span class="co"># Hmisc</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">Hmisc</span><span class="fu">::</span><span class="fu">impute</span><span class="op">(</span><span class="va">x</span>,<span class="st">'random'</span><span class="op">)</span>, <span class="va">air_miss</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#mice</span></span>
 <span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">complete</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">air_miss</span>, printFlag <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Quick Reference Table</strong></p>
 <table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
 <thead><tr class="header">
 <th>Function</th>
 <th>Description</th>
@@ -183,7 +187,7 @@ Moreover there are offered a few functions built to work with popular R packages
 <li>Predictive mean matching (PMM) <strong>(x3)</strong> because of pre-sorting and binary search (<code>mice</code> algorithm was improved too).</li>
 </ul>
 <p><img src="reference/figures/g_summary.png"></p>
-<p>Environment: R 4.1.3 Mac M1</p>
+<p>Environment: R 4.2.1 Mac M1</p>
 <p>If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.</p>
 </div>
 </div>
