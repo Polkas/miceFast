@@ -1,5 +1,5 @@
 
-#' \code{fill_NA_N} function for the multiple imputations purpose.
+#' \code{fill_NA_N} function for the multiple imputations purpose
 #'
 #' @description
 #' Multiple imputations to fill the missing data.

@@ -3,7 +3,7 @@
 \docType{data}
 \name{air_miss}
 \alias{air_miss}
-\title{airquality dataset with additional variables.}
+\title{airquality dataset with additional variables}
 \format{
 A data frame and data table with 154 observations on 11 variables.
 \describe{
@@ -29,7 +29,7 @@ The data were obtained from the New York State Department of Conservation (ozone
 air_miss
 }
 \description{
-airquality dataset with additional variables.
+airquality dataset with additional variables
 }
 \details{
 Daily readings of the following air quality values for May 1, 1973 (a Tuesday) to September 30, 1973.

@@ -1,12 +1,13 @@
-#' \code{naive_fill_NA} function for the simple and automatic imputations purpose.
+#' \code{naive_fill_NA} function for the simple and automatic imputation
 #'
 #' @description
-#' Simplified imputations to automatically fill the missing data.
-#' Impute by sampling non missing values.
+#' Automatically fill the missing data with a simple imputation method,
+#' impute with sampling the non missing values.
+#' It is recommended to use this function for each categorical variable separately.
 #'
-#' @param x a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables
+#' @param x a numeric matrix or data.frame/data.table (factor/character/numeric/logical variables)
 #' @param replace if to sample with replacement, by default TRUE.
-#' @return load imputations in a similar to the input type.
+#' @return object with a similar structure to the input but without missing values.
 #'
 #' @note this is a very simple and fast solution but not recommended,
 #' for more complex solutions please check the vignette.

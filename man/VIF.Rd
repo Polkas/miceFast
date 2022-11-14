@@ -50,21 +50,21 @@ library(miceFast)
 library(data.table)
 
 airquality2 <- airquality
-
+airquality2$Temp2 <- airquality2$Temp**2
 data_DT <- data.table(airquality2)
 data_DT[, .(vifs = VIF(
   x = .SD,
   posit_y = "Ozone",
   posit_x = c("Solar.R", "Wind", "Temp", "Month", "Day", "Temp2"),
   correct = FALSE
-))][["vifs"]]
+))][["vifs.V1"]]
 
 data_DT[, .(vifs = VIF(
   x = .SD,
   posit_y = 1,
   posit_x = c(2, 3, 4, 5, 6, 7),
   correct = TRUE
-))][["vifs"]]
+))][["vifs.V1"]]
 }
 
 }

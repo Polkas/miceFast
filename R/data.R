@@ -1,4 +1,4 @@
-#' airquality dataset with additional variables.
+#' airquality dataset with additional variables
 #'
 #' @usage air_miss
 #'

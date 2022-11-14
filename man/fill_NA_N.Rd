@@ -5,7 +5,7 @@
 \alias{fill_NA_N.data.frame}
 \alias{fill_NA_N.data.table}
 \alias{fill_NA_N.matrix}
-\title{\code{fill_NA_N} function for the multiple imputations purpose.}
+\title{\code{fill_NA_N} function for the multiple imputations purpose}
 \usage{
 fill_NA_N(
   x,

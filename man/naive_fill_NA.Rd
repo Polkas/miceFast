@@ -5,7 +5,7 @@
 \alias{naive_fill_NA.data.frame}
 \alias{naive_fill_NA.data.table}
 \alias{naive_fill_NA.matrix}
-\title{\code{naive_fill_NA} function for the simple and automatic imputations purpose.}
+\title{\code{naive_fill_NA} function for the simple and automatic imputation}
 \usage{
 naive_fill_NA(x, replace = TRUE)
 
@@ -16,16 +16,17 @@ naive_fill_NA(x, replace = TRUE)
 \method{naive_fill_NA}{matrix}(x, replace = TRUE)
 }
 \arguments{
-\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables}
+\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical variables)}
 
 \item{replace}{if to sample with replacement, by default TRUE.}
 }
 \value{
-load imputations in a similar to the input type.
+object with a similar structure to the input but without missing values.
 }
 \description{
-Simplified imputations to automatically fill the missing data.
-Impute by sampling non missing values.
+Automatically fill the missing data with a simple imputation method,
+impute with sampling the non missing values.
+It is recommended to use this function for each categorical variable separately.
 }
 \section{Methods (by class)}{
 \itemize{
