@@ -182,20 +182,20 @@ air_miss <- air_miss %>%
   ungroup() %>%
   # Average of a few methods
   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
-
   # Protecting against collinearity or low number of observations - across small groups
   # Be carful when using a data.table grouping option
   # because of lack of protection against collinearity or low number of observations.
   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
   group_by(groups) %>%
-  do(mutate(., Ozone_chac_imp = tryCatch(fill_NA(
-    x = .,
-    model = "lda",
-    posit_y = "Ozone_chac",
-    posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
-    w = .[["weights"]]
-  ),
-  error = function(e) .[["Ozone_chac"]]
+  do(mutate(., Ozone_chac_imp = tryCatch(
+    fill_NA(
+      x = .,
+      model = "lda",
+      posit_y = "Ozone_chac",
+      posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
+      w = .[["weights"]]
+    ),
+    error = function(e) .[["Ozone_chac"]]
   ))) %>%
   ungroup()
 ```
@@ -205,7 +205,7 @@ air_miss <- air_miss %>%
 ```{r,echo=TRUE}
 # Distribution of imputations vs Distribution of initial data
 compare_imp(air_miss, origin = "Ozone", target = "Ozone_imp_mix")
-# or 
+# or
 compare_imp(air_miss, origin = "Ozone", target = c("Ozone_imp2", "Ozone_imp_mix"))
 ```
 
@@ -302,23 +302,22 @@ air_miss[, Solar_R_imp := fill_NA_N(
     logreg = TRUE,
     k = 10
   ), .(groups)] %>%
-
   # Average of a few methods
   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] %>%
-
   # Protecting against collinearity or low number of observations - across small groups
   # Be careful when using a data.table grouping option
   # because of lack of protection against collinearity or low number of observations.
   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
 
-  .[, Ozone_chac_imp := tryCatch(fill_NA(
-    x = .SD,
-    model = "lda",
-    posit_y = "Ozone_chac",
-    posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
-    w = .SD[["weights"]]
-  ),
-  error = function(e) .SD[["Ozone_chac"]]
+  .[, Ozone_chac_imp := tryCatch(
+    fill_NA(
+      x = .SD,
+      model = "lda",
+      posit_y = "Ozone_chac",
+      posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
+      w = .SD[["weights"]]
+    ),
+    error = function(e) .SD[["Ozone_chac"]]
   ), .(groups)]
 ```
 

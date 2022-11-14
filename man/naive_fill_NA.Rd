@@ -26,11 +26,11 @@ Next all numeric variables will be utilized to impute character/factoer variable
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data.frame}: S3 method for data.frame
+\item \code{naive_fill_NA(data.frame)}: S3 method for data.frame
 
-\item \code{matrix}: S3 method for matrix
+\item \code{naive_fill_NA(matrix)}: S3 method for matrix
+
 }}
-
 \note{
 this is a very simple and fast solution but not recommended, for more complex solutions check the vignette
 }

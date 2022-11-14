@@ -109,26 +109,26 @@
 #'   ungroup() %>%
 #'   # Average of a few methods
 #'   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
-#'
 #'   # Protecting against collinearity or low number of observations - across small groups
 #'   # Be carful when using a grouping option
 #'   # because of lack of protection against collinearity or low number of observations.
 #'   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
 #'   group_by(groups) %>%
-#'   do(mutate(., Ozone_chac_imp = tryCatch(fill_NA(
-#'     x = .,
-#'     model = "lda",
-#'     posit_y = "Ozone_chac",
-#'     posit_x = c(
-#'       "Intercept",
-#'       "Month",
-#'       "Day",
-#'       "Temp",
-#'       "x_character_imp"
+#'   do(mutate(., Ozone_chac_imp = tryCatch(
+#'     fill_NA(
+#'       x = .,
+#'       model = "lda",
+#'       posit_y = "Ozone_chac",
+#'       posit_x = c(
+#'         "Intercept",
+#'         "Month",
+#'         "Day",
+#'         "Temp",
+#'         "x_character_imp"
+#'       ),
+#'       w = .[["weights"]]
 #'     ),
-#'     w = .[["weights"]]
-#'   ),
-#'   error = function(e) .[["Ozone_chac"]]
+#'     error = function(e) .[["Ozone_chac"]]
 #'   ))) %>%
 #'   ungroup()
 #'
@@ -211,29 +211,28 @@
 #'     logreg = TRUE,
 #'     k = 10
 #'   ), .(groups)] %>%
-#'
 #'   # Average of a few methods
 #'   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] %>%
-#'
 #'   # Protecting against collinearity or low number of observations - across small groups
 #'   # Be carful when using a data.table grouping option
 #'   # because of lack of protection against collinearity or low number of observations.
 #'   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
 #'
-#'   .[, Ozone_chac_imp := tryCatch(fill_NA(
-#'     x = .SD,
-#'     model = "lda",
-#'     posit_y = "Ozone_chac",
-#'     posit_x = c(
-#'       "Intercept",
-#'       "Month",
-#'       "Day",
-#'       "Temp",
-#'       "x_character_imp"
+#'   .[, Ozone_chac_imp := tryCatch(
+#'     fill_NA(
+#'       x = .SD,
+#'       model = "lda",
+#'       posit_y = "Ozone_chac",
+#'       posit_x = c(
+#'         "Intercept",
+#'         "Month",
+#'         "Day",
+#'         "Temp",
+#'         "x_character_imp"
+#'       ),
+#'       w = .SD[["weights"]]
 #'     ),
-#'     w = .SD[["weights"]]
-#'   ),
-#'   error = function(e) .SD[["Ozone_chac"]]
+#'     error = function(e) .SD[["Ozone_chac"]]
 #'   ), .(groups)]
 #'
 #' # Sample of results
@@ -327,7 +326,7 @@ fill_NA.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy))))  else factor(yy)
+    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy)))) else factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
     f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))
@@ -398,7 +397,7 @@ fill_NA.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FA
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy))))  else factor(yy)
+    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy)))) else factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
     f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))

@@ -34,13 +34,13 @@ You have to decide which variable should be delete. Values higher than 10 signal
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data.frame}: 
+\item \code{VIF(data.frame)}: 
 
-\item \code{data.table}: 
+\item \code{VIF(data.table)}: 
 
-\item \code{matrix}: 
+\item \code{VIF(matrix)}: 
+
 }}
-
 \note{
 vif_corrected = vif_basic^{(1/(2*df))}
 }

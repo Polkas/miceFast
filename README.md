@@ -54,11 +54,11 @@ upset_NA(air_miss, 6)
 
 naive_fill_NA(air_miss)
 
-#Check vignette for an advance usage
-#there is required a thorough examination
+# Check vignette for an advance usage
+# there is required a thorough examination
 
-#Other packages - popular simple solutions
-#Hmisc
+# Other packages - popular simple solutions
+# Hmisc
 data.frame(Map(function(x) Hmisc::impute(x,'random'), air_miss))
 
 #mice
@@ -88,6 +88,6 @@ Summing up, `miceFast` offer a relevant reduction of a calculations time for:
 
 ![](man/figures/g_summary.png)
 
-Environment: R 4.1.3 Mac M1
+Environment: R 4.2.1 Mac M1
 
 If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.

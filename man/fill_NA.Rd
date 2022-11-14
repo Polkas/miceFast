@@ -40,13 +40,13 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data.frame}: S3 method for data.frame
+\item \code{fill_NA(data.frame)}: S3 method for data.frame
 
-\item \code{data.table}: s3 method for data.table
+\item \code{fill_NA(data.table)}: s3 method for data.table
 
-\item \code{matrix}: S3 method for matrix
+\item \code{fill_NA(matrix)}: S3 method for matrix
+
 }}
-
 \note{
 There is assumed that users add the intercept by their own.
 The miceFast module provides the most efficient environment, the second recommended option is to use data.table and the numeric matrix data type.
@@ -139,26 +139,26 @@ air_miss <- air_miss \%>\%
   ungroup() \%>\%
   # Average of a few methods
   mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) \%>\%
-
   # Protecting against collinearity or low number of observations - across small groups
   # Be carful when using a grouping option
   # because of lack of protection against collinearity or low number of observations.
   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
   group_by(groups) \%>\%
-  do(mutate(., Ozone_chac_imp = tryCatch(fill_NA(
-    x = .,
-    model = "lda",
-    posit_y = "Ozone_chac",
-    posit_x = c(
-      "Intercept",
-      "Month",
-      "Day",
-      "Temp",
-      "x_character_imp"
+  do(mutate(., Ozone_chac_imp = tryCatch(
+    fill_NA(
+      x = .,
+      model = "lda",
+      posit_y = "Ozone_chac",
+      posit_x = c(
+        "Intercept",
+        "Month",
+        "Day",
+        "Temp",
+        "x_character_imp"
+      ),
+      w = .[["weights"]]
     ),
-    w = .[["weights"]]
-  ),
-  error = function(e) .[["Ozone_chac"]]
+    error = function(e) .[["Ozone_chac"]]
   ))) \%>\%
   ungroup()
 
@@ -241,29 +241,28 @@ air_miss[, Solar_R_imp := fill_NA_N(
     logreg = TRUE,
     k = 10
   ), .(groups)] \%>\%
-
   # Average of a few methods
   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] \%>\%
-
   # Protecting against collinearity or low number of observations - across small groups
   # Be carful when using a data.table grouping option
   # because of lack of protection against collinearity or low number of observations.
   # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
 
-  .[, Ozone_chac_imp := tryCatch(fill_NA(
-    x = .SD,
-    model = "lda",
-    posit_y = "Ozone_chac",
-    posit_x = c(
-      "Intercept",
-      "Month",
-      "Day",
-      "Temp",
-      "x_character_imp"
+  .[, Ozone_chac_imp := tryCatch(
+    fill_NA(
+      x = .SD,
+      model = "lda",
+      posit_y = "Ozone_chac",
+      posit_x = c(
+        "Intercept",
+        "Month",
+        "Day",
+        "Temp",
+        "x_character_imp"
+      ),
+      w = .SD[["weights"]]
     ),
-    w = .SD[["weights"]]
-  ),
-  error = function(e) .SD[["Ozone_chac"]]
+    error = function(e) .SD[["Ozone_chac"]]
   ), .(groups)]
 
 # Sample of results

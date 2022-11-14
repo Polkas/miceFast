@@ -9,24 +9,24 @@
 #' library(ggplot2)
 #' data(air_miss)
 #' air_miss$Ozone_imp <- fill_NA(
-#'     x = air_miss,
-#'     model = "lm_bayes",
-#'     posit_y = 1,
-#'     posit_x = c(4, 6),
-#'     logreg = TRUE
+#'   x = air_miss,
+#'   model = "lm_bayes",
+#'   posit_y = 1,
+#'   posit_x = c(4, 6),
+#'   logreg = TRUE
 #' )
 #' air_miss$Ozone_imp2 <- fill_NA_N(
-#'     x = air_miss,
-#'     model = "pmm",
-#'     posit_y = 1,
-#'     posit_x = c(4, 6),
-#'     logreg = TRUE
+#'   x = air_miss,
+#'   model = "pmm",
+#'   posit_y = 1,
+#'   posit_x = c(4, 6),
+#'   logreg = TRUE
 #' )
 #'
 #' compare_imp(air_miss, origin = "Ozone", "Ozone_imp")
-#' compare_imp(air_miss, origin = "Ozone", c("Ozone_imp", 'Ozone_imp2'))
+#' compare_imp(air_miss, origin = "Ozone", c("Ozone_imp", "Ozone_imp2"))
 #'
-compare_imp = function(df, origin, target) {
+compare_imp <- function(df, origin, target) {
   stopifnot(inherits(df, "data.frame"))
   stopifnot(inherits(origin, "character"))
   stopifnot(inherits(target, "character"))
@@ -34,13 +34,21 @@ compare_imp = function(df, origin, target) {
 
   if (suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))) {
     data <- as.data.frame(df)
-    data$origin_NA <- ifelse(is.na(data[[origin]]) , "missing", "complete")
+    data$origin_NA <- ifelse(is.na(data[[origin]]), "missing", "complete")
     data_long <- utils::stack(data[, c(origin, target)])
     data_long <- cbind(data_long, origin_NA = rep(data$origin_NA, length(c(origin, target))))
     colnames(data_long) <- c("value", "name", "origin_NA")
     data_final <- data_long[(((data_long$origin_NA == "missing") & (data_long$name %in% target)) | ((data_long$origin_NA == "complete") & (data_long$name == origin))), ]
-    ggplot2::ggplot(data_final, ggplot2::aes_string(x = "value", fill = "name", group = "name")) +
-      ggplot2::geom_density(alpha = 0.4)
+    ggplot2::ggplot(
+      data_final,
+      ggplot2::aes(
+        x = !!as.name("value"),
+        fill = !!as.name("name"),
+        color = !!as.name("name"),
+        group = !!as.name("name")
+      )
+    ) +
+    ggplot2::geom_density(alpha = 0.4)
   } else {
     stop("Please install ggplot2 package to use the compare_imp function.")
   }

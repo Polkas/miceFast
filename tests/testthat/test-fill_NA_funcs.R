@@ -513,7 +513,7 @@ testthat::test_that("dplyr pipe pipeline fill_NA_N, fill_NA - dis", {
       model = "lda",
       posit_y = "y_fac",
       posit_x = c("Intercept", "x2", "x3", "x4"), w = .[["weights"]]
-    ))  %>%
+    )) %>%
     mutate(y_imp5 = fill_NA(
       x = .,
       model = "lm_noise",
@@ -531,8 +531,7 @@ testthat::test_that("dplyr pipe pipeline fill_NA_N, fill_NA - dis", {
   dd_y <- data_df2[index_NA, "y_true"]
 
   # Better than naive
-  testthat::expect_true(all(lapply(dd, function(x) 100 * mean(x == dd_y))  > 10))
-
+  testthat::expect_true(all(lapply(dd, function(x) 100 * mean(x == dd_y)) > 10))
 })
 
 data_DT <- as.data.table(data_df)
@@ -601,6 +600,5 @@ testthat::test_that("data.table pipeline fill_NA/fill_NA_N accuracy - disc", {
 
   # Better than naive
   testthat::expect_true(all(data_DT[index_NA, c("y_true", colnames(data_DT)[grep("y_imp", colnames(data_DT))]), with = FALSE] %>%
-                              .[, lapply(.SD, function(x) 100 * mean(y_true == x))] > 10))
-
+    .[, lapply(.SD, function(x) 100 * mean(y_true == x))] > 10))
 })

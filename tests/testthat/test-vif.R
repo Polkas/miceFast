@@ -4,9 +4,12 @@ collin_x <- function(y, x) {
 
   vifs <- sapply(1:ncol(XXinv), function(i) det(XXinv[i, i, drop = FALSE]) * det(XXinv[-i, -i, drop = FALSE]) / det(XXinv))
 
-  vifs2 <- sapply(1:ncol(XXinv),
-                  function(i) Reduce("*", svd(XXinv[i, i, drop = FALSE])$d) *
-                    Reduce("*", svd(XXinv[-i, -i, drop = FALSE])$d) / Reduce("*", svd(XXinv)$d)
+  vifs2 <- sapply(
+    1:ncol(XXinv),
+    function(i) {
+      Reduce("*", svd(XXinv[i, i, drop = FALSE])$d) *
+        Reduce("*", svd(XXinv[-i, -i, drop = FALSE])$d) / Reduce("*", svd(XXinv)$d)
+    }
   )
   list(vifs, vifs2)
 }
@@ -38,14 +41,12 @@ testthat::test_that("VIF error", {
 
 test_that("VIF matrix", {
   expect_true(all(VIF(airquality_mat, 1, c(2:5), correct = FALSE) >=
-                    VIF(airquality_mat, "Ozone", c("Solar.R", "Wind", "Temp", "Month"),  correct = TRUE))
-              )
+    VIF(airquality_mat, "Ozone", c("Solar.R", "Wind", "Temp", "Month"), correct = TRUE)))
 })
 
 test_that("VIF data.frame", {
   expect_true(all(VIF(airquality2, 1, c(2:5), correct = FALSE) >=
-                    VIF(airquality2, "Ozone", c("Solar.R", "Wind", "Temp", "Month"), correct = TRUE))
-             )
+    VIF(airquality2, "Ozone", c("Solar.R", "Wind", "Temp", "Month"), correct = TRUE)))
 })
 
 test_that("VIF data.table", {
@@ -54,6 +55,6 @@ test_that("VIF data.table", {
   expect_true(any(VIF(air_miss, "Ozone", c("Solar.R", "Wind", "Temp", "Day")) >= 1))
   expect_true(all(
     VIF(air_miss, 1, c(2:5), correct = FALSE) >=
-      VIF(air_miss, "Ozone", c("Solar.R", "Wind", "Temp", "Day"), correct = TRUE))
-  )
+      VIF(air_miss, "Ozone", c("Solar.R", "Wind", "Temp", "Day"), correct = TRUE)
+  ))
 })

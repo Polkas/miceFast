@@ -56,7 +56,6 @@ naive_fill_NA.data.frame <- function(x) {
   nn <- col_names[types_n & (na_col_p > 0)]
 
   for (posit_y in nn) {
-
     # full_n <- (types_n) & (na_col_p_new == 0)
 
     yy <- x[[posit_y]]

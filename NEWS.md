@@ -1,3 +1,9 @@
+# miceFast 0.8.1.9000
+
+* replace `ggplot2::aes_string` with  `ggplot2::aes`, as the former is depreciated.
+* regenerate performance benchmarks on R 4.2.1.
+* styler over the code.
+
 # miceFast 0.8.1
 
 * `tinyverse` world, less dependencies.

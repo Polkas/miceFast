@@ -62,8 +62,8 @@ VIF <- function(x, posit_y, posit_x, correct = FALSE) {
 
     if (length(posit_x) < 2) stop("at least two independent variables should be provided")
 
-    #contains_intercept <- any(unlist(apply(x[, posit_x], 2, function(i) all(duplicated(i)[-1L]))))
-    #if (contains_intercept) stop("Do not include an intercept")
+    # contains_intercept <- any(unlist(apply(x[, posit_x], 2, function(i) all(duplicated(i)[-1L]))))
+    # if (contains_intercept) stop("Do not include an intercept")
 
     if (is.character(posit_y)) {
       posit_y <- match(posit_y, cols)
