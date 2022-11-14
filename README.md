@@ -54,15 +54,15 @@ upset_NA(air_miss, 6)
 
 naive_fill_NA(air_miss)
 
-# Check vignette for an advance usage
-# there is required a thorough examination
+# Check out the vignette for an advance usage
+# There is required a thorough examination
 
 # Other packages - popular simple solutions
 # Hmisc
-data.frame(Map(function(x) Hmisc::impute(x,'random'), air_miss))
+data.frame(Map(function(x) Hmisc::impute(x, 'random'), air_miss))
 
 #mice
-mice::complete(mice::mice(air_miss, printFlag = F))
+mice::complete(mice::mice(air_miss, printFlag = FALSE))
 
 ```
 
@@ -70,7 +70,7 @@ mice::complete(mice::mice(air_miss, printFlag = F))
 
 |  Function | Description |
 |----------------------|----------------------|
-| `new(miceFast)` | OOP instance with bunch of methods - check vignette |
+| `new(miceFast)` | OOP instance with bunch of methods - check out vignette |
 | `fill_NA()`  |  imputation - lda,lm_pred,lm_bayes,lm_noise |
 | `fill_NA_N()` |   multiple imputation - pmm,lm_bayes,lm_noise |
 | `VIF()` | Variance inflation factor |

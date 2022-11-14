@@ -3,42 +3,50 @@
 \name{naive_fill_NA}
 \alias{naive_fill_NA}
 \alias{naive_fill_NA.data.frame}
+\alias{naive_fill_NA.data.table}
 \alias{naive_fill_NA.matrix}
-\title{\code{naive_fill_NA} function for the imputations purpose.}
+\title{\code{naive_fill_NA} function for the simple and automatic imputations purpose.}
 \usage{
-naive_fill_NA(x)
+naive_fill_NA(x, replace = TRUE)
 
-\method{naive_fill_NA}{data.frame}(x)
+\method{naive_fill_NA}{data.frame}(x, replace = TRUE)
 
-\method{naive_fill_NA}{matrix}(x)
+\method{naive_fill_NA}{data.table}(x, replace = TRUE)
+
+\method{naive_fill_NA}{matrix}(x, replace = TRUE)
 }
 \arguments{
-\item{x}{a numeric matrix or data.frame (factor/character/numeric/logical)  - variables}
+\item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical)  - variables}
+
+\item{replace}{if to sample with replacement, by default TRUE.}
 }
 \value{
 load imputations in a similar to the input type.
 }
 \description{
-Regular imputations to fill the missing data.
-Non missing independent variables are used to approximate a missing observations for a dependent variable.
-For numeric columns with any missing data a simple bayesian mean will be used.
-Next all numeric variables will be utilized to impute character/factoer variables by Linear Discriminant Analysis.
+Simplified imputations to automatically fill the missing data.
+Impute by sampling non missing values.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{naive_fill_NA(data.frame)}: S3 method for data.frame
 
+\item \code{naive_fill_NA(data.table)}: S3 method for data.table
+
 \item \code{naive_fill_NA(matrix)}: S3 method for matrix
 
 }}
 \note{
-this is a very simple and fast solution but not recommended, for more complex solutions check the vignette
+this is a very simple and fast solution but not recommended,
+for more complex solutions please check the vignette.
 }
 \examples{
 \dontrun{
 library(miceFast)
 data(air_miss)
 naive_fill_NA(air_miss)
+# Could be useful to run it separately for each group level
+do.call(rbind, Map(naive_fill_NA, split(air_miss, air_miss$groups)))
 }
 
 }

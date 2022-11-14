@@ -1,5 +1,6 @@
 # miceFast 0.8.1.9000
 
+* simplified `naive_fill_NA`, It is a regular sampling imputation now.
 * replace `ggplot2::aes_string` with  `ggplot2::aes`, as the former is depreciated.
 * regenerate performance benchmarks on R 4.2.1.
 * styler over the code.
