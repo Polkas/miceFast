@@ -6,7 +6,6 @@
 #' It is recommended to use this function for each categorical variable separately.
 #'
 #' @param x a numeric matrix or data.frame/data.table (factor/character/numeric/logical variables)
-#' @param replace if to sample with replacement, by default TRUE.
 #' @return object with a similar structure to the input but without missing values.
 #'
 #' @note this is a very simple and fast solution but not recommended,
@@ -26,7 +25,7 @@
 #' @name naive_fill_NA
 #'
 #' @export
-naive_fill_NA <- function(x, replace = TRUE) {
+naive_fill_NA <- function(x) {
   if (inherits(x, "data.frame") || inherits(x, "matrix")) {
     UseMethod("naive_fill_NA", x)
   } else {
@@ -35,12 +34,12 @@ naive_fill_NA <- function(x, replace = TRUE) {
 }
 
 #' @describeIn naive_fill_NA S3 method for data.frame
-naive_fill_NA.data.frame <- function(x, replace = TRUE) {
+naive_fill_NA.data.frame <- function(x) {
   naive_fill_NA.matrix(x)
 }
 
 #' @describeIn naive_fill_NA S3 method for data.table
-naive_fill_NA.data.table <- function(x, replace = TRUE) {
+naive_fill_NA.data.table <- function(x) {
   any_na <- vapply(x, function(c) anyNA(c), logical(1))
   if (any(any_na)) {
     cols <- which(any_na)
@@ -53,7 +52,7 @@ naive_fill_NA.data.table <- function(x, replace = TRUE) {
         replacements <- base::sample(
           vec[!is_na],
           sum_na,
-          replace = replace
+          replace = TRUE
         )
         data.table::set(x, as.integer(which(is_na)), icol, replacements)
       }
@@ -63,7 +62,7 @@ naive_fill_NA.data.table <- function(x, replace = TRUE) {
 }
 
 #' @describeIn naive_fill_NA S3 method for matrix
-naive_fill_NA.matrix <- function(x, replace = TRUE) {
+naive_fill_NA.matrix <- function(x) {
   any_na <- vapply(seq_len(ncol(x)), function(c) anyNA(x[, c]), logical(1))
   if (any(any_na)) {
     cols <- which(any_na)
@@ -76,7 +75,7 @@ naive_fill_NA.matrix <- function(x, replace = TRUE) {
         replacements <- base::sample(
           vec[!is_na],
           sum_na,
-          replace = replace
+          replace = TRUE
         )
         x[is_na, icol] <- replacements
       }

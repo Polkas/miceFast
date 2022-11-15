@@ -7,18 +7,16 @@
 \alias{naive_fill_NA.matrix}
 \title{\code{naive_fill_NA} function for the simple and automatic imputation}
 \usage{
-naive_fill_NA(x, replace = TRUE)
+naive_fill_NA(x)
 
-\method{naive_fill_NA}{data.frame}(x, replace = TRUE)
+\method{naive_fill_NA}{data.frame}(x)
 
-\method{naive_fill_NA}{data.table}(x, replace = TRUE)
+\method{naive_fill_NA}{data.table}(x)
 
-\method{naive_fill_NA}{matrix}(x, replace = TRUE)
+\method{naive_fill_NA}{matrix}(x)
 }
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical variables)}
-
-\item{replace}{if to sample with replacement, by default TRUE.}
 }
 \value{
 object with a similar structure to the input but without missing values.
