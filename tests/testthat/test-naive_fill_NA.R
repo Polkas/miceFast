@@ -1,7 +1,30 @@
+test_that("get_replacements", {
+  testthat::expect_identical(get_replacements(c(1,2,3)), numeric(0))
+  testthat::expect_identical(get_replacements(1:3), integer(0))
+  set.seed(1234)
+  testthat::expect_identical(get_replacements(c(1:3, NA)), 2L)
+  set.seed(1234)
+  testthat::expect_identical(get_replacements(c(1:3, NA), c(FALSE, FALSE, FALSE, TRUE)), 2L)
+  set.seed(1234)
+  testthat::expect_identical(get_replacements(c(1:3, NA), c(FALSE, FALSE, FALSE, TRUE), 1), 2L)
+  set.seed(1234)
+  testthat::expect_identical(get_replacements(c(1:3, NA), c(FALSE, FALSE, FALSE, TRUE), 1, 3), 2L)
+})
+
 test_that("naive_fill_NA on empty", {
   testthat::expect_identical(naive_fill_NA(data.frame()), data.frame())
   testthat::expect_identical(naive_fill_NA(data.table::data.table()), data.table::data.table())
   testthat::expect_identical(naive_fill_NA(matrix()), matrix())
+})
+
+test_that("naive_fill_NA with one non missing", {
+  testthat::expect_identical(naive_fill_NA(data.frame(a = c(1, NA))), data.frame(a = c(1, 1)))
+  testthat::expect_identical(naive_fill_NA(data.table::data.table(a = c(1, NA))), data.table::data.table(a = c(1, 1)))
+  testthat::expect_identical(naive_fill_NA(matrix(c(1, NA), ncol = 1)), matrix(c(1, 1), ncol = 1))
+
+  testthat::expect_identical(naive_fill_NA(data.frame(a = c(1, NA, NA))), data.frame(a = c(1, 1, 1)))
+  testthat::expect_identical(naive_fill_NA(data.table::data.table(a = c(1, NA, NA))), data.table::data.table(a = c(1, 1, 1)))
+  testthat::expect_identical(naive_fill_NA(matrix(c(1, NA, NA), ncol = 1)), matrix(c(1, 1, 1), ncol = 1))
 })
 
 test_that("naive_fill_NA on one col", {

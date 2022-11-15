@@ -35,7 +35,21 @@ naive_fill_NA <- function(x) {
 
 #' @describeIn naive_fill_NA S3 method for data.frame
 naive_fill_NA.data.frame <- function(x) {
-  naive_fill_NA.matrix(x)
+  any_na <- vapply(seq_len(ncol(x)), function(c) anyNA(x[[c]]), logical(1))
+  if (any(any_na)) {
+    cols <- which(any_na)
+    for (icol in cols) {
+      vec <- x[[icol]]
+      is_na <- is.na(vec)
+      sum_na <- sum(is_na)
+      sum_nonna <- length(vec) - sum_na
+      if (any(is_na) && (sum_nonna >= 1)) {
+        replacements <- get_replacements(vec, is_na, sum_na, sum_nonna)
+        x[is_na, icol] <- replacements
+      }
+    }
+  }
+  return(x)
 }
 
 #' @describeIn naive_fill_NA S3 method for data.table
@@ -44,16 +58,12 @@ naive_fill_NA.data.table <- function(x) {
   if (any(any_na)) {
     cols <- which(any_na)
     for (icol in cols) {
-      vec <- as.vector(x[[icol]])
+      vec <- x[[icol]]
       is_na <- is.na(vec)
       sum_na <- sum(is_na)
-      sum_nonna <- sum(!is_na)
-      if (any(is_na) && (sum_nonna > 1)) {
-        replacements <- base::sample(
-          vec[!is_na],
-          sum_na,
-          replace = TRUE
-        )
+      sum_nonna <- length(vec) - sum_na
+      if (any(is_na) && (sum_nonna >= 1)) {
+        replacements <- get_replacements(vec, is_na, sum_na, sum_nonna)
         data.table::set(x, as.integer(which(is_na)), icol, replacements)
       }
     }
@@ -67,16 +77,12 @@ naive_fill_NA.matrix <- function(x) {
   if (any(any_na)) {
     cols <- which(any_na)
     for (icol in cols) {
-      vec <- as.vector(x[, icol])
+      vec <- x[, icol]
       is_na <- is.na(vec)
       sum_na <- sum(is_na)
-      sum_nonna <- sum(!is_na)
-      if (any(is_na) && (sum_nonna > 1)) {
-        replacements <- base::sample(
-          vec[!is_na],
-          sum_na,
-          replace = TRUE
-        )
+      sum_nonna <- length(vec) - sum_na
+      if (any(is_na) && (sum_nonna >= 1)) {
+        replacements <- get_replacements(vec, is_na, sum_na, sum_nonna)
         x[is_na, icol] <- replacements
       }
     }
@@ -85,3 +91,20 @@ naive_fill_NA.matrix <- function(x) {
 }
 
 
+#' @keywords internal
+get_replacements <- function(
+    vec,
+    is_na = is.na(vec),
+    sum_na = sum(is_na),
+    sum_nonna = length(vec) - sum_na
+  ) {
+  if (sum_nonna == 1) {
+    rep(vec[!is_na], sum_na)
+  } else {
+    base::sample(
+      vec[!is_na],
+      sum_na,
+      replace = TRUE
+    )
+  }
+}
