@@ -4,11 +4,11 @@ test_that("get_replacements", {
   set.seed(1234)
   testthat::expect_identical(get_replacements(c(1:3, NA)), 2L)
   set.seed(1234)
-  testthat::expect_identical(get_replacements(c(1:3, NA), c(FALSE, FALSE, FALSE, TRUE)), 2L)
+  testthat::expect_identical(get_replacements(c(1:3, NA), c(TRUE, TRUE, TRUE, FALSE)), 2L)
   set.seed(1234)
-  testthat::expect_identical(get_replacements(c(1:3, NA), c(FALSE, FALSE, FALSE, TRUE), 1), 2L)
+  testthat::expect_identical(get_replacements(c(1:3, NA), c(TRUE, TRUE, TRUE, FALSE), 3), 2L)
   set.seed(1234)
-  testthat::expect_identical(get_replacements(c(1:3, NA), c(FALSE, FALSE, FALSE, TRUE), 1, 3), 2L)
+  testthat::expect_identical(get_replacements(c(1:3, NA), c(TRUE, TRUE, TRUE, FALSE), 3, 1), 2L)
 })
 
 test_that("naive_fill_NA on empty", {
