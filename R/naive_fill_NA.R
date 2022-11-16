@@ -26,7 +26,7 @@
 #'
 #' @export
 naive_fill_NA <- function(x) {
-  if (inherits(x, "data.frame") || inherits(x, "matrix")) {
+  if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table") ) {
     UseMethod("naive_fill_NA", x)
   } else {
     stop("wrong data type - it should be data.frame, matrix or data.table")
@@ -35,7 +35,7 @@ naive_fill_NA <- function(x) {
 
 #' @describeIn naive_fill_NA S3 method for data.frame
 naive_fill_NA.data.frame <- function(x) {
-  any_na <- vapply(seq_len(ncol(x)), function(c) anyNA(x[[c]]), logical(1))
+  any_na <- vapply(x, function(c) anyNA(c), logical(1))
   if (any(any_na)) {
     cols <- which(any_na)
     for (icol in cols) {
