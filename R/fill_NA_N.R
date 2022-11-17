@@ -270,7 +270,7 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 
 
     UseMethod("fill_NA_N", x)
   } else {
-    stop("wrong data type - it should be data.frame, matrix or data.table (where data.table has to be installed)")
+    stop("wrong data type - it should be data.frame, matrix or data.table")
   }
 }
 

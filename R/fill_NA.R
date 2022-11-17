@@ -269,7 +269,7 @@ fill_NA <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, ridge 
 
     UseMethod("fill_NA", x)
   } else {
-    stop("wrong data type - it should be data.frame, matrix or data.table (where data.table package has to be installed)")
+    stop("wrong data type - it should be data.frame, matrix or data.table")
   }
 }
 

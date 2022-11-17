@@ -2,10 +2,12 @@
 #'
 #' @description VIF measure how much the variance of the estimated regression coefficients are inflated.
 #' It helps to identify when the predictor variables are linearly related.
-#' You have to decide which variable should be delete. Values higher than 10 signal a potential collinearity problem.
+#' You have to decide which variable should be delete.
+#' Usually values higher than 10 (around), mean a collinearity problem.
 #'
 #' @param x a numeric matrix or data.frame/data.table (factor/character/numeric) - variables
-#' @param posit_y an integer/character - a position/name of dependent variable
+#' @param posit_y an integer/character - a position/name of dependent variable.
+#' This variable is taken into account only for getting complete cases.
 #' @param posit_x an integer/character vector - positions/names of independent variables
 #' @param correct a boolean - basic or corrected - Default: FALSE
 #'
@@ -22,6 +24,7 @@
 #'
 #' airquality2 <- airquality
 #' airquality2$Temp2 <- airquality2$Temp**2
+#' airquality2$Month <- factor(airquality2$Month)
 #' data_DT <- data.table(airquality2)
 #' data_DT[, .(vifs = VIF(
 #'   x = .SD,
@@ -85,10 +88,10 @@ VIF <- function(x, posit_y, posit_x, correct = FALSE) {
 VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
   x_small <- x[, c(posit_y, posit_x)]
   x_small[[1]] <- as.numeric(x_small[[1]])
-  xx <- model.matrix.lm(~., x_small, na.action = "na.pass")
+  xx <- model.matrix.lm(~.-1, x_small, na.action = "na.pass")
   aa <- attributes(xx)$assign
-  ll <- 3:ncol(xx)
-  VIF_(xx, 2, ll, aa[ll], correct)
+  ll <- 2:ncol(xx)
+  VIF_(xx, 1, ll, aa[ll], correct)
 }
 
 #' @describeIn  VIF
