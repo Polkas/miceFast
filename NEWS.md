@@ -1,4 +1,4 @@
-# miceFast 0.8.1.9000
+# miceFast 0.8.2
 
 * simplified `naive_fill_NA`, It is a regular sampling imputation now.
 * Fixed `dontrun` examples.
