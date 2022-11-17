@@ -20,4 +20,3 @@ Maciej Nasinski
 \references{
 \url{https://github.com/Polkas/miceFast}
 }
-\keyword{ imputations, missings, OOP }

@@ -50,14 +50,6 @@ test_that("VIF data.frame", {
   expect_true(length(VIF(airquality2, 1, c(2:5), correct = FALSE)) == 4)
 })
 
-airquality2$Month <- factor(airquality2$Month)
-
-test_that("VIF data.frame with factor", {
-  expect_true(all(VIF(airquality2, 1, c(2:5), correct = FALSE) >=
-                    VIF(airquality2, "Ozone", c("Solar.R", "Wind", "Temp", "Month"), correct = TRUE)))
-  expect_true(length(VIF(airquality2, 1, c(2:5), correct = FALSE)) == 4)
-})
-
 test_that("VIF data.table", {
   setDT(air_miss)
   expect_true(any(VIF(air_miss, 1, c(2:5)) >= 1))
