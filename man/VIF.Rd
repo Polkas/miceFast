@@ -44,7 +44,7 @@ Usually values higher than 10 (around), mean a collinearity problem.
 
 }}
 \note{
-vif_corrected = vif_basic^{(1/(2*df))}
+vif_corrected = vif_basic^(1/(2*df))
 }
 \examples{
 \dontrun{
