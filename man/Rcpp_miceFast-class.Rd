@@ -8,14 +8,10 @@
 \description{
 This C++ class could be used to build a miceFast objects by invoking \code{new(miceFast)} function.
 }
-\section{Extends}{
-Class \code{"\linkS4class{C++Object}"}, directly.
 
-All reference classes extend and inherit methods from \code{"\linkS4class{envRefClass}"}.
-
-}
 \references{
 See the documentation for RcppArmadillo and Rcpp for more details of how this class was built.
+\url{https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-modules.pdf}
 }
 
 \note{
@@ -26,7 +22,6 @@ Vigniette:
 \url{https://CRAN.R-project.org/package=miceFast}
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
 #showClass("Rcpp_miceFast")

@@ -7,22 +7,19 @@
 \description{
 This C++ class could be used to build a corrData object by invoking \code{new(corrData,...)} function.
 }
-\section{Extends}{
-Class \code{"\linkS4class{C++Object}"}, directly.
 
-All reference classes extend and inherit methods from \code{"\linkS4class{envRefClass}"}.
-
-}
 \references{
 See the documentation for RcppArmadillo and Rcpp for more details of how this class was built.
+\url{https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-modules.pdf}
 }
 
 \note{
 This is only frame for building C++ object which could be used to implement certain methods.
 Check the vignette for more details of implementing methods.
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+Vigniette:
+\url{https://CRAN.R-project.org/package=miceFast}
+}
 
 \examples{
 #showClass("Rcpp_corrData")
