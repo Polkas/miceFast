@@ -9,8 +9,8 @@ This C++ class could be used to build a corrData object by invoking \code{new(co
 }
 
 \references{
-See the documentation for RcppArmadillo and Rcpp for more details of how this class was built.
-\url{https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-modules.pdf}
+See the documentation for Rcpp modules for more details of how this class was built.
+\code{vignette("Rcpp-modules", package = "Rcpp")}
 }
 
 \note{

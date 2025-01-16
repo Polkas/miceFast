@@ -10,4 +10,4 @@ RUN apt-get update && apt-get install -y \
     pandoc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'mice', 'rmarkdown', 'knitr'))"
+RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'mice', 'UpSetR', 'rmarkdown', 'knitr'))"

@@ -5,6 +5,7 @@ cran-comments.md
 TODO.md
 ^_pkgdown\.yml$
 ^docs$
+^\.devcontainer$
 ^pkgdown$
 .*\.png
 ^doc$
