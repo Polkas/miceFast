@@ -34,4 +34,4 @@ LinkingTo:
 RcppModules: miceFast, corrData
 NeedsCompilation: yes
 LazyData: true
-RoxygenNote: 7.2.2
+RoxygenNote: 7.3.2

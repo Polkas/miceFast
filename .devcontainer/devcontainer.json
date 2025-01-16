@@ -1,0 +1,17 @@
+{
+  "name": "R + Rcpp Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "terminal.integrated.profiles.linux": {
+      "bash": {
+        "path": "/bin/bash"
+      }
+    }
+  },
+  "extensions": [
+    "REditorSupport.r",
+    "ms-vscode-remote.remote-containers"   // Or "ms-vscode.remote-containers" depending on your version
+  ]
+}
