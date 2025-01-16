@@ -6,7 +6,7 @@ Maciej Nasinski
 [![R build status](https://github.com/polkas/miceFast/workflows/R-CMD-check/badge.svg)](https://github.com/polkas/miceFast/actions)
 [![CRAN](http://www.r-pkg.org/badges/version/miceFast)](https://cran.r-project.org/package=miceFast)
 [![codecov](https://codecov.io/gh/Polkas/miceFast/branch/master/graph/badge.svg)](https://app.codecov.io/gh/Polkas/miceFast)
-[![Dependencies](https://tinyverse.netlify.com/badge/miceFast)](https://cran.r-project.org/package=miceFast)
+[![Dependencies](https://tinyverse.netlify.app/badge/miceFast)](https://cran.r-project.org/package=miceFast)
 
 Fast imputations under the object-oriented programming paradigm. 	
 Moreover there are offered a few functions built to work with popular R packages such as 'data.table' or 'dplyr'.
