@@ -10,5 +10,4 @@ RUN apt-get update && apt-get install -y \
     pandoc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'remotes'))"
-RUN R -e "remotes::install_deps(dependencies = TRUE)"
+RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'rmarkdown', 'knitr')"
