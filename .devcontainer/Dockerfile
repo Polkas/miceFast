@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     git \
     libgit2-dev \
     build-essential \
+    pandoc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo', 'devtools'))"
+RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'remotes');remotes::install_deps(dependencies = TRUE)"
