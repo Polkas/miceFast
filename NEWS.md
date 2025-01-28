@@ -2,6 +2,7 @@
 
 * fixed CRAN Notes.
 * style the cpp code.
+* VIF() should be more stable.
 
 # miceFast 0.8.2
 

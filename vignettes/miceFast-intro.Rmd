@@ -86,23 +86,21 @@ upset_NA(air_miss, 6)
 
 ### Intro: dplyr
 
-```{r,echo=TRUE}
+```{r, echo=TRUE}
 # VIF - values bigger than 10 (around) suggest that there might be a collinearity problem.
 # VIF is high for Solar.R and x_character which is obvious - x_character is a factor version of numeric Solar.R
-air_miss %>%
-  do(vifs = VIF(.,
-    posit_y = "Ozone",
-    posit_x = c(
-      "Solar.R",
-      "Wind",
-      "Temp",
-      "x_character",
-      "Day",
-      "weights",
-      "groups"
-    )
-  )) %>%
-  unlist()
+VIF(air_miss,
+  posit_y = "Ozone",
+  posit_x = c(
+    "Solar.R",
+    "Wind",
+    "Temp",
+    "x_character",
+    "Day",
+    "weights",
+    "groups"
+  )
+)
 
 # IMPUTATIONS
 air_miss <- air_miss %>%

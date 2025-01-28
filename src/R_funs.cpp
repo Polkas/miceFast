@@ -1,6 +1,6 @@
 #include <RcppArmadillo.h>
-#include "miceFast.h"
 #include <math.h>
+#include "miceFast.h"
 
 arma::uvec get_index_full_R(arma::mat &x, int posit_y, arma::uvec posit_x) {
   arma::colvec y_col = x.col(posit_y);

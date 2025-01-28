@@ -88,10 +88,10 @@ VIF <- function(x, posit_y, posit_x, correct = FALSE) {
 VIF.data.frame <- function(x, posit_y, posit_x, correct = FALSE) {
   x_small <- x[, c(posit_y, posit_x)]
   x_small[[1]] <- as.numeric(x_small[[1]])
-  xx <- model.matrix.lm(~.-1, x_small, na.action = "na.pass")
+  xx <- model.matrix.lm(~., x_small, na.action = "na.pass")
   aa <- attributes(xx)$assign
-  ll <- 2:ncol(xx)
-  VIF_(xx, 1, ll, aa[ll], correct)
+  ll <- 3:ncol(xx)
+  VIF_(xx, 2, ll, aa[ll], correct)
 }
 
 #' @describeIn  VIF
@@ -109,6 +109,7 @@ VIF.data.table <- function(x, posit_y, posit_x, correct = FALSE) {
 
 VIF.matrix <- function(x, posit_y, posit_x, correct = FALSE) {
   x_small <- x[, c(posit_y, posit_x)]
+  stopifnot(is.numeric(x_small))
   ncol_x <- ncol(x_small)
   VIF_(x_small, 1, 2:ncol_x, 2:ncol_x, correct)
 }
