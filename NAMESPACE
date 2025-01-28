@@ -10,6 +10,8 @@ importFrom(data.table, as.data.table)
 importFrom(data.table, setDT)
 
 useDynLib(miceFast,.registration=TRUE)
+export(corrData)
+export(miceFast)
 
 export(neibo)
 
