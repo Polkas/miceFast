@@ -1,57 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/miceFast-intro.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Rcpp_corrData-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Rcpp_miceFast-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/VIF.html</loc>
-  </url>
-  <url>
-    <loc>/reference/air_miss.html</loc>
-  </url>
-  <url>
-    <loc>/reference/compare_imp.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fill_NA.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fill_NA_N.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/miceFast-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/naive_fill_NA.html</loc>
-  </url>
-  <url>
-    <loc>/reference/neibo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/upset_NA.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/miceFast-intro.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/Rcpp_corrData-class.html</loc></url>
+<url><loc>/reference/Rcpp_miceFast-class.html</loc></url>
+<url><loc>/reference/VIF.html</loc></url>
+<url><loc>/reference/air_miss.html</loc></url>
+<url><loc>/reference/compare_imp.html</loc></url>
+<url><loc>/reference/fill_NA.html</loc></url>
+<url><loc>/reference/fill_NA_N.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/miceFast-package.html</loc></url>
+<url><loc>/reference/naive_fill_NA.html</loc></url>
+<url><loc>/reference/neibo.html</loc></url>
+<url><loc>/reference/upset_NA.html</loc></url>
 </urlset>
+
