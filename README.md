@@ -33,7 +33,6 @@ devtools::install_github("polkas/miceFast")
 
 **Recommended to download boosted BLAS library, even x100 faster:**
 
-- Windows Users recommended to download MRO MKL: https://mran.microsoft.com/download
 - Linux users recommended to download Optimized BLAS (linear algebra) library: `sudo apt-get install libopenblas-dev`
 - Apple vecLib BLAS:
 ```bash
