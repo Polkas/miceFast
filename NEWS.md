@@ -1,4 +1,4 @@
-# miceFast 0.8.4.9000
+# miceFast 0.8.5
 
 * cran related update, `OMP_THREAD_LIMIT`.
 
