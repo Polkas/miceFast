@@ -19,10 +19,6 @@ knitr::opts_chunk$set(echo = FALSE)
 
 This vignette introduces the **miceFast** package, which provides fast imputations in an object-oriented programming style.  
 The underlying methods rely on quantitative models with closed-form solutions implemented via linear algebra operations.   
-The greatest performance gains often arise when:
-
-- A grouping variable is involved (the grouping structure is leveraged efficiently).
-- Multiple imputations are performed by evaluating a model only once and then reusing it.
 
 Additional utility functions are provided for easy integration with popular R packages such as **dplyr** and **data.table**.
 
@@ -92,8 +88,7 @@ Below we show how to:
 
 1. Calculate VIF.
 2. Perform various imputations with and without grouping.
-3. Use imputations (e.g., averaging across 30 draws).
-4. Safely handle collinearity or small group sizes by wrapping calls in `tryCatch`.
+3. Safely handle collinearity or small group sizes by wrapping calls in `tryCatch`.
 
 ```{r, echo=TRUE}
 # VIF (Variance Inflation Factor) > ~10 suggests collinearity problems.
