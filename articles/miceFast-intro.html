@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Maciej
 Nasinski</h4>
             
-            <h4 data-toc-skip class="date">2025-01-28</h4>
+            <h4 data-toc-skip class="date">2025-02-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/Polkas/miceFast/blob/main/vignettes/miceFast-intro.Rmd" class="external-link"><code>vignettes/miceFast-intro.Rmd</code></a></small>
       <div class="hidden name"><code>miceFast-intro.Rmd</code></div>
@@ -90,108 +90,135 @@ Nasinski</h4>
 
     
     
-<p>Loading the package and setting a seed:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"miceFast"</span>, <span class="st">"mice"</span>, <span class="st">"ggplot2"</span>, <span class="st">"dplyr"</span>, <span class="st">"data.table"</span><span class="op">)</span></span>
-<span><span class="va">inst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">pkgs</span>, <span class="va">library</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123456</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Fast imputations under the object-oriented programming paradigm.
-There were quantitative models with a closed-form solution. This package
-is based on linear algebra operations. The biggest improvement in time
-performance could be achieved for a calculation where a grouping
-variable has to be used. A single evaluation of a quantitative model for
-the multiple imputations is another major enhancement. Moreover there
-are a few functions built to work with popular R packages.</p>
-</div>
-<div class="section level2">
-<h2 id="performance">Performance<a class="anchor" aria-label="anchor" href="#performance"></a>
-</h2>
-<p>miceFast was compared<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> with the mice package. For the grouping
-option there was used a basic R looping and popular dplyr/data.table
-packages. Summing up, miceFast offer a relevant reduction of a
-calculations time for:</p>
+<p>This vignette introduces the <strong>miceFast</strong> package, which
+provides fast imputations in an object-oriented programming style.<br>
+The underlying methods rely on quantitative models with closed-form
+solutions implemented via linear algebra operations.<br>
+The greatest performance gains often arise when:</p>
 <ul>
-<li>Linear Discriminant Analysis around <strong>(x5)</strong>
-</li>
-<li>where a grouping variable have to be used <strong>(around x10
-depending on data dimensions and number of groups and even more than
-x100 although compared to data.table only a few k faster or even the
-same)</strong> because of pre-sorting by grouping variable</li>
-<li>multiple imputations is faster around <strong>x(a number of multiple
-imputations)</strong> because the core of a model is evaluated only
-ones.</li>
-<li>Variance inflation factors (VIF) <strong>(x5)</strong> because the
-unnecessary linear regression is not evaluated - we need only inverse of
-X’X</li>
-<li>Predictive mean matching (PMM) <strong>(x3)</strong> because of
-pre-sorting and binary search (<code>mice</code> algorithm was improved
-too).</li>
+<li>A grouping variable is involved (the grouping structure is leveraged
+efficiently).</li>
+<li>Multiple imputations are performed by evaluating a model only once
+and then reusing it.</li>
 </ul>
-<p>If you are interested about the procedure of testing performance
-check performance_validity.R file at the extdata folder.</p>
+<p>Additional utility functions are provided for easy integration with
+popular R packages such as <strong>dplyr</strong> and
+<strong>data.table</strong>.</p>
+<div class="section level3">
+<h3 id="installation-and-setup">Installation and Setup<a class="anchor" aria-label="anchor" href="#installation-and-setup"></a>
+</h3>
+<p>Before you begin, ensure the <strong>miceFast</strong> package is
+installed. You may also want to install a high-performance BLAS library
+for significant speedups.</p>
+<div class="section level4">
+<h4 id="blas">BLAS<a class="anchor" aria-label="anchor" href="#blas"></a>
+</h4>
+<p><strong>Recommended: Install an optimized BLAS library (potentially
+up to 100x faster):</strong></p>
+<ul>
+<li><p><strong>Linux</strong>:
+<code>sudo apt-get install libopenblas-dev</code></p></li>
+<li>
+<p><strong>macOS (Accelerate/vecLib BLAS)</strong>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="bu">cd</span> /Library/Frameworks/R.framework/Resources/lib</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-sf</span> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib</span></code></pre></div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section level3">
+<h3 id="loading-the-package-and-setting-a-seed">Loading the Package and Setting a Seed<a class="anchor" aria-label="anchor" href="#loading-the-package-and-setting-a-seed"></a>
+</h3>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"miceFast"</span>, <span class="st">"mice"</span>, <span class="st">"ggplot2"</span>, <span class="st">"dplyr"</span>, <span class="st">"data.table"</span><span class="op">)</span></span>
+<span><span class="va">inst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">pkgs</span>, <span class="va">library</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123456</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+</h3>
+<p>The <strong>miceFast</strong> package accelerates imputations for
+quantitative models (with closed-form solutions) by using efficient
+linear algebra routines. It offers substantial speed improvements
+in:</p>
+<ul>
+<li>
+<strong>Linear Discriminant Analysis</strong> (up to 5x
+faster),</li>
+<li>
+<strong>Grouping-based calculations</strong> (often 10x or more,
+depending on data size, number of groups, etc.),</li>
+<li>
+<strong>Multiple imputations</strong> (faster by approximately the
+number of imputations, since the core model is computed only once),</li>
+<li>
+<strong>Variance Inflation Factor (VIF)</strong> computations
+(around 5x faster by skipping redundant steps),</li>
+<li>
+<strong>Predictive Mean Matching (PMM)</strong> (around 3x faster
+thanks to pre-sorting and binary search).</li>
+</ul>
+<p><strong>Note:</strong> For details on the performance-testing
+procedure, see the file <code>performance_validity.R</code> in the
+<code>extdata</code> folder. Additional simulation plots (which you are
+free to modify) are located in <code>extdata/images</code>.<br><br><br><em>Environment: R 4.2 on Mac M1.</em></p>
+</div>
+<div class="section level3">
+<h3 id="motivations">Motivations<a class="anchor" aria-label="anchor" href="#motivations"></a>
+</h3>
+<p>Missing data is a common issue in data analysis. One approach is to
+delete any row containing missing observations, though this can degrade
+the quality or representativeness of your dataset. Another, often
+better, approach is to use imputation methods (such as multiple or
+regular imputations) to fill in missing data, leveraging observed
+independent variables.</p>
+<p>Since R and Python are user-friendly but can be slower for heavy
+computation, <strong>miceFast</strong> uses efficient C++/RcppArmadillo
+routines under the hood to speed up the imputation process.</p>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="introduction-for-dplyrdata-table-users">Introduction for dplyr/data.table Users<a class="anchor" aria-label="anchor" href="#introduction-for-dplyrdata-table-users"></a>
+</h2>
+<p>The <strong>miceFast</strong> package provides additional functions
+(<code>fill_NA</code> and <code>fill_NA_N</code>) that are designed to
+be stable in the presence of user-level mistakes or complex data
+structures. Below are minimal examples using <strong>dplyr</strong> and
+<strong>data.table</strong>.</p>
+<div class="section level3">
+<h3 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"performance_validity.R"</span>, package <span class="op">=</span> <span class="st">"miceFast"</span><span class="op">)</span></span></code></pre></div>
-<p>Additional plots for simulations with certain parameters (but feel
-free to change them) are located:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>  <span class="co"># airquality with additional variables</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="examining-missingness">Examining Missingness<a class="anchor" aria-label="anchor" href="#examining-missingness"></a>
+</h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"images"</span>, package <span class="op">=</span> <span class="st">"miceFast"</span><span class="op">)</span></span></code></pre></div>
-<p>Moreover there are offered a few functions built to work with the
-popular R packages such as ‘data.table’.</p>
-</div>
-<div class="section level2">
-<h2 id="motivations">Motivations<a class="anchor" aria-label="anchor" href="#motivations"></a>
-</h2>
-<p>Missing data is a common problem. The easiest solution is to delete
-observations for which a certain variable is missing. However this will
-somek deteriorate the quality of a project. Another solution will be to
-use methods such as multiple/regular imputations to fill the missing
-data. Non missing independent variables could be used to approximate
-missing observations for a dependent variable. R or Python language are
-user-friendly for data manipulation but parallely brings slower
-computations. Languages such as C++ give us an opportunity to boost our
-applications or projects.</p>
-<div style="page-break-after: always;"></div>
-</div>
-<div class="section level2">
-<h2 id="introduction-for-data-tabledplyr-users---using-additional-functions-from-micefast">Introduction for data.table/dplyr users - using additional functions
-from miceFast:<a class="anchor" aria-label="anchor" href="#introduction-for-data-tabledplyr-users---using-additional-functions-from-micefast"></a>
-</h2>
-<p>Usage of <code>fill_NA</code> and <code>fill_NA_N</code> functions
-from miceFast - this functions should be resistant to glitches from an
-user activity perspective and a data structure.</p>
-<div class="section level3">
-<h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
-</h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># airquality dataset with additional variables</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span></code></pre></div>
-<p>NA structure</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/upset_NA.html">upset_NA</a></span><span class="op">(</span><span class="va">air_miss</span>, <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
-<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+</div>
 </div>
 <div class="section level3">
-<h3 id="intro-dplyr">Intro: dplyr<a class="anchor" aria-label="anchor" href="#intro-dplyr"></a>
+<h3 id="using-dplyr">Using dplyr<a class="anchor" aria-label="anchor" href="#using-dplyr"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># VIF - values bigger than 10 (around) suggest that there might be a collinearity problem.</span></span>
-<span><span class="co"># VIF is high for Solar.R and x_character which is obvious - x_character is a factor version of numeric Solar.R</span></span>
+<p>Below we show how to:</p>
+<ol style="list-style-type: decimal">
+<li>Calculate VIF.</li>
+<li>Perform various imputations with and without grouping.</li>
+<li>Use multiple imputations (e.g., averaging across 30 draws).</li>
+<li>Safely handle collinearity or small group sizes by wrapping calls in
+<code>tryCatch</code>.</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># VIF (Variance Inflation Factor) &gt; ~10 suggests collinearity problems.</span></span>
 <span><span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span><span class="va">air_miss</span>,</span>
-<span>  posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"Solar.R"</span>,</span>
-<span>    <span class="st">"Wind"</span>,</span>
-<span>    <span class="st">"Temp"</span>,</span>
-<span>    <span class="st">"x_character"</span>,</span>
-<span>    <span class="st">"Day"</span>,</span>
-<span>    <span class="st">"weights"</span>,</span>
-<span>    <span class="st">"groups"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character"</span>,</span>
+<span>                <span class="st">"Day"</span>, <span class="st">"weights"</span>, <span class="st">"groups"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##           [,1]</span></span>
 <span><span class="co">## [1,] 24.978996</span></span>
 <span><span class="co">## [2,]  1.445308</span></span>
@@ -200,29 +227,28 @@ user activity perspective and a data structure.</p>
 <span><span class="co">## [5,]  1.083795</span></span>
 <span><span class="co">## [6,]  1.100853</span></span>
 <span><span class="co">## [7,]  2.954588</span></span></code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># IMPUTATIONS</span></span>
-<span><span class="va">air_miss</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Imputations with a grouping option (models are separately assessed for each group)</span></span>
-<span>  <span class="co"># taking into account provided weights</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">air_miss</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="co"># Impute with grouping and weights</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Solar_R_imp <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">.</span>,</span>
-<span>    model <span class="op">=</span> <span class="st">"lm_pred"</span>,</span>
-<span>    posit_y <span class="op">=</span> <span class="st">"Solar.R"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span>,</span>
-<span>    w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
-<span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, </span>
+<span>    Solar_R_imp <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">.</span>,</span>
+<span>      model <span class="op">=</span> <span class="st">"lm_pred"</span>,</span>
+<span>      posit_y <span class="op">=</span> <span class="st">"Solar.R"</span>,</span>
+<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span>,</span>
+<span>      w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Imputations - discrete variable</span></span>
+<span>  <span class="co"># Impute a discrete variable</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>x_character_imp <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lda"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="st">"x_character"</span>,</span>
 <span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># logreg was used because almost log-normal distribution of Ozone</span></span>
-<span>  <span class="co"># imputations around mean</span></span>
+<span>  <span class="co"># Log regression because Ozone is roughly log-normal</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp1 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
@@ -230,7 +256,7 @@ user activity perspective and a data structure.</p>
 <span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span><span class="op">)</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># imputations using positions - Intercept, Temp</span></span>
+<span>  <span class="co"># Impute by position indices</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp2 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
@@ -238,8 +264,7 @@ user activity perspective and a data structure.</p>
 <span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># multiple imputations (average of x30 imputations)</span></span>
-<span>  <span class="co"># with a factor independent variable, weights and logreg options</span></span>
+<span>  <span class="co"># Imputations (mean of 30 draws)</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp3 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_noise"</span>,</span>
@@ -259,74 +284,72 @@ user activity perspective and a data structure.</p>
 <span>    k <span class="op">=</span> <span class="fl">30</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_imp5 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">.</span>,</span>
-<span>    model <span class="op">=</span> <span class="st">"lm_pred"</span>,</span>
-<span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
-<span>    w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_imp6 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">.</span>,</span>
-<span>    model <span class="op">=</span> <span class="st">"pmm"</span>,</span>
-<span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
-<span>    w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    k <span class="op">=</span> <span class="fl">20</span></span>
-<span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Average of a few methods</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp_mix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"Ozone_imp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Protecting against collinearity or low number of observations - across small groups</span></span>
-<span>  <span class="co"># Be carful when using a data.table grouping option</span></span>
-<span>  <span class="co"># because of lack of protection against collinearity or low number of observations.</span></span>
-<span>  <span class="co"># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>, Ozone_chac_imp <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>  <span class="co"># Single evaluation model</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>,</span>
+<span>    Ozone_imp5 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>      x <span class="op">=</span> <span class="va">.</span>,</span>
-<span>      model <span class="op">=</span> <span class="st">"lda"</span>,</span>
-<span>      posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
-<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
-<span>      w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
-<span>  <span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      model <span class="op">=</span> <span class="st">"lm_pred"</span>,</span>
+<span>      posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
+<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>      w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>,</span>
+<span>    Ozone_imp6 <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">.</span>,</span>
+<span>      model <span class="op">=</span> <span class="st">"pmm"</span>,</span>
+<span>      posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
+<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>      w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>      k <span class="op">=</span> <span class="fl">20</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="co"># Combine imputations</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp_mix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"Ozone_imp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="co"># Protect against errors in small groups</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">.</span>,</span>
+<span>    Ozone_chac_imp <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>        x <span class="op">=</span> <span class="va">.</span>,</span>
+<span>        model <span class="op">=</span> <span class="st">"lda"</span>,</span>
+<span>        posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
+<span>        posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
+<span>        w <span class="op">=</span> <span class="va">.</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="results---visualization">results - visualization<a class="anchor" aria-label="anchor" href="#results---visualization"></a>
-</h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Distribution of imputations vs Distribution of initial data</span></span>
+<div class="section level4">
+<h4 id="visualizing-results">Visualizing Results<a class="anchor" aria-label="anchor" href="#visualizing-results"></a>
+</h4>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compare original vs. imputed distributions</span></span>
 <span><span class="fu"><a href="../reference/compare_imp.html">compare_imp</a></span><span class="op">(</span><span class="va">air_miss</span>, origin <span class="op">=</span> <span class="st">"Ozone"</span>, target <span class="op">=</span> <span class="st">"Ozone_imp_mix"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># or</span></span>
+<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Or compare multiple imputation columns</span></span>
 <span><span class="fu"><a href="../reference/compare_imp.html">compare_imp</a></span><span class="op">(</span><span class="va">air_miss</span>, origin <span class="op">=</span> <span class="st">"Ozone"</span>, target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone_imp2"</span>, <span class="st">"Ozone_imp_mix"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
+<p><img src="miceFast-intro_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
+</div>
 </div>
 <div class="section level3">
-<h3 id="intro-data-table">Intro: data.table<a class="anchor" aria-label="anchor" href="#intro-data-table"></a>
+<h3 id="using-data-table">Using data.table<a class="anchor" aria-label="anchor" href="#using-data-table"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>Below is a similar approach using <strong>data.table</strong>
+syntax.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
-<span><span class="co"># VIF - values bigger than 10 (around) suggest that there might be a collinearity problem.</span></span>
-<span><span class="co"># VIF is high for Solar.R and x_character which is obvious - x_character is a factor version of numeric Solar.R</span></span>
+<span></span>
+<span><span class="co"># VIF check</span></span>
 <span><span class="va">air_miss</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span><span class="va">.SD</span>,</span>
 <span>  posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"Solar.R"</span>,</span>
-<span>    <span class="st">"Wind"</span>,</span>
-<span>    <span class="st">"Temp"</span>,</span>
-<span>    <span class="st">"x_character"</span>,</span>
-<span>    <span class="st">"Day"</span>,</span>
-<span>    <span class="st">"weights"</span>,</span>
-<span>    <span class="st">"groups"</span></span>
-<span>  <span class="op">)</span></span>
+<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>,<span class="st">"Wind"</span>,<span class="st">"Temp"</span>,<span class="st">"x_character"</span>,<span class="st">"Day"</span>,<span class="st">"weights"</span>,<span class="st">"groups"</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##           V1</span></span>
 <span><span class="co">##        &lt;num&gt;</span></span>
@@ -337,27 +360,22 @@ user activity perspective and a data structure.</p>
 <span><span class="co">## 5:  1.083795</span></span>
 <span><span class="co">## 6:  1.100853</span></span>
 <span><span class="co">## 7:  2.954588</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># IMPUTATIONS</span></span>
-<span><span class="co"># Imputations with a grouping option (models are separately assessed for each group)</span></span>
-<span><span class="co"># taking into account provided weights</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Imputations</span></span>
 <span><span class="va">air_miss</span><span class="op">[</span>, <span class="va">Solar_R_imp</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
 <span>  posit_y <span class="op">=</span> <span class="st">"Solar.R"</span>,</span>
-<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span>,</span>
+<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>,<span class="st">"Temp"</span>,<span class="st">"Intercept"</span><span class="op">)</span>,</span>
 <span>  w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">100</span></span>
 <span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Imputations - discrete variable</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">x_character_imp</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lda"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="st">"x_character"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"groups"</span><span class="op">)</span></span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>,<span class="st">"Temp"</span>,<span class="st">"groups"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># logreg was used because almost log-normal distribution of Ozone</span></span>
-<span>  <span class="co"># imputations around mean</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp1</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
@@ -365,22 +383,18 @@ user activity perspective and a data structure.</p>
 <span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span><span class="op">)</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># imputations using positions - Intercept, Temp</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp2</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">6</span><span class="op">)</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># model with a factor independent variable</span></span>
-<span>  <span class="co"># multiple imputations (average of x30 imputations)</span></span>
-<span>  <span class="co"># with a factor independent variable, weights and logreg options</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp3</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_noise"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>,<span class="st">"x_character_imp"</span>,<span class="st">"Wind"</span>,<span class="st">"Temp"</span><span class="op">)</span>,</span>
 <span>    w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    k <span class="op">=</span> <span class="fl">30</span></span>
@@ -389,7 +403,7 @@ user activity perspective and a data structure.</p>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>,<span class="st">"x_character_imp"</span>,<span class="st">"Wind"</span>,<span class="st">"Temp"</span><span class="op">)</span>,</span>
 <span>    w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    k <span class="op">=</span> <span class="fl">30</span></span>
@@ -398,399 +412,273 @@ user activity perspective and a data structure.</p>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"lm_pred"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>,<span class="st">"x_character_imp"</span>,<span class="st">"Wind"</span>,<span class="st">"Temp"</span><span class="op">)</span>,</span>
 <span>    w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp6</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>    model <span class="op">=</span> <span class="st">"pmm"</span>,</span>
 <span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"x_character_imp"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>,<span class="st">"x_character_imp"</span>,<span class="st">"Wind"</span>,<span class="st">"Temp"</span><span class="op">)</span>,</span>
 <span>    w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    k <span class="op">=</span> <span class="fl">10</span></span>
-<span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Average of a few methods</span></span>
+<span>  <span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="co"># Average across a set of methods</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_imp_mix</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>, .SDcols <span class="op">=</span> <span class="va">Ozone_imp1</span><span class="op">:</span><span class="va">Ozone_imp6</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="co"># Protecting against collinearity or low number of observations - across small groups</span></span>
-<span>  <span class="co"># Be careful when using a data.table grouping option</span></span>
-<span>  <span class="co"># because of lack of protection against collinearity or low number of observations.</span></span>
-<span>  <span class="co"># There could be used a tryCatch(fill_NA(...),error=function(e) return(...))</span></span>
-<span></span>
+<span>  <span class="co"># tryCatch for small group issues or collinearity</span></span>
 <span>  <span class="va">.</span><span class="op">[</span>, <span class="va">Ozone_chac_imp</span> <span class="op">:=</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>      x <span class="op">=</span> <span class="va">.SD</span>,</span>
 <span>      model <span class="op">=</span> <span class="st">"lda"</span>,</span>
 <span>      posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
-<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp"</span>, <span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
+<span>      posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Intercept"</span>,<span class="st">"Month"</span>,<span class="st">"Day"</span>,<span class="st">"Temp"</span>,<span class="st">"x_character_imp"</span><span class="op">)</span>,</span>
 <span>      w <span class="op">=</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.SD</span><span class="op">[[</span><span class="st">"Ozone_chac"</span><span class="op">]</span><span class="op">]</span></span>
-<span>  <span class="op">)</span>, <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<div style="page-break-after: always;"></div>
+<span>  <span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
+<hr>
 </div>
 </div>
 <div class="section level2">
-<h2 id="genereting-data-with-the-corrdata-module">Genereting data with the corrData Module<a class="anchor" aria-label="anchor" href="#genereting-data-with-the-corrdata-module"></a>
+<h2 id="generating-data-with-the-corrdata-module">Generating Data with the corrData Module<a class="anchor" aria-label="anchor" href="#generating-data-with-the-corrdata-module"></a>
 </h2>
-<p>Available constructors:</p>
-<p><code>new(corrData,nr_cat,n_obs,means,cor_matrix)</code></p>
-<p><code>new(corrData,n_obs,means,cor_matrix)</code></p>
-<p>where:</p>
+<p>You can generate correlated data via <code>corrData</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Constructors:</span></span>
+<span><span class="fu">new</span><span class="op">(</span><span class="va">corrData</span>, <span class="va">nr_cat</span>, <span class="va">n_obs</span>, <span class="va">means</span>, <span class="va">cor_matrix</span><span class="op">)</span></span>
+<span><span class="fu">new</span><span class="op">(</span><span class="va">corrData</span>, <span class="va">n_obs</span>, <span class="va">means</span>, <span class="va">cor_matrix</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Some relevant methods:</span></span>
+<span><span class="va">cd_obj</span><span class="op">$</span><span class="fu">fill</span><span class="op">(</span><span class="st">"type"</span><span class="op">)</span>  <span class="co"># "contin", "binom", or "discrete"</span></span></code></pre></div>
 <ul>
 <li>
-<code>nr_cat</code> : number of categories for discrete dependent
-variable</li>
+<code>nr_cat</code>: number of categories for a discrete dependent
+variable<br>
+</li>
 <li>
-<code>n_obs</code> : number of observations</li>
+<code>n_obs</code>: number of observations<br>
+</li>
 <li>
-<code>means</code>: center independent variables</li>
+<code>means</code>: centers for independent variables<br>
+</li>
 <li>
-<code>cor_mat</code> : positive defined correlation matrix</li>
+<code>cor_matrix</code>: a positive-definite correlation matrix</li>
 </ul>
-<p>relevant class methods:</p>
-<ul>
-<li>
-<code>fill("type")</code> : generating data [return a numeric
-matrix] - data with correlated variables where first variable is of
-binomial,discrete or continuous type.</li>
-</ul>
-<p><code>type</code>:character - possible options
-(“contin”,“binom”,“discrete”)</p>
+<p>Example usage:</p>
+<hr>
 </div>
 <div class="section level2">
-<h2 id="imputing-data-with-the-micefast-module">Imputing data with the miceFast Module:<a class="anchor" aria-label="anchor" href="#imputing-data-with-the-micefast-module"></a>
+<h2 id="imputing-data-with-the-micefast-module">Imputing Data with the miceFast Module<a class="anchor" aria-label="anchor" href="#imputing-data-with-the-micefast-module"></a>
 </h2>
-<p>Available constructors:</p>
-<p><code>new(miceFast)</code></p>
-<p>relevant class methods:</p>
+<p>The <strong>miceFast</strong> module performs fast imputations via
+various built-in models. Below is a summary of its main methods:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong><code>set_data(x)</code></strong>: Provide the data as a
+numeric matrix by reference.<br>
+</li>
+<li>
+<strong><code>set_g(g)</code></strong>: Provide a grouping variable
+(numeric vector, must be positive, no NAs).<br>
+</li>
+<li>
+<strong><code>set_w(w)</code></strong>: Provide a weighting variable
+(numeric vector, must be positive, no NAs).<br>
+</li>
+<li>
+<strong><code>impute(model, posit_y, posit_x)</code></strong>:
+Single imputation according to the chosen model.<br>
+</li>
+<li>
+<strong><code>impute_N(model, posit_y, posit_x, k)</code></strong>:
+Multiple imputations (averaged result) for certain models.<br>
+</li>
+<li>
+<strong><code>update_var(posit_y, imputations)</code></strong>:
+Permanently update the object’s data for the specified column with new
+imputations.<br>
+</li>
+<li>
+<strong><code>vifs(posit_y, posit_x)</code></strong>: Compute
+Variance Inflation Factors.<br>
+</li>
+<li>
+<strong><code>sort_byg()</code></strong> /
+<strong><code>is_sorted_byg()</code></strong>: Sort the data by the
+grouping variable (or check if sorted).<br>
+</li>
+<li>
+<strong><code>which_updated()</code></strong>: Check which variables
+have been permanently updated in the object.</li>
+</ol>
+<p>Supported models:</p>
 <ul>
 <li>
-<code>set_data(x)</code> - providing the data by a reference - a
-numeric matrix [void]</li>
+<code>"lda"</code>: Linear discriminant analysis (for categorical
+<code>posit_y</code>).<br>
+</li>
 <li>
-<code>get_data()</code> - retrieving the data [return a numeric
-matrix] - the same values as provided by reference x, recommended to use
-x directly</li>
+<code>"lm_pred"</code>: Standard linear model prediction (including
+a mean-imputation approach if you only include an intercept).<br>
+</li>
 <li>
-<code>set_g(g)</code> - providing the grouping variable by a
-reference - a numeric vector WITOUT NA values - positive values
-[void]</li>
+<code>"lm_bayes"</code>: Linear model with Bayesian noise.<br>
+</li>
 <li>
-<code>get_g()</code> - retrieving the grouping variable [return a
-numeric vector] - the same values as provided by reference g,
-recommended to use g directly</li>
+<code>"lm_noise"</code>: Similar to <code>"lm_bayes"</code> but with
+different noise assumptions.<br>
+</li>
 <li>
-<code>set_w(w)</code> - providing the weighting variable by a
-reference - a numeric vector WITOUT NA values - positive values</li>
-<li>
-<code>get_w()</code> - retrieving the weighting variable [return a
-numeric vector] - the same values as provided by reference w,
-recommended to use w directly</li>
-<li>
-<code>get_index()</code> - getting the index [return a integer
-vector] - useful after automatic sorting procedure</li>
-<li>
-<code>set_ridge(ridge)</code> - providing a ridge i.e. the
-disturbance to diag of XX, default 1e-6</li>
-<li>
-<code>get_ridge()</code> - getting a ridge</li>
-<li>
-<code>impute("model",posit_y,posit_x)</code> - impute data under
-characteristics form object like a optional grouping or weighting
-variable [return a list with 3 vectors: a numeric vector “imputations”
-dependent variable with replaced Na values, a integer vector
-“index_imputed” positions where data was imputed, a integer vector
-“index_full” positions which were used to assess the model]</li>
-<li>
-<code>impute_N("model2",posit_y,posit_x,k)</code> - multiple
-imputations - impute data under characteristics form object like a
-optional grouping or weighting variable - works for
-(“lm_bayes”,“lm_noise”, “pmm”) - [return a list with 3 vectors: a
-numeric vector “imputations” dependent variable with replaced Na values
-by average of N results, a integer vector “index_imputed” positions
-where data was imputed, a integer vector “index_full” positions which
-were used to assess the model]</li>
-<li>
-<code>update_var(posit_y,imputations)</code> - permanently update
-variable at the object and data. WARNING, use it only if you are sure
-about model parameters. [void]</li>
-<li>
-<code>get_models()</code> - possible quantitative models for a
-certain type of dependent variable [return a character vector:
-recommended models for impute and impute_N methods]</li>
-<li>
-<code>get_model()</code> - a recommended quantitative model for a
-certain type of dependent variable [return a character: recommended
-model for impute and impute_N methods] - useful while looping</li>
-<li>
-<code>which_updated()</code> - which variables were modified by
-update_var at the object (and data) [return a integer vector: positions
-at provided data at which variables were update by update_var
-method]</li>
-<li>
-<code>sort_byg()</code> - sort data by the grouping variable
-[void]</li>
-<li>
-<code>is_sorted_byg()</code> - is data sorted by the grouping
-variable [void]</li>
-<li>
-<code>vifs(posit_y,posit_x)</code> - Variance inflation factors
-(VIF) [return a numeric vector: VIF for all variables provided by
-posit_x] <code>x</code> : numeric matrix - variables<br><code>g</code> : numeric vector - you could build it form several
-discrete variables<br><code>w</code>: numeric vector with positive values - weights for
-weighted linear regressions<br><code>model</code>: character - a possible options
-(“lda”,“lm_pred”,“lm_bayes”,“lm_noise”)<br><code>model2</code>: character - a possible options
-(“lm_bayes”,“lm_noise”, “pmm”) <code>posit_y</code>: integer - a
-position of dependent variable<br><code>posit_x</code>: integer vector - positions of independent
-variables<br><code>imputations</code> : numeric vector - imputations<br><code>k</code> : integer - number of multiple imputations or k-nearest
-for pmm</li>
+<code>"pmm"</code>: Predictive Mean Matching (used via
+<code>impute_N</code>).</li>
 </ul>
-<p><em>For a simple mean imputations add intercept to data and use
-“lm_pred”</em><br><em>The lda model is assessed only if there are more than 15 complete
-observations and for the lms models if the number of independent
-variables is smaller than the number of observations.</em></p>
-<div style="page-break-after: always;"></div>
-<p>###Imputations</p>
-<p><strong>miceFast module usage:</strong></p>
-<p>Remember that a matrix could be build only under a one data type so
-factor variables have to be melted use <code>model.matrix</code> to get
-numeric matrix from <code>data.frame</code> - see Tips in this
-document</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("mice")</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span><span class="op">)</span></span>
+<blockquote>
+<p><em>Note:</em> For purely mean imputation, add an intercept column
+and use <code>"lm_pred"</code>. The LDA model requires at least 15
+complete observations. Linear models require at least as many complete
+observations as the number of predictors.</p>
+</blockquote>
+<div class="section level3">
+<h3 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h3>
+<div class="section level4">
+<h4 id="simple-usage">Simple Usage<a class="anchor" aria-label="anchor" href="#simple-usage"></a>
+</h4>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://amices.org/mice/reference/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">miceFast</span><span class="op">)</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="co"># providing data by a reference</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">get_ridge</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 1e-06</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
-<span><span class="co"># OR not recommended</span></span>
-<span><span class="co"># data[,2] = model$impute("lm_pred",2,5)$imputations</span></span>
-<span><span class="co"># model$set_data(data) #Updating the object</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">3</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lda"</span>, <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="co"># Single imputation, linear model</span></span>
+<span><span class="va">imp_result</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, posit_y <span class="op">=</span> <span class="fl">2</span>, posit_x <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">imp_result</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Old slow syntax model$update_var(4,rowMeans(sapply(1:10,function(x) model$impute("lm_bayes",4,c(1,2,3))$imputations)))</span></span>
-<span><span class="co"># New syntax - impute_N</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">4</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="co"># LDA imputation for a categorical variable</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">3</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lda"</span>, <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># When working with 'Big Data'</span></span>
-<span><span class="co"># it is recommended to occasionally manually invoke a garbage collector `gc()`</span></span>
+<span><span class="co"># Multiple imputation example</span></span>
+<span><span class="va">multi_imp</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">4</span>, <span class="va">multi_imp</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Be careful with `update_var` because of the permanent update at the object and data</span></span>
-<span><span class="co"># That is why `update_var` could be used only ones for a certain column</span></span>
-<span><span class="co"># check which variables was updated - inside the object</span></span>
+<span><span class="co"># Check which variables were updated</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">which_updated</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 2 3 4</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##      [,1]    [,2] [,3]     [,4] [,5] [,6]</span></span>
-<span><span class="co">## [1,]    1 26.5625    1 181.4461    1    1</span></span>
-<span><span class="co">## [2,]    2 22.7000    1 187.0000    1    2</span></span>
-<span><span class="co">## [3,]    1 26.5625    1 187.0000    1    3</span></span></code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   age     bmi hyp      chl intercept index</span></span>
-<span><span class="co">## 1   1 26.5625   1 181.4461         1     1</span></span>
-<span><span class="co">## 2   2 22.7000   1 187.0000         1     2</span></span>
-<span><span class="co">## 3   1 26.5625   1 187.0000         1     3</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   age  bmi hyp chl</span></span>
-<span><span class="co">## 1   1   NA  NA  NA</span></span>
-<span><span class="co">## 2   2 22.7   1 187</span></span>
-<span><span class="co">## 3   1   NA   1 187</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
-<div style="page-break-after: always;"></div>
-<p><strong>Model with additional parameters:</strong> - data sorted by
-the grouping variable</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span> <span class="co"># a numeric vector - positive values</span></span>
-<span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span> <span class="co"># a numeric vector not integers - positive values - sorted increasingly</span></span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Always be cautious with 'update_var' </span></span>
+<span><span class="co"># since it permanently alters the object and your data matrix.</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="example-with-weights-and-groups-pre-sorted">Example with Weights and Groups (Pre-sorted)<a class="anchor" aria-label="anchor" href="#example-with-weights-and-groups-pre-sorted"></a>
+</h4>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://amices.org/mice/reference/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>,<span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>,<span class="fl">5</span><span class="op">]</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">miceFast</span><span class="op">)</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="co"># providing data by a reference</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_w</span><span class="op">(</span><span class="va">weights</span><span class="op">)</span> <span class="co"># providing by a reference</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_g</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="co"># providing by a reference</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_w</span><span class="op">(</span><span class="va">weights</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_g</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># impute adapt to provided parameters like w or g</span></span>
-<span><span class="co"># Simple mean - permanent imputation at the object and data</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="co"># Impute with group-wise weighting</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, <span class="fl">1</span>, <span class="fl">6</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">6</span><span class="op">)</span>, k<span class="op">=</span><span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Printing data and retrieving an old order</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_g</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_w</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_index</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Inspect updated data, returning to original order via model$get_index()</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://amices.org/mice/reference/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_g</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_w</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_index</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]      [,9]</span></span>
 <span><span class="co">## [1,]   41  190  7.4   67    1    1    1    5 1.2183624</span></span>
 <span><span class="co">## [2,]   36  118  8.0   72    2    1    2    5 1.2866076</span></span>
 <span><span class="co">## [3,]   12  149 12.6   74    3    1    3    5 0.7953631</span></span>
 <span><span class="co">## [4,]   18  313 11.5   62    4    1    4    5 0.7386522</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">airquality</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   Ozone Solar.R Wind Temp Month Day</span></span>
-<span><span class="co">## 1    41     190  7.4   67     5   1</span></span>
-<span><span class="co">## 2    36     118  8.0   72     5   2</span></span>
-<span><span class="co">## 3    12     149 12.6   74     5   3</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_g</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_w</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]      [,9]</span></span>
-<span><span class="co">## [1,]   41  190  7.4   67    1    1    1    5 1.2183624</span></span>
-<span><span class="co">## [2,]   36  118  8.0   72    2    1    2    5 1.2866076</span></span>
-<span><span class="co">## [3,]   12  149 12.6   74    3    1    3    5 0.7953631</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">groups</span>, <span class="va">weights</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##      Ozone Solar.R Wind Temp Day intercept index groups   weights</span></span>
-<span><span class="co">## [1,]    41     190  7.4   67   1         1     1      5 1.2183624</span></span>
-<span><span class="co">## [2,]    36     118  8.0   72   2         1     2      5 1.2866076</span></span>
-<span><span class="co">## [3,]    12     149 12.6   74   3         1     3      5 0.7953631</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
-<div style="page-break-after: always;"></div>
-<p><strong>Model with additional parameters:</strong> - data not sorted
-by the grouping variable</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span> <span class="co"># a numeric vector - positive values</span></span>
-<span><span class="co"># groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values</span></span>
-<span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="co"># a numeric vector not integers - positive values</span></span>
+</div>
+<div class="section level4">
+<h4 id="example-with-unsorted-groups">Example with Unsorted Groups<a class="anchor" aria-label="anchor" href="#example-with-unsorted-groups"></a>
+</h4>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://amices.org/mice/reference/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>,<span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">miceFast</span><span class="op">)</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="co"># providing by a reference</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_w</span><span class="op">(</span><span class="va">weights</span><span class="op">)</span> <span class="co"># providing by a reference</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">set_g</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="co"># providing by a reference</span></span>
-<span><span class="co"># impute adapt to provided parmaters like w or g</span></span>
-<span><span class="co"># Warning - if data is not sorted increasingly by the g then it would be done automatically</span></span>
-<span><span class="co"># during a first imputation</span></span>
-<span><span class="co"># Simple mean - permanent imputation at the object and data</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_w</span><span class="op">(</span><span class="va">weights</span><span class="op">)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_g</span><span class="op">(</span><span class="va">groups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># The data will be automatically sorted by 'groups' during the first imputation:</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, <span class="fl">1</span>, <span class="fl">6</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning in model$impute("lm_pred", 1, 6): </span></span>
 <span><span class="co">##  Data was sorted by the grouping variable - use `get_index()` to retrieve an order</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">6</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Printing data and retrieving an old order</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_g</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_w</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_index</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://amices.org/mice/reference/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_g</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_w</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_index</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]      [,9]</span></span>
 <span><span class="co">## [1,]   41  190  7.4   67    1    1    1    3 0.8644072</span></span>
 <span><span class="co">## [2,]   36  118  8.0   72    2    1    2    7 0.5708125</span></span>
 <span><span class="co">## [3,]   12  149 12.6   74    3    1    3    6 0.3919961</span></span>
 <span><span class="co">## [4,]   18  313 11.5   62    4    1    4    8 1.0201001</span></span></code></pre>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">airquality</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   Ozone Solar.R Wind Temp Month Day</span></span>
-<span><span class="co">## 1    41     190  7.4   67     5   1</span></span>
-<span><span class="co">## 2    36     118  8.0   72     5   2</span></span>
-<span><span class="co">## 3    12     149 12.6   74     5   3</span></span>
-<span><span class="co">## 4    18     313 11.5   62     5   4</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_g</span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span><span class="op">$</span><span class="fu">get_w</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span> <span class="co"># is ordered by g</span></span></code></pre></div>
-<pre><code><span><span class="co">##          [,1]     [,2] [,3] [,4] [,5] [,6] [,7] [,8]      [,9]</span></span>
-<span><span class="co">## [1,] 19.00000  99.0000 13.8   59    8    1    8    1 1.2699505</span></span>
-<span><span class="co">## [2,] 11.00000 290.0000  9.2   66   13    1   13    1 1.0288995</span></span>
-<span><span class="co">## [3,] 34.00000 307.0000 12.0   66   17    1   17    1 0.5691152</span></span>
-<span><span class="co">## [4,] 28.28677 216.6807  8.0   57   27    1   27    1 1.6436256</span></span></code></pre>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">groups</span>, <span class="va">weights</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span> <span class="co"># is sorted by g cause we provide data by a reference</span></span></code></pre></div>
-<pre><code><span><span class="co">##         Ozone  Solar.R Wind Temp Day intercept index groups   weights</span></span>
-<span><span class="co">## [1,] 19.00000  99.0000 13.8   59   8         1     8      1 1.2699505</span></span>
-<span><span class="co">## [2,] 11.00000 290.0000  9.2   66  13         1    13      1 1.0288995</span></span>
-<span><span class="co">## [3,] 34.00000 307.0000 12.0   66  17         1    17      1 0.5691152</span></span>
-<span><span class="co">## [4,] 28.28677 216.6807  8.0   57  27         1    27      1 1.6436256</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
-<div style="page-break-after: always;"></div>
-<div class="section level3">
-<h3 id="tips">Tips<a class="anchor" aria-label="anchor" href="#tips"></a>
-</h3>
-<p><strong>matrix from data.frame</strong></p>
-<p>Remember that a matrix could be built only under a one data type so
-factor/character variables have to be melted. Sb could use
-<code>model.matrix</code> to get numeric matrix from a
-<code>data.frame</code>:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># str(mtcars)</span></span>
-<span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span><span class="op">)</span></span>
-<span><span class="va">mtcars</span><span class="op">$</span><span class="va">gear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">gear</span><span class="op">)</span></span>
-<span><span class="va">mtcars_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix.lm</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span>, <span class="va">mtcars</span>, na.action <span class="op">=</span> <span class="st">"na.pass"</span><span class="op">)</span></span>
-<span><span class="co"># str(mtcars_mat)</span></span></code></pre></div>
-<p><strong>Variance inflation factors (VIF)</strong></p>
-<p>VIF measures how much the variance of the estimated regression
-coefficients are inflated. It helps to identify when the predictor
-variables are linearly related. You have to decide which variable should
-be deleted. Values higher than 10 signal a potential collinearity
-problem.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">airquality2</span> <span class="op">&lt;-</span> <span class="va">airquality</span></span>
-<span><span class="va">airquality2</span><span class="op">$</span><span class="va">Temp2</span> <span class="op">&lt;-</span> <span class="va">airquality2</span><span class="op">$</span><span class="va">Temp</span><span class="op">**</span><span class="fl">2</span></span>
-<span><span class="va">airquality2</span><span class="op">$</span><span class="va">Month</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">airquality2</span><span class="op">$</span><span class="va">Month</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># car::vif(lm(Ozone ~ ., data = airquality2))</span></span></code></pre></div>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_DT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">airquality2</span><span class="op">)</span></span>
-<span><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">.SD</span>,</span>
-<span>  posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
-<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Temp2"</span><span class="op">)</span>, correct <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##       vifs.V1</span></span>
-<span><span class="co">##         &lt;num&gt;</span></span>
-<span><span class="co">## 1:   1.230156</span></span>
-<span><span class="co">## 2:   1.415414</span></span>
-<span><span class="co">## 3: 264.800283</span></span>
-<span><span class="co">## 4:   2.774325</span></span>
-<span><span class="co">## 5:   1.038574</span></span>
-<span><span class="co">## 6: 249.766363</span></span></code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">.SD</span>,</span>
-<span>  posit_y <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span><span class="op">)</span>, correct <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##      vifs.V1</span></span>
-<span><span class="co">##        &lt;num&gt;</span></span>
-<span><span class="co">## 1:  1.109124</span></span>
-<span><span class="co">## 2:  1.189712</span></span>
-<span><span class="co">## 3: 16.272685</span></span>
-<span><span class="co">## 4:  1.136043</span></span>
-<span><span class="co">## 5:  1.019105</span></span>
-<span><span class="co">## 6: 15.803998</span></span></code></pre>
+<hr>
+</div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+<h2 id="tips-and-additional-notes">Tips and Additional Notes<a class="anchor" aria-label="anchor" href="#tips-and-additional-notes"></a>
 </h2>
-<p>URL: <a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf" class="external-link uri">https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf</a><br>
-Title: Exposing C++ functions and classes with Rcpp modules Dirk
-Eddelbuettel and Romain François<br>
-Author: <a href="https://dirk.eddelbuettel.com" class="external-link uri">https://dirk.eddelbuettel.com</a> and <a href="https://purrple.cat" class="external-link uri">https://purrple.cat</a> Date:
-March 8, 2018</p>
-<p>URL: <a href="https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf" class="external-link uri">https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf</a><br>
-Title: RcppArmadillo: Easily Extending R with High-Performance C++
-Code<br>
-Author: Dirk Eddelbuettel and Conrad Sanderson<br>
-Date: July 1, 2012</p>
-<p>URL: <a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf" class="external-link uri">https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf</a><br>
-Title: Extending R with C++: A Brief Introduction to Rcpp<br>
-Author: Dirk Eddelbuettel and James Joseph Balamuta<br>
-Date: March 8, 2018</p>
-<p>Title: MICE: Multivariate Imputation by Chained Equations in R<br>
-Author: Stef van Buuren<br>
-Date: 2013</p>
-<p>Title: CSCE 666: Pattern Analysis<br>
-Author: Ricardo Gutierrez-Osuna<br>
-Date: Fall 2013</p>
-</div>
-<div class="footnotes footnotes-end-of-document">
+<ul>
+<li>
+<p><strong>Creating matrices from data frames</strong>: Remember
+that standard R matrices can only hold one data type (often numeric).
+Factor and character columns must be transformed (e.g., via
+<code>model.matrix</code>).</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span><span class="op">)</span></span>
+<span><span class="va">mtcars</span><span class="op">$</span><span class="va">gear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">gear</span><span class="op">)</span></span>
+<span><span class="va">mtcars_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span>, na.action <span class="op">=</span> <span class="st">"na.pass"</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li>
+<p><strong>Variance Inflation Factors (VIF)</strong>: VIF measures
+how much the variance of a regression coefficient is inflated due to
+collinearity. High values (&gt;10) may indicate problematic
+collinearity.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">airquality2</span> <span class="op">&lt;-</span> <span class="va">airquality</span></span>
+<span><span class="va">airquality2</span><span class="op">$</span><span class="va">Temp2</span> <span class="op">&lt;-</span> <span class="va">airquality2</span><span class="op">$</span><span class="va">Temp</span><span class="op">^</span><span class="fl">2</span></span>
+<span><span class="va">airquality2</span><span class="op">$</span><span class="va">Month</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">airquality2</span><span class="op">$</span><span class="va">Month</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Using data.table:</span></span>
+<span><span class="va">data_DT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">airquality2</span><span class="op">)</span></span>
+<span><span class="va">data_DT</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>vifs <span class="op">=</span> <span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">.SD</span>,</span>
+<span>  posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
+<span>  posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>,<span class="st">"Wind"</span>,<span class="st">"Temp"</span>,<span class="st">"Month"</span>,<span class="st">"Day"</span>,<span class="st">"Temp2"</span><span class="op">)</span>,</span>
+<span>  correct <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
+</li>
+</ul>
 <hr>
-<ol>
-<li id="fn1"><p>Environment: R 4.1.3 Mac M1.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-</ol>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li><p><strong>Exposing C++ functions and classes with Rcpp
+modules</strong><br>
+Dirk Eddelbuettel and Romain François (2018)<br><a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf" class="external-link uri">https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf</a></p></li>
+<li><p><strong>RcppArmadillo: Easily Extending R with High-Performance
+C++ Code</strong><br>
+Dirk Eddelbuettel and Conrad Sanderson (2012)<br><a href="https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf" class="external-link uri">https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf</a></p></li>
+<li><p><strong>Extending R with C++: A Brief Introduction to
+Rcpp</strong><br>
+Dirk Eddelbuettel and James Joseph Balamuta (2018)<br><a href="https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf" class="external-link uri">https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf</a></p></li>
+<li><p><strong>MICE: Multivariate Imputation by Chained Equations in
+R</strong><br>
+Stef van Buuren (2013)</p></li>
+<li><p><strong>CSCE 666: Pattern Analysis</strong><br>
+Ricardo Gutierrez-Osuna (Fall 2013)</p></li>
+</ul>
 </div>
   </div>
 
