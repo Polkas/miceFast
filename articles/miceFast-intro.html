@@ -96,14 +96,7 @@ Nasinski</h4>
 <p>This vignette introduces the <strong>miceFast</strong> package, which
 provides fast imputations in an object-oriented programming style.<br>
 The underlying methods rely on quantitative models with closed-form
-solutions implemented via linear algebra operations.<br>
-The greatest performance gains often arise when:</p>
-<ul>
-<li>A grouping variable is involved (the grouping structure is leveraged
-efficiently).</li>
-<li>Multiple imputations are performed by evaluating a model only once
-and then reusing it.</li>
-</ul>
+solutions implemented via linear algebra operations.</p>
 <p>Additional utility functions are provided for easy integration with
 popular R packages such as <strong>dplyr</strong> and
 <strong>data.table</strong>.</p>
@@ -211,7 +204,6 @@ structures. Below are minimal examples using <strong>dplyr</strong> and
 <ol style="list-style-type: decimal">
 <li>Calculate VIF.</li>
 <li>Perform various imputations with and without grouping.</li>
-<li>Use imputations (e.g., averaging across 30 draws).</li>
 <li>Safely handle collinearity or small group sizes by wrapping calls in
 <code>tryCatch</code>.</li>
 </ol>
