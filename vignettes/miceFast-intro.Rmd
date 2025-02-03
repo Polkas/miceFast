@@ -59,9 +59,8 @@ The **miceFast** package accelerates imputations for quantitative models (with c
 - **Variance Inflation Factor (VIF)** computations (around 5x faster by skipping redundant steps),
 - **Predictive Mean Matching (PMM)** (around 3x faster thanks to pre-sorting and binary search).
 
-**Note:** For details on the performance-testing procedure, see the file `performance_validity.R` in the `extdata` folder. Additional simulation plots (which you are free to modify) are located in `extdata/images`.  
-<br>  
-_Environment: R 4.2 on Mac M1._
+> **Note:** For details on the performance-testing procedure, see the file `performance_validity.R` in the `extdata` folder. Additional simulation plots (which you are free to modify) are located in `extdata/images`.  
+> _Environment: R 4.2 on Mac M1._
 
 ## Motivations
 
@@ -93,16 +92,20 @@ Below we show how to:
 
 1. Calculate VIF.
 2. Perform various imputations with and without grouping.
-3. Use multiple imputations (e.g., averaging across 30 draws).
+3. Use imputations (e.g., averaging across 30 draws).
 4. Safely handle collinearity or small group sizes by wrapping calls in `tryCatch`.
 
 ```{r, echo=TRUE}
 # VIF (Variance Inflation Factor) > ~10 suggests collinearity problems.
-VIF(air_miss,
-    posit_y = "Ozone",
-    posit_x = c("Solar.R", "Wind", "Temp", "x_character",
-                "Day", "weights", "groups"))
+VIF(
+  air_miss,
+  posit_y = "Ozone",
+  posit_x = c("Solar.R", "Wind", "Temp", "x_character",
+              "Day", "weights", "groups")
+)
+```
 
+```{r, echo=TRUE}
 air_miss <- air_miss %>%
   # Impute with grouping and weights
   group_by(groups) %>%
@@ -218,13 +221,9 @@ Below is a similar approach using **data.table** syntax.
 ```{r, echo=TRUE}
 data(air_miss)
 setDT(air_miss)
+```
 
-# VIF check
-air_miss[, .(VIF(.SD,
-  posit_y = "Ozone",
-  posit_x = c("Solar.R","Wind","Temp","x_character","Day","weights","groups")
-))]
-
+```{r, echo=TRUE}
 # Imputations
 air_miss[, Solar_R_imp := fill_NA_N(
   x = .SD,
@@ -398,7 +397,7 @@ model$set_g(groups)
 
 # Impute with group-wise weighting
 model$update_var(1, model$impute("lm_pred", 1, 6)$imputations)
-model$update_var(2, model$impute_N("lm_bayes", 2, c(1,3,4,5,6), k=10)$imputations)
+model$update_var(2, model$impute_N("lm_bayes", 2, c(1,3,4,5,6), k = 10)$imputations)
 
 # Inspect updated data, returning to original order via model$get_index()
 head(cbind(model$get_data(), model$get_g(), model$get_w())[order(model$get_index()), ], 4)
@@ -407,7 +406,7 @@ head(cbind(model$get_data(), model$get_g(), model$get_w())[order(model$get_index
 ### Example with Unsorted Groups
 
 ```{r, echo=TRUE}
-data <- cbind(as.matrix(airquality[,-5]), intercept = 1, index = 1:nrow(airquality))
+data <- cbind(as.matrix(airquality[, -5]), intercept = 1, index = 1:nrow(airquality))
 weights <- rgamma(nrow(data), 3, 3)
 groups <- as.numeric(sample(1:8, nrow(data), replace = TRUE))
 
@@ -441,13 +440,12 @@ head(cbind(model$get_data(), model$get_g(), model$get_w())[order(model$get_index
   airquality2$Month <- factor(airquality2$Month)
   
   # Using data.table:
-  data_DT <- data.table(airquality2)
-  data_DT[, .(vifs = VIF(
-    x = .SD,
+  VIF(
+    airquality2,
     posit_y = "Ozone",
-    posit_x = c("Solar.R","Wind","Temp","Month","Day","Temp2"),
+    posit_x = c("Solar.R", "Wind", "Temp", "Month", "Day", "Temp2"),
     correct = FALSE
-  ))]
+  )
   ```
 
 ---
