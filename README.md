@@ -1,5 +1,6 @@
 # miceFast <a href='https://github.com/polkas/miceFast'><img src='man/figures/miceFast_logo.png' align="right" width="200" /></a>
-Maciej Nasinski  
+
+**Author**: Maciej Nasinski  
 
 [**Check the miceFast website for more details**](https://polkas.github.io/miceFast/index.html)
 
@@ -8,39 +9,33 @@ Maciej Nasinski
 [![codecov](https://codecov.io/gh/Polkas/miceFast/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Polkas/miceFast)
 [![Dependencies](https://tinyverse.netlify.app/badge/miceFast)](https://cran.r-project.org/package=miceFast)
 
-Fast imputations under the object-oriented programming paradigm. 	
-Moreover there are offered a few functions built to work with popular R packages such as 'data.table' or 'dplyr'.
-The biggest improvement in time performance could be achieve for a calculation where a grouping variable have to be used.
-A single evaluation of a quantitative model for the multiple imputations is another major enhancement.
-A new major improvement is one of the fastest predictive mean matching in the R world because of presorting and binary search.
+## Overview
 
-Performance benchmarks (check performance_validity.R file at extdata).
+**miceFast** provides fast methods for imputing missing data, leveraging an object-oriented programming paradigm and optimized linear algebra routines.  
+The package includes convenient helper functions compatible with **data.table**, **dplyr**, and other popular R packages.
 
-[Advanced Usage - Vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html)
+Major speed improvements occur when:  
+- Using a **grouping variable**, where the data is automatically sorted by group, significantly reducing computation time.
+- Performing **multiple imputations**, by evaluating the underlying quantitative model only once for multiple draws.
+- Running **Predictive Mean Matching (PMM)**, thanks to presorting and binary search.
+
+For performance details, see `performance_validity.R` in the `extdata` folder or the [Advanced Usage Vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html).
 
 ## Installation
 
+You can install **miceFast** from CRAN:
 ```r
-install.packages('miceFast')
+install.packages("miceFast")
 ```
-
-or
-
+Or install the development version from GitHub:
 ```r
 # install.packages("devtools")
 devtools::install_github("polkas/miceFast")
 ```
 
-**Recommended to download boosted BLAS library, even x100 faster:**
+## Quick Example
 
-- Linux users recommended to download Optimized BLAS (linear algebra) library: `sudo apt-get install libopenblas-dev`
-- Apple vecLib BLAS:
-```bash
-cd /Library/Frameworks/R.framework/Resources/lib
-ln -sf /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib
-```
-
-## Quick Implementation
+Below is a short demonstration. See the [vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html) for advanced usage and best practices.
 
 ```r
 library(miceFast)
@@ -48,45 +43,59 @@ library(miceFast)
 set.seed(1234)
 data(air_miss)
 
-# plot NA structure
+# Visualize the NA structure
 upset_NA(air_miss, 6)
 
-naive_fill_NA(air_miss)
+# Simple and naive fill
+imputed_data <- naive_fill_NA(air_miss)
 
-# Check out the vignette for an advance usage
-# There is required a thorough examination
-
-# Other packages - popular simple solutions
+# Compare with other packages:
 # Hmisc
-data.frame(Map(function(x) Hmisc::impute(x, 'random'), air_miss))
+library(Hmisc)
+data.frame(Map(function(x) Hmisc::impute(x, "random"), air_miss))
 
-#mice
+# mice
+library(mice)
 mice::complete(mice::mice(air_miss, printFlag = FALSE))
-
 ```
 
-**Quick Reference Table** 
+---
 
-|  Function | Description |
-|----------------------|----------------------|
-| `new(miceFast)` | OOP instance with bunch of methods - check out vignette |
-| `fill_NA()`  |  imputation - lda,lm_pred,lm_bayes,lm_noise |
-| `fill_NA_N()` |   multiple imputation - pmm,lm_bayes,lm_noise |
-| `VIF()` | Variance inflation factor |
-| `naive_fill_NA()` | auto imputations |  
-| `compare_imp()` | comparing imputations | 
-| `upset_NA()` | visualize NA structure - UpSetR::upset|
+## Key Features
 
-Summing up, `miceFast` offer a relevant reduction of a calculations time for:  
+- **Object-Oriented Interface** via `miceFast` objects (Rcpp modules).
+- **Convenient Helpers**:  
+  - `fill_NA()`: Single imputation (LDA, `lm_pred`, `lm_bayes`, `lm_noise`).  
+  - `fill_NA_N()`: Multiple imputations (PMM, `lm_bayes`, `lm_noise`).  
+  - `VIF()`: Variance Inflation Factor calculations.  
+  - `naive_fill_NA()`: Automatic naive imputations.  
+  - `compare_imp()`: Compare original vs. imputed values.  
+  - `upset_NA()`: Visualize NA structure using [UpSetR](https://cran.r-project.org/package=UpSetR).
 
-- Linear Discriminant Analysis around **(x5)**
-- where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable
-- multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
-- Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
-- Predictive mean matching (PMM) **(x3)** because of pre-sorting and binary search (`mice` algorithm was improved too).
+**Quick Reference Table**:
+
+| Function        | Description                                                                 |
+|-----------------|-----------------------------------------------------------------------------|
+| `new(miceFast)` | Creates an OOP instance with numerous imputation methods (see the vignette). |
+| `fill_NA()`     | Single imputation: LDA, `lm_pred`, `lm_bayes`, `lm_noise`.                   |
+| `fill_NA_N()`   | Multiple imputations (N repeats): PMM, `lm_bayes`, `lm_noise`.               |
+| `VIF()`         | Computes Variance Inflation Factors.                                         |
+| `naive_fill_NA()` | Performs automatic, naive imputations.                                     |
+| `compare_imp()` | Compares imputations vs. original data.                                      |
+| `upset_NA()`    | Visualizes NA structure using an UpSet plot.                                 |
+
+---
+
+## Performance Highlights
+
+Benchmark testing (on R 4.2, macOS M1) shows **miceFast** can significantly reduce computation time, especially in these scenarios:
+
+- **Linear Discriminant Analysis (LDA)**: ~5x faster.  
+- **Grouping Variable Imputations**: ~10x faster (and can exceed 100x in some edge cases).  
+- **Multiple Imputations**: ~`x * (number of multiple imputations)` faster, since the model is computed only once.  
+- **Variance Inflation Factors (VIF)**: ~5x faster, because we only compute the inverse of X'X.  
+- **Predictive Mean Matching (PMM)**: ~3x faster, thanks to presorting and binary search.
 
 ![](man/figures/g_summary.png)
 
-Environment: R 4.2.1 Mac M1
-
-If you are interested about the procedure of testing performance and validity check performance_validity.R file at the extdata folder.
+For more details, refer to the [`performance_validity.R` file](extdata/performance_validity.R) in the `extdata` folder.

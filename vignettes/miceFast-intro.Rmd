@@ -15,115 +15,115 @@ vignette: >
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-Loading the package and setting a seed:
+# Overview
 
-```{r, echo=TRUE,message=FALSE,warning=FALSE}
+This vignette introduces the **miceFast** package, which provides fast imputations in an object-oriented programming style.  
+The underlying methods rely on quantitative models with closed-form solutions implemented via linear algebra operations.   
+The greatest performance gains often arise when:
+
+- A grouping variable is involved (the grouping structure is leveraged efficiently).
+- Multiple imputations are performed by evaluating a model only once and then reusing it.
+
+Additional utility functions are provided for easy integration with popular R packages such as **dplyr** and **data.table**.
+
+## Installation and Setup
+
+Before you begin, ensure the **miceFast** package is installed. You may also want to install a high-performance BLAS library for significant speedups.
+
+### BLAS
+
+**Recommended: Install an optimized BLAS library (potentially up to 100x faster):**
+
+- **Linux**: `sudo apt-get install libopenblas-dev`
+- **macOS (Accelerate/vecLib BLAS)**:
+  ```bash
+  cd /Library/Frameworks/R.framework/Resources/lib
+  ln -sf /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib libRblas.dylib
+  ```
+
+## Loading the Package and Setting a Seed
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 pkgs <- c("miceFast", "mice", "ggplot2", "dplyr", "data.table")
 inst <- lapply(pkgs, library, character.only = TRUE)
-```
-
-```{r,echo=TRUE}
 set.seed(123456)
 ```
 
 ## Description
 
-Fast imputations under the object-oriented programming paradigm.
-There were quantitative models with a closed-form solution. This package is based on linear algebra operations.
-The biggest improvement in time performance could be achieved for a calculation where a grouping variable has to be used.
-A single evaluation of a quantitative model for the multiple imputations is another major enhancement.
-Moreover there are a few functions built to work with popular R packages.
+The **miceFast** package accelerates imputations for quantitative models (with closed-form solutions) by using efficient linear algebra routines. It offers substantial speed improvements in:
 
-## Performance
+- **Linear Discriminant Analysis** (up to 5x faster),
+- **Grouping-based calculations** (often 10x or more, depending on data size, number of groups, etc.),
+- **Multiple imputations** (faster by approximately the number of imputations, since the core model is computed only once),
+- **Variance Inflation Factor (VIF)** computations (around 5x faster by skipping redundant steps),
+- **Predictive Mean Matching (PMM)** (around 3x faster thanks to pre-sorting and binary search).
 
-miceFast was compared[^Environment] with the mice package. For the grouping option there was used a basic R looping and popular dplyr/data.table packages.
-Summing up, miceFast offer a relevant reduction of a calculations time for:  
-
-- Linear Discriminant Analysis around **(x5)**
-- where a grouping variable have to be used **(around x10 depending on data dimensions and number of groups and even more than x100 although compared to data.table only a few k faster or even the same)** because of pre-sorting by grouping variable
-- multiple imputations is faster around **x(a number of multiple imputations)** because the core of a model is evaluated only ones.
-- Variance inflation factors (VIF) **(x5)** because the unnecessary linear regression is not evaluated - we need only inverse of X'X
-- Predictive mean matching (PMM) **(x3)** because of pre-sorting and binary search (`mice` algorithm was improved too).
-
-If you are interested about the procedure of testing performance check performance_validity.R file at the extdata folder.
-
-```{r,eval=FALSE,echo=TRUE}
-system.file("extdata", "performance_validity.R", package = "miceFast")
-```
-
-Additional plots for simulations with certain parameters (but feel free to change them) are located:
-
-```{r,eval=FALSE,echo=TRUE}
-system.file("extdata", "images", package = "miceFast")
-```
-
-Moreover there are offered a few functions built to work with the popular R packages such as 'data.table'.
-
-[^Environment]: Environment: R 4.1.3 Mac M1.
+**Note:** For details on the performance-testing procedure, see the file `performance_validity.R` in the `extdata` folder. Additional simulation plots (which you are free to modify) are located in `extdata/images`.  
+<br>  
+_Environment: R 4.2 on Mac M1._
 
 ## Motivations
 
-Missing data is a common problem. The easiest solution is to delete observations for which a certain variable is missing. However this will somek deteriorate the quality of a project. Another solution will be to use methods such as multiple/regular imputations to fill the missing data. Non missing independent variables could be used to approximate missing observations for a dependent variable. R or Python language are user-friendly for data manipulation but parallely brings slower computations. Languages such as C++ give us an opportunity to boost our applications or projects.
+Missing data is a common issue in data analysis. One approach is to delete any row containing missing observations, though this can degrade the quality or representativeness of your dataset. Another, often better, approach is to use imputation methods (such as multiple or regular imputations) to fill in missing data, leveraging observed independent variables.
 
-\newpage
+Since R and Python are user-friendly but can be slower for heavy computation, **miceFast** uses efficient C++/RcppArmadillo routines under the hood to speed up the imputation process.
 
-## Introduction for data.table/dplyr users - using additional functions from miceFast:
+---
 
-Usage of `fill_NA` and `fill_NA_N` functions from miceFast - this functions should be resistant to glitches from an user activity perspective and a data structure.
+# Introduction for dplyr/data.table Users
 
-### Data 
+The **miceFast** package provides additional functions (`fill_NA` and `fill_NA_N`) that are designed to be stable in the presence of user-level mistakes or complex data structures. Below are minimal examples using **dplyr** and **data.table**.
 
-```{r,echo=TRUE}
-# airquality dataset with additional variables
-data(air_miss)
+## Example Data
+
+```{r, echo=TRUE}
+data(air_miss)  # airquality with additional variables
 ```
 
-NA structure
+### Examining Missingness
 
 ```{r, echo=TRUE}
 upset_NA(air_miss, 6)
 ```
 
-### Intro: dplyr
+## Using dplyr
+
+Below we show how to:
+
+1. Calculate VIF.
+2. Perform various imputations with and without grouping.
+3. Use multiple imputations (e.g., averaging across 30 draws).
+4. Safely handle collinearity or small group sizes by wrapping calls in `tryCatch`.
 
 ```{r, echo=TRUE}
-# VIF - values bigger than 10 (around) suggest that there might be a collinearity problem.
-# VIF is high for Solar.R and x_character which is obvious - x_character is a factor version of numeric Solar.R
+# VIF (Variance Inflation Factor) > ~10 suggests collinearity problems.
 VIF(air_miss,
-  posit_y = "Ozone",
-  posit_x = c(
-    "Solar.R",
-    "Wind",
-    "Temp",
-    "x_character",
-    "Day",
-    "weights",
-    "groups"
-  )
-)
+    posit_y = "Ozone",
+    posit_x = c("Solar.R", "Wind", "Temp", "x_character",
+                "Day", "weights", "groups"))
 
-# IMPUTATIONS
 air_miss <- air_miss %>%
-  # Imputations with a grouping option (models are separately assessed for each group)
-  # taking into account provided weights
+  # Impute with grouping and weights
   group_by(groups) %>%
-  do(mutate(., Solar_R_imp = fill_NA(
-    x = .,
-    model = "lm_pred",
-    posit_y = "Solar.R",
-    posit_x = c("Wind", "Temp", "Intercept"),
-    w = .[["weights"]]
-  ))) %>%
+  do(mutate(., 
+    Solar_R_imp = fill_NA(
+      x = .,
+      model = "lm_pred",
+      posit_y = "Solar.R",
+      posit_x = c("Wind", "Temp", "Intercept"),
+      w = .[["weights"]]
+    )
+  )) %>%
   ungroup() %>%
-  # Imputations - discrete variable
+  # Impute a discrete variable
   mutate(x_character_imp = fill_NA(
     x = .,
     model = "lda",
     posit_y = "x_character",
     posit_x = c("Wind", "Temp")
   )) %>%
-  # logreg was used because almost log-normal distribution of Ozone
-  # imputations around mean
+  # Log regression because Ozone is roughly log-normal
   mutate(Ozone_imp1 = fill_NA(
     x = .,
     model = "lm_bayes",
@@ -131,7 +131,7 @@ air_miss <- air_miss %>%
     posit_x = c("Intercept"),
     logreg = TRUE
   )) %>%
-  # imputations using positions - Intercept, Temp
+  # Impute by position indices
   mutate(Ozone_imp2 = fill_NA(
     x = .,
     model = "lm_bayes",
@@ -139,8 +139,7 @@ air_miss <- air_miss %>%
     posit_x = c(4, 6),
     logreg = TRUE
   )) %>%
-  # multiple imputations (average of x30 imputations)
-  # with a factor independent variable, weights and logreg options
+  # Imputations (mean of 30 draws)
   mutate(Ozone_imp3 = fill_NA_N(
     x = .,
     model = "lm_noise",
@@ -160,93 +159,87 @@ air_miss <- air_miss %>%
     k = 30
   )) %>%
   group_by(groups) %>%
-  do(mutate(., Ozone_imp5 = fill_NA(
-    x = .,
-    model = "lm_pred",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .[["weights"]],
-    logreg = TRUE
-  ))) %>%
-  do(mutate(., Ozone_imp6 = fill_NA_N(
-    x = .,
-    model = "pmm",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .[["weights"]],
-    logreg = TRUE,
-    k = 20
-  ))) %>%
-  ungroup() %>%
-  # Average of a few methods
-  mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
-  # Protecting against collinearity or low number of observations - across small groups
-  # Be carful when using a data.table grouping option
-  # because of lack of protection against collinearity or low number of observations.
-  # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
-  group_by(groups) %>%
-  do(mutate(., Ozone_chac_imp = tryCatch(
-    fill_NA(
+  # Single evaluation model
+  do(mutate(.,
+    Ozone_imp5 = fill_NA(
       x = .,
-      model = "lda",
-      posit_y = "Ozone_chac",
-      posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
-      w = .[["weights"]]
-    ),
-    error = function(e) .[["Ozone_chac"]]
-  ))) %>%
+      model = "lm_pred",
+      posit_y = "Ozone",
+      posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+      w = .[["weights"]],
+      logreg = TRUE
+    )
+  )) %>%
+  do(mutate(.,
+    Ozone_imp6 = fill_NA_N(
+      x = .,
+      model = "pmm",
+      posit_y = "Ozone",
+      posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+      w = .[["weights"]],
+      logreg = TRUE,
+      k = 20
+    )
+  )) %>%
+  ungroup() %>%
+  # Combine imputations
+  mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) %>%
+  # Protect against errors in small groups
+  group_by(groups) %>%
+  do(mutate(.,
+    Ozone_chac_imp = tryCatch(
+      fill_NA(
+        x = .,
+        model = "lda",
+        posit_y = "Ozone_chac",
+        posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
+        w = .[["weights"]]
+      ),
+      error = function(e) .[["Ozone_chac"]]
+    )
+  )) %>%
   ungroup()
 ```
 
-### results - visualization
+### Visualizing Results
 
-```{r,echo=TRUE}
-# Distribution of imputations vs Distribution of initial data
+```{r, echo=TRUE}
+# Compare original vs. imputed distributions
 compare_imp(air_miss, origin = "Ozone", target = "Ozone_imp_mix")
-# or
+
+# Or compare multiple imputation columns
 compare_imp(air_miss, origin = "Ozone", target = c("Ozone_imp2", "Ozone_imp_mix"))
 ```
 
-### Intro: data.table
+## Using data.table
 
-```{r,echo=TRUE}
+Below is a similar approach using **data.table** syntax.
+
+```{r, echo=TRUE}
 data(air_miss)
 setDT(air_miss)
-# VIF - values bigger than 10 (around) suggest that there might be a collinearity problem.
-# VIF is high for Solar.R and x_character which is obvious - x_character is a factor version of numeric Solar.R
+
+# VIF check
 air_miss[, .(VIF(.SD,
   posit_y = "Ozone",
-  posit_x = c(
-    "Solar.R",
-    "Wind",
-    "Temp",
-    "x_character",
-    "Day",
-    "weights",
-    "groups"
-  )
+  posit_x = c("Solar.R","Wind","Temp","x_character","Day","weights","groups")
 ))]
 
-# IMPUTATIONS
-# Imputations with a grouping option (models are separately assessed for each group)
-# taking into account provided weights
+# Imputations
 air_miss[, Solar_R_imp := fill_NA_N(
   x = .SD,
   model = "lm_bayes",
   posit_y = "Solar.R",
-  posit_x = c("Wind", "Temp", "Intercept"),
+  posit_x = c("Wind","Temp","Intercept"),
   w = .SD[["weights"]],
   k = 100
 ), by = .(groups)] %>%
-  # Imputations - discrete variable
   .[, x_character_imp := fill_NA(
     x = .SD,
     model = "lda",
     posit_y = "x_character",
-    posit_x = c("Wind", "Temp", "groups")
+    posit_x = c("Wind","Temp","groups")
   )] %>%
-  # logreg was used because almost log-normal distribution of Ozone
-  # imputations around mean
   .[, Ozone_imp1 := fill_NA(
     x = .SD,
     model = "lm_bayes",
@@ -254,22 +247,18 @@ air_miss[, Solar_R_imp := fill_NA_N(
     posit_x = c("Intercept"),
     logreg = TRUE
   )] %>%
-  # imputations using positions - Intercept, Temp
   .[, Ozone_imp2 := fill_NA(
     x = .SD,
     model = "lm_bayes",
     posit_y = 1,
-    posit_x = c(4, 6),
+    posit_x = c(4,6),
     logreg = TRUE
   )] %>%
-  # model with a factor independent variable
-  # multiple imputations (average of x30 imputations)
-  # with a factor independent variable, weights and logreg options
   .[, Ozone_imp3 := fill_NA_N(
     x = .SD,
     model = "lm_noise",
     posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    posit_x = c("Intercept","x_character_imp","Wind","Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
     k = 30
@@ -278,7 +267,7 @@ air_miss[, Solar_R_imp := fill_NA_N(
     x = .SD,
     model = "lm_bayes",
     posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    posit_x = c("Intercept","x_character_imp","Wind","Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
     k = 30
@@ -287,271 +276,198 @@ air_miss[, Solar_R_imp := fill_NA_N(
     x = .SD,
     model = "lm_pred",
     posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    posit_x = c("Intercept","x_character_imp","Wind","Temp"),
     w = .SD[["weights"]],
     logreg = TRUE
-  ), .(groups)] %>%
+  ), by = .(groups)] %>%
   .[, Ozone_imp6 := fill_NA_N(
     x = .SD,
     model = "pmm",
     posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
+    posit_x = c("Intercept","x_character_imp","Wind","Temp"),
     w = .SD[["weights"]],
     logreg = TRUE,
     k = 10
-  ), .(groups)] %>%
-  # Average of a few methods
+  ), by = .(groups)] %>%
+  # Average across a set of methods
   .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] %>%
-  # Protecting against collinearity or low number of observations - across small groups
-  # Be careful when using a data.table grouping option
-  # because of lack of protection against collinearity or low number of observations.
-  # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
-
+  # tryCatch for small group issues or collinearity
   .[, Ozone_chac_imp := tryCatch(
     fill_NA(
       x = .SD,
       model = "lda",
       posit_y = "Ozone_chac",
-      posit_x = c("Intercept", "Month", "Day", "Temp", "x_character_imp"),
+      posit_x = c("Intercept","Month","Day","Temp","x_character_imp"),
       w = .SD[["weights"]]
     ),
     error = function(e) .SD[["Ozone_chac"]]
-  ), .(groups)]
+  ), by = .(groups)]
 ```
 
-\newpage
+---
 
-## Genereting data with the corrData Module
+# Generating Data with the corrData Module
 
-Available constructors:
+You can generate correlated data via `corrData`:
 
-`new(corrData,nr_cat,n_obs,means,cor_matrix)`
+```r
+# Constructors:
+new(corrData, nr_cat, n_obs, means, cor_matrix)
+new(corrData, n_obs, means, cor_matrix)
 
-`new(corrData,n_obs,means,cor_matrix)`
+# Some relevant methods:
+cd_obj$fill("type")  # "contin", "binom", or "discrete"
+```
 
-where:
+- `nr_cat`: number of categories for a discrete dependent variable  
+- `n_obs`: number of observations  
+- `means`: centers for independent variables  
+- `cor_matrix`: a positive-definite correlation matrix  
 
-- `nr_cat` : number of categories for discrete dependent variable
-- `n_obs` : number of observations
-- `means`: center independent variables
-- `cor_mat` : positive defined correlation matrix
+Example usage:
 
-relevant class methods:
+```{r, eval=FALSE}
+cd <- new(corrData, nr_cat = 3, n_obs = 1000, means = c(0,1,2), cor_matrix = some_matrix)
+generated_data <- cd$fill("discrete")
+```
 
-- `fill("type")` : generating data [return a numeric matrix] - data with correlated variables where first variable is of binomial,discrete or continuous type.
+---
 
-`type`:character - possible options ("contin","binom","discrete")
+# Imputing Data with the miceFast Module
 
-## Imputing data with the miceFast Module:
+The **miceFast** module performs fast imputations via various built-in models. Below is a summary of its main methods:
 
-Available constructors:
+1. **`set_data(x)`**: Provide the data as a numeric matrix by reference.  
+2. **`set_g(g)`**: Provide a grouping variable (numeric vector, must be positive, no NAs).  
+3. **`set_w(w)`**: Provide a weighting variable (numeric vector, must be positive, no NAs).  
+4. **`impute(model, posit_y, posit_x)`**: Single imputation according to the chosen model.  
+5. **`impute_N(model, posit_y, posit_x, k)`**: Multiple imputations (averaged result) for certain models.  
+6. **`update_var(posit_y, imputations)`**: Permanently update the object’s data for the specified column with new imputations.  
+7. **`vifs(posit_y, posit_x)`**: Compute Variance Inflation Factors.  
+8. **`sort_byg()`** / **`is_sorted_byg()`**: Sort the data by the grouping variable (or check if sorted).  
+9. **`which_updated()`**: Check which variables have been permanently updated in the object.
 
-`new(miceFast)`
+Supported models:
 
-relevant class methods:
+- `"lda"`: Linear discriminant analysis (for categorical `posit_y`).  
+- `"lm_pred"`: Standard linear model prediction (including a mean-imputation approach if you only include an intercept).  
+- `"lm_bayes"`: Linear model with Bayesian noise.  
+- `"lm_noise"`: Similar to `"lm_bayes"` but with different noise assumptions.  
+- `"pmm"`: Predictive Mean Matching (used via `impute_N`).  
 
-- `set_data(x)` - providing the data by a reference - a numeric matrix [void]
-- `get_data()` - retrieving the data [return a numeric matrix] - the same values as provided by reference x, recommended to use x directly
-- `set_g(g)` - providing the grouping variable by a reference - a numeric vector WITOUT NA values - positive values [void]
-- `get_g()` - retrieving the grouping variable [return a numeric vector] - the same values as provided by reference g, recommended to use g directly
-- `set_w(w)` - providing the weighting variable by a reference - a numeric vector WITOUT NA values - positive values
-- `get_w()` - retrieving the weighting variable [return a numeric vector] - the same values as provided by reference w, recommended to use w directly
-- `get_index()` - getting the index [return a integer vector] - useful after automatic sorting procedure
--  `set_ridge(ridge)` - providing a ridge i.e. the disturbance to diag of XX, default 1e-6
--  `get_ridge()` - getting a ridge
-- `impute("model",posit_y,posit_x)` - impute data under characteristics form object like a optional grouping or weighting variable [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
-- `impute_N("model2",posit_y,posit_x,k)` - multiple imputations - impute data under characteristics form object like a optional grouping or weighting variable - works for ("lm_bayes","lm_noise", "pmm") - [return a list with 3 vectors: a numeric vector "imputations" dependent variable with replaced Na values by average of N results, a integer vector "index_imputed" positions where data was imputed, a integer vector "index_full" positions which were used to assess the model]
-- `update_var(posit_y,imputations)` - permanently update variable at the object and data. WARNING, use it only if you are sure about model parameters. [void]
-- `get_models()` - possible quantitative models for a certain type of dependent variable [return a character vector: recommended models for impute and impute_N methods] 
-- `get_model()` - a recommended quantitative model for a certain type of dependent variable [return a character: recommended model for impute and impute_N methods] - useful while looping
-- `which_updated()` - which variables were modified by update_var at the object (and data) [return a integer vector: positions at provided data at which variables were update by update_var method] 
-- `sort_byg()` - sort data by the grouping variable [void]
-- `is_sorted_byg()` - is data sorted by the grouping variable [void]
-- `vifs(posit_y,posit_x)` - Variance inflation factors (VIF) [return a numeric vector: VIF for all variables provided by posit_x]
-`x` : numeric matrix - variables  
-`g` : numeric vector - you could build it form several discrete variables  
-`w`:  numeric vector with positive values - weights for weighted linear regressions  
-`model`: character - a possible options ("lda","lm_pred","lm_bayes","lm_noise")  
-`model2`: character - a possible options ("lm_bayes","lm_noise", "pmm")
-`posit_y`: integer - a position of dependent variable  
-`posit_x`: integer vector - positions of independent variables  
-`imputations` : numeric vector - imputations  
-`k` : integer - number of multiple imputations or k-nearest for pmm
+> *Note:* For purely mean imputation, add an intercept column and use `"lm_pred"`. The LDA model requires at least 15 complete observations. Linear models require at least as many complete observations as the number of predictors.
 
-*For a simple mean imputations add intercept to data and use "lm_pred"*  
-*The lda model is assessed only if there are more than 15 complete observations and for the lms models if the number of independent variables is smaller than the number of observations.*
+## Examples
 
-\newpage
+### Simple Usage
 
-###Imputations
-
-**miceFast module usage:**
-
-Remember that a matrix could be build only under a one data type so factor variables have to be melted
-use `model.matrix` to get numeric matrix from `data.frame` - see Tips in this document
-
-```{r,echo=TRUE}
-# install.packages("mice")
+```{r, echo=TRUE}
 data <- cbind(as.matrix(mice::nhanes), intercept = 1, index = 1:nrow(mice::nhanes))
 model <- new(miceFast)
-model$set_data(data) # providing data by a reference
-model$get_ridge()
-model$update_var(2, model$impute("lm_pred", 2, 5)$imputations)
-# OR not recommended
-# data[,2] = model$impute("lm_pred",2,5)$imputations
-# model$set_data(data) #Updating the object
+model$set_data(data)
 
-model$update_var(3, model$impute("lda", 3, c(1, 2))$imputations)
+# Single imputation, linear model
+imp_result <- model$impute("lm_pred", posit_y = 2, posit_x = 5)
+model$update_var(2, imp_result$imputations)
 
-# Old slow syntax model$update_var(4,rowMeans(sapply(1:10,function(x) model$impute("lm_bayes",4,c(1,2,3))$imputations)))
-# New syntax - impute_N
-model$update_var(4, model$impute_N("lm_bayes", 4, c(1, 2, 3), 10)$imputations)
+# LDA imputation for a categorical variable
+model$update_var(3, model$impute("lda", 3, c(1,2))$imputations)
 
-# When working with 'Big Data'
-# it is recommended to occasionally manually invoke a garbage collector `gc()`
+# Multiple imputation example
+multi_imp <- model$impute_N("lm_bayes", 4, c(1,2,3), k = 10)
+model$update_var(4, multi_imp$imputations)
 
-# Be careful with `update_var` because of the permanent update at the object and data
-# That is why `update_var` could be used only ones for a certain column
-# check which variables was updated - inside the object
+# Check which variables were updated
 model$which_updated()
-head(model$get_data(), 3)
-head(data, 3)
-head(mice::nhanes, 3)
-rm(model)
+
+# Always be cautious with 'update_var' 
+# since it permanently alters the object and your data matrix.
 ```
 
-\newpage
+### Example with Weights and Groups (Pre-sorted)
 
-**Model with additional parameters:** - data sorted by the grouping variable
-
-```{r,echo=TRUE}
-data <- cbind(as.matrix(airquality[, -5]), intercept = 1, index = 1:nrow(airquality))
-weights <- rgamma(nrow(data), 3, 3) # a numeric vector - positive values
-groups <- as.numeric(airquality[, 5]) # a numeric vector not integers - positive values - sorted increasingly
+```{r, echo=TRUE}
+data <- cbind(as.matrix(airquality[,-5]), intercept = 1, index = 1:nrow(airquality))
+weights <- rgamma(nrow(data), 3, 3)
+groups <- as.numeric(airquality[,5]) 
 
 model <- new(miceFast)
-model$set_data(data) # providing data by a reference
-model$set_w(weights) # providing by a reference
-model$set_g(groups) # providing by a reference
+model$set_data(data)
+model$set_w(weights)
+model$set_g(groups)
 
-# impute adapt to provided parameters like w or g
-# Simple mean - permanent imputation at the object and data
-model$update_var(1, model$impute("lm_pred", 1, c(6))$imputations)
-
-model$update_var(2, model$impute_N("lm_bayes", 2, c(1, 3, 4, 5, 6), 10)$imputations)
-
-# Printing data and retrieving an old order
-head(cbind(model$get_data(), model$get_g(), model$get_w())[order(model$get_index()), ], 4)
-
-head(airquality, 3)
-
-head(cbind(model$get_data(), model$get_g(), model$get_w()), 3)
-
-head(cbind(data, groups, weights), 3)
-
-rm(model)
-```
-
-\newpage
-
-**Model with additional parameters:** - data not sorted by the grouping variable
-
-```{r,echo=TRUE}
-data <- cbind(as.matrix(airquality[, -5]), intercept = 1, index = 1:nrow(airquality))
-weights <- rgamma(nrow(data), 3, 3) # a numeric vector - positive values
-# groups = as.numeric(airquality[,5]) # a numeric vector not integers - positive values
-groups <- as.numeric(sample(1:8, nrow(data), replace = T)) # a numeric vector not integers - positive values
-
-model <- new(miceFast)
-model$set_data(data) # providing by a reference
-model$set_w(weights) # providing by a reference
-model$set_g(groups) # providing by a reference
-# impute adapt to provided parmaters like w or g
-# Warning - if data is not sorted increasingly by the g then it would be done automatically
-# during a first imputation
-# Simple mean - permanent imputation at the object and data
+# Impute with group-wise weighting
 model$update_var(1, model$impute("lm_pred", 1, 6)$imputations)
+model$update_var(2, model$impute_N("lm_bayes", 2, c(1,3,4,5,6), k=10)$imputations)
 
-model$update_var(2, model$impute_N("lm_bayes", 2, c(1, 3, 4, 5, 6), 10)$imputations)
-
-# Printing data and retrieving an old order
+# Inspect updated data, returning to original order via model$get_index()
 head(cbind(model$get_data(), model$get_g(), model$get_w())[order(model$get_index()), ], 4)
-
-head(airquality, 4)
-
-head(cbind(model$get_data(), model$get_g(), model$get_w()), 4) # is ordered by g
-
-head(cbind(data, groups, weights), 4) # is sorted by g cause we provide data by a reference
-
-rm(model)
 ```
 
-\newpage
+### Example with Unsorted Groups
 
-### Tips
+```{r, echo=TRUE}
+data <- cbind(as.matrix(airquality[,-5]), intercept = 1, index = 1:nrow(airquality))
+weights <- rgamma(nrow(data), 3, 3)
+groups <- as.numeric(sample(1:8, nrow(data), replace = TRUE))
 
-**matrix from data.frame**
+model <- new(miceFast)
+model$set_data(data)
+model$set_w(weights)
+model$set_g(groups)
 
-Remember that a matrix could be built only under a one data type so factor/character variables have to be melted.
-Sb could use `model.matrix` to get numeric matrix from a `data.frame`:
+# The data will be automatically sorted by 'groups' during the first imputation:
+model$update_var(1, model$impute("lm_pred", 1, 6)$imputations)
+model$update_var(2, model$impute_N("lm_bayes", 2, c(1,3,4,5,6), 10)$imputations)
 
-```{r,echo=TRUE}
-# str(mtcars)
-mtcars$cyl <- factor(mtcars$cyl)
-mtcars$gear <- factor(mtcars$gear)
-mtcars_mat <- model.matrix.lm(~., mtcars, na.action = "na.pass")
-# str(mtcars_mat)
+head(cbind(model$get_data(), model$get_g(), model$get_w())[order(model$get_index()), ], 4)
 ```
 
-**Variance inflation factors (VIF)**
+---
 
-VIF measures how much the variance of the estimated regression coefficients are inflated. It helps to identify when the predictor variables are linearly related. You have to decide which variable should be deleted. Values higher than 10 signal a potential collinearity problem.
+# Tips and Additional Notes
 
-```{r,echo=TRUE}
-airquality2 <- airquality
-airquality2$Temp2 <- airquality2$Temp**2
-airquality2$Month <- factor(airquality2$Month)
+- **Creating matrices from data frames**: Remember that standard R matrices can only hold one data type (often numeric). Factor and character columns must be transformed (e.g., via `model.matrix`).
+  ```r
+  mtcars$cyl <- factor(mtcars$cyl)
+  mtcars$gear <- factor(mtcars$gear)
+  mtcars_mat <- model.matrix(~ ., data = mtcars, na.action = "na.pass")
+  ```
 
-# car::vif(lm(Ozone ~ ., data = airquality2))
-```
+- **Variance Inflation Factors (VIF)**: VIF measures how much the variance of a regression coefficient is inflated due to collinearity. High values (>10) may indicate problematic collinearity.  
+  ```r
+  airquality2 <- airquality
+  airquality2$Temp2 <- airquality2$Temp^2
+  airquality2$Month <- factor(airquality2$Month)
+  
+  # Using data.table:
+  data_DT <- data.table(airquality2)
+  data_DT[, .(vifs = VIF(
+    x = .SD,
+    posit_y = "Ozone",
+    posit_x = c("Solar.R","Wind","Temp","Month","Day","Temp2"),
+    correct = FALSE
+  ))]
+  ```
 
+---
 
-```{r,echo=TRUE}
-data_DT <- data.table(airquality2)
-data_DT[, .(vifs = VIF(
-  x = .SD,
-  posit_y = "Ozone",
-  posit_x = c("Solar.R", "Wind", "Temp", "Month", "Day", "Temp2"), correct = FALSE
-))]
+# References
 
-data_DT[, .(vifs = VIF(
-  x = .SD,
-  posit_y = 1,
-  posit_x = c(2, 3, 4, 5, 6, 7), correct = TRUE
-))]
-```
+- **Exposing C++ functions and classes with Rcpp modules**  
+  Dirk Eddelbuettel and Romain François (2018)  
+  <https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf>
 
-## Bibliography
+- **RcppArmadillo: Easily Extending R with High-Performance C++ Code**  
+  Dirk Eddelbuettel and Conrad Sanderson (2012)  
+  <https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf>
 
-URL: https://dirk.eddelbuettel.com/code/rcpp/Rcpp-modules.pdf  
-Title: Exposing C++ functions and classes with Rcpp modules Dirk Eddelbuettel and Romain François  
-Author: https://dirk.eddelbuettel.com and  https://purrple.cat
-Date: March 8, 2018
+- **Extending R with C++: A Brief Introduction to Rcpp**  
+  Dirk Eddelbuettel and James Joseph Balamuta (2018)  
+  <https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf>
 
-URL: https://dirk.eddelbuettel.com/papers/RcppArmadillo-intro.pdf  
-Title: RcppArmadillo: Easily Extending R with High-Performance C++ Code  
-Author: Dirk Eddelbuettel and Conrad Sanderson  
-Date: July 1, 2012
+- **MICE: Multivariate Imputation by Chained Equations in R**  
+  Stef van Buuren (2013)
 
-URL: https://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf  
-Title: Extending R with C++: A Brief Introduction to Rcpp   
-Author: Dirk Eddelbuettel and James Joseph Balamuta  
-Date: March 8, 2018  
-
-Title: MICE: Multivariate Imputation by Chained Equations in R  
-Author: Stef van Buuren  
-Date: 2013
-
-Title: CSCE 666: Pattern Analysis  
-Author: Ricardo Gutierrez-Osuna  
-Date: Fall 2013
+- **CSCE 666: Pattern Analysis**  
+  Ricardo Gutierrez-Osuna (Fall 2013)
