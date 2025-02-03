@@ -19,7 +19,9 @@ Major speed improvements occur when:
 - Performing **multiple imputations**, by evaluating the underlying quantitative model only once for multiple draws.
 - Running **Predictive Mean Matching (PMM)**, thanks to presorting and binary search.
 
-For performance details, see `performance_validity.R` in the `extdata` folder or the [Advanced Usage Vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html).
+For performance details, see `performance_validity.R` in the `extdata` folder.
+
+[It is recommended to read the Advanced Usage Vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html).
 
 ## Installation
 
