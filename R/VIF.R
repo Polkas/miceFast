@@ -11,7 +11,7 @@
 #' @param posit_x an integer/character vector - positions/names of independent variables
 #' @param correct a boolean - basic or corrected - Default: FALSE
 #'
-#' @note vif_corrected = vif_basic^{(1/(2*df))}
+#' @note The corrected VIF is obtained by raising the basic VIF to the power of one divided by two times the degrees of freedom.
 #'
 #' @return load a numeric vector with VIF for all variables provided by posit_x
 #'

@@ -44,7 +44,7 @@ Usually values higher than 10 (around), mean a collinearity problem.
 
 }}
 \note{
-vif_corrected = vif_basic^{(1/(2*df))}
+The corrected VIF is obtained by raising the basic VIF to the power of one divided by two times the degrees of freedom.
 }
 \examples{
 \dontrun{

@@ -100,4 +100,4 @@ Benchmark testing (on R 4.2, macOS M1) shows **miceFast** can significantly redu
 
 ![](man/figures/g_summary.png)
 
-For more details, refer to the [`performance_validity.R` file](extdata/performance_validity.R) in the `extdata` folder.
+For performance details, see `performance_validity.R` in the `extdata` folder.
