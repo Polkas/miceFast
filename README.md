@@ -65,8 +65,8 @@ mice::complete(mice::mice(air_miss, printFlag = FALSE))
 
 - **Object-Oriented Interface** via `miceFast` objects (Rcpp modules).
 - **Convenient Helpers**:  
-  - `fill_NA()`: Single imputation (LDA, `lm_pred`, `lm_bayes`, `lm_noise`).  
-  - `fill_NA_N()`: Multiple imputations (PMM, `lm_bayes`, `lm_noise`).  
+  - `fill_NA()`: Single imputation (`lda`, `lm_pred`, `lm_bayes`, `lm_noise`).  
+  - `fill_NA_N()`: Multiple imputations (`pmm`, `lm_bayes`, `lm_noise`).  
   - `VIF()`: Variance Inflation Factor calculations.  
   - `naive_fill_NA()`: Automatic naive imputations.  
   - `compare_imp()`: Compare original vs. imputed values.  
@@ -77,8 +77,8 @@ mice::complete(mice::mice(air_miss, printFlag = FALSE))
 | Function        | Description                                                                 |
 |-----------------|-----------------------------------------------------------------------------|
 | `new(miceFast)` | Creates an OOP instance with numerous imputation methods (see the vignette). |
-| `fill_NA()`     | Single imputation: LDA, `lm_pred`, `lm_bayes`, `lm_noise`.                   |
-| `fill_NA_N()`   | Multiple imputations (N repeats): PMM, `lm_bayes`, `lm_noise`.               |
+| `fill_NA()`     | Single imputation: `lda`, `lm_pred`, `lm_bayes`, `lm_noise`.                   |
+| `fill_NA_N()`   | Multiple imputations (N repeats): `pmm`, `lm_bayes`, `lm_noise`.               |
 | `VIF()`         | Computes Variance Inflation Factors.                                         |
 | `naive_fill_NA()` | Performs automatic, naive imputations.                                     |
 | `compare_imp()` | Compares imputations vs. original data.                                      |
