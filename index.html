@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.5.9000</span>
       </span>
     </div>
 
@@ -129,6 +129,51 @@ The package includes convenient helper functions compatible with <strong>data.ta
 <span><span class="co"># mice</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/amices/mice" class="external-link">mice</a></span><span class="op">)</span></span>
 <span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">complete</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">air_miss</span>, printFlag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="loop-example">Loop example<a class="anchor" aria-label="anchor" href="#loop-example"></a>
+</h2>
+<p>Multiple imputations are performed in a loop where a continuous variable is imputed using a Bayesian linear model (lm_bayes) that incorporates relevant predictors and weights for robust estimation. Simultaneously, a categorical variable is imputed using linear discriminant analysis (LDA) augmented with a randomly generated ridge penalty.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define a function that performs the imputation on the dataset</span></span>
+<span><span class="va">impute_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>      <span class="co"># Impute the continuous variable using lm_bayes</span></span>
+<span>      Solar_R_imp <span class="op">=</span> <span class="fu"><a href="reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>        x <span class="op">=</span> <span class="va">.</span>,</span>
+<span>        model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
+<span>        posit_y <span class="op">=</span> <span class="st">"Solar.R"</span>,</span>
+<span>        posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span>,</span>
+<span>        w <span class="op">=</span> <span class="va">weights</span>  <span class="co"># assuming 'weights' is a column in data</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      <span class="co"># Impute the categorical variable using lda with a random ridge parameter</span></span>
+<span>      Ozone_chac_imp <span class="op">=</span> <span class="fu"><a href="reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
+<span>        x <span class="op">=</span> <span class="va">.</span>,</span>
+<span>        model <span class="op">=</span> <span class="st">"lda"</span>,</span>
+<span>        posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
+<span>        posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
+<span>        ridge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Set seed for reproducibility</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123456</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run the imputation process 3 times using replicate()</span></span>
+<span><span class="co"># This returns a list of imputed datasets.</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span>, expr <span class="op">=</span> <span class="fu">impute_data</span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check results: Calculate the mean of the imputed Solar.R values in each dataset</span></span>
+<span><span class="va">means_imputed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">res</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">Solar_R_imp</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">means_imputed</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check results: Tabulate the imputed categorical variable for each dataset</span></span>
+<span><span class="va">tables_imputed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">res</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">Ozone_chac_imp</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tables_imputed</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -206,7 +251,7 @@ The package includes convenient helper functions compatible with <strong>data.ta
 <div class="section level2">
 <h2 id="performance-highlights">Performance Highlights<a class="anchor" aria-label="anchor" href="#performance-highlights"></a>
 </h2>
-<p>Benchmark testing (on R 4.2, macOS M1) shows <strong>miceFast</strong> can significantly reduce computation time, especially in these scenarios:</p>
+<p>Benchmark testing (on R 4.4.3, macOS M3 Pro, <a href="https://cran.r-project.org/bin/macosx/RMacOSX-FAQ.html#Which-BLAS-is-used-and-how-can-it-be-changed_003f" class="external-link">optimized BLAS and LAPACK</a>) shows <strong>miceFast</strong> can significantly reduce computation time, especially in these scenarios:</p>
 <ul>
 <li>
 <strong>Linear Discriminant Analysis (LDA)</strong>: ~5x faster.<br>
@@ -257,7 +302,7 @@ The package includes convenient helper functions compatible with <strong>data.ta
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Maciej Nasinski <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Maciej Nasinski <br><small class="roles"> Author, maintainer </small>   </li>
 </ul>
 </div>
 

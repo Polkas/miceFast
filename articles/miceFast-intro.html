@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.5.9000</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Maciej
 Nasinski</h4>
             
-            <h4 data-toc-skip class="date">2025-02-03</h4>
+            <h4 data-toc-skip class="date">2025-04-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/Polkas/miceFast/blob/main/vignettes/miceFast-intro.Rmd" class="external-link"><code>vignettes/miceFast-intro.Rmd</code></a></small>
       <div class="hidden name"><code>miceFast-intro.Rmd</code></div>
@@ -340,7 +340,7 @@ structures. Below are minimal examples using <strong>dplyr</strong> and
 syntax.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Imputations</span></span>
 <span><span class="va">air_miss</span><span class="op">[</span>, <span class="va">Solar_R_imp</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA_N.html">fill_NA_N</a></span><span class="op">(</span></span>
