@@ -1,3 +1,8 @@
+# miceFast 0.8.5.9000
+
+* improve README file with loop example.
+* regenerate performance benchmarks on R 4.4.3 and M3.
+
 # miceFast 0.8.5
 
 * cran related update, `OMP_THREAD_LIMIT`.

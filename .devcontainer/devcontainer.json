@@ -1,17 +1,50 @@
 {
-  "name": "R + Rcpp Dev Container",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "settings": {
-    "terminal.integrated.profiles.linux": {
-      "bash": {
-        "path": "/bin/bash"
+  "name": "R Development",
+  //"build": {
+  //	"dockerfile": "Dockerfile"
+  //},
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  //"image": "rocker/tidyverse:4.4.2",
+  "features": {
+      "ghcr.io/devcontainers/features/git:1": {},
+      "ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
+          "version": "4.4.2",
+          "installRadian": true,
+          "installVscDebugger": true,
+          "installJupyterlab": true,
+          "vscodeRSupport": "full"
       }
-    }
   },
-  "extensions": [
-    "REditorSupport.r",
-    "ms-vscode-remote.remote-containers"   // Or "ms-vscode.remote-containers" depending on your version
-  ]
+  "customizations": {
+      // Configure properties specific to VS Code.
+      "vscode": {
+          "settings": {
+              "files.autoSave": "afterDelay",
+              "files.autoSaveDelay": 1000,
+              "r.rpath.linux": "/usr/local/bin/R",
+              "r.rterm.linux": "/usr/local/bin/radian",
+              "r.rterm.option": [
+                "--no-save",
+                "--no-restore",
+                "--r-binary=/usr/local/bin/R"],
+              "r.bracketedPaste": true,
+              "[r]": {
+                  "editor.formatOnSave": true,
+                  "editor.formatOnPaste": true,
+                  "editor.defaultFormatter": "Posit.air-vscode"
+              }
+          },
+          // Add the IDs of extensions you want installed when the container is created.
+          "extensions": [
+              "reditorsupport.r",
+              "Posit.air-vscode",
+              "ms-toolsai.jupyter",
+
+              "eamodio.gitlens",
+              "github.copilot",
+              "github.copilot-chat"
+          ]
+      }
+  },
+  "postCreateCommand": "echo Hello World"
 }

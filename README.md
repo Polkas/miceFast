@@ -61,6 +61,52 @@ library(mice)
 mice::complete(mice::mice(air_miss, printFlag = FALSE))
 ```
 
+## Loop example
+
+Multiple imputations are performed in a loop where a continuous variable is imputed using a Bayesian linear model (lm_bayes) that incorporates relevant predictors and weights for robust estimation. Simultaneously, a categorical variable is imputed using linear discriminant analysis (LDA) augmented with a randomly generated ridge penalty.
+
+```r
+library(dplyr)
+
+# Define a function that performs the imputation on the dataset
+impute_data <- function(data) {
+  data %>%
+    mutate(
+      # Impute the continuous variable using lm_bayes
+      Solar_R_imp = fill_NA(
+        x = .,
+        model = "lm_bayes",
+        posit_y = "Solar.R",
+        posit_x = c("Wind", "Temp", "Intercept"),
+        w = weights  # assuming 'weights' is a column in data
+      ),
+      # Impute the categorical variable using lda with a random ridge parameter
+      Ozone_chac_imp = fill_NA(
+        x = .,
+        model = "lda",
+        posit_y = "Ozone_chac",
+        posit_x = c("Wind", "Temp"),
+        ridge = runif(1, 0, 50)
+      )
+    )
+}
+
+# Set seed for reproducibility
+set.seed(123456)
+
+# Run the imputation process 3 times using replicate()
+# This returns a list of imputed datasets.
+res <- replicate(n = 3, expr = impute_data(air_miss), simplify = FALSE)
+
+# Check results: Calculate the mean of the imputed Solar.R values in each dataset
+means_imputed <- lapply(res, function(x) mean(x$Solar_R_imp, na.rm = TRUE))
+print(means_imputed)
+
+# Check results: Tabulate the imputed categorical variable for each dataset
+tables_imputed <- lapply(res, function(x) table(x$Ozone_chac_imp))
+print(tables_imputed)
+```
+
 ---
 
 ## Key Features
@@ -90,7 +136,7 @@ mice::complete(mice::mice(air_miss, printFlag = FALSE))
 
 ## Performance Highlights
 
-Benchmark testing (on R 4.2, macOS M1) shows **miceFast** can significantly reduce computation time, especially in these scenarios:
+Benchmark testing (on R 4.4.3, macOS M3 Pro, [optimized BLAS and LAPACK](https://cran.r-project.org/bin/macosx/RMacOSX-FAQ.html#Which-BLAS-is-used-and-how-can-it-be-changed_003f)) shows **miceFast** can significantly reduce computation time, especially in these scenarios:
 
 - **Linear Discriminant Analysis (LDA)**: ~5x faster.  
 - **Grouping Variable Imputations**: ~10x faster (and can exceed 100x in some edge cases).  
