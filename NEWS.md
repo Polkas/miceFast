@@ -1,8 +1,10 @@
 # miceFast 0.8.5.9000
 
+Kota Hattori, thank you for your feedback and for motivating me for this deep update.
+
 ## New features
 
-* `pool()` function for combining results from multiply imputed datasets (Rubin's rules, Barnard-Rubin df adjustment). Works with `lm`, `glm`, and other models that support `coef()` and `vcov()`.
+* `pool()` function for combining results from multiply imputed datasets (Rubin's rules, Barnard-Rubin df adjustment). Works with `lm`, `glm`, and other models that support `coef()` and `vcov()`. Validated against `mice`.
 * `print` and `summary` methods for pooled results.
 
 ## Bug fixes
