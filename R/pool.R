@@ -77,126 +77,146 @@
 #'
 #' @export
 pool <- function(fits, dfcom = NULL) {
-  stopifnot(is.list(fits))
-  if (length(fits) < 2L) {
-    stop("At least 2 fitted models are required (length(fits) >= 2).", call. = FALSE)
-  }
-
-  m <- length(fits)
-
-  # Extract coefficients and vcov from each fit
-  coefs <- tryCatch(
-    lapply(fits, stats::coef),
-    error = function(e) {
-      stop("All models must support coef(). Error: ", e$message, call. = FALSE)
+    stopifnot(is.list(fits))
+    if (length(fits) < 2L) {
+        stop(
+            "At least 2 fitted models are required (length(fits) >= 2).",
+            call. = FALSE
+        )
     }
-  )
-  vcovs <- tryCatch(
-    lapply(fits, stats::vcov),
-    error = function(e) {
-      stop("All models must support vcov(). Error: ", e$message, call. = FALSE)
-    }
-  )
 
-  # Parameter names and dimension
+    m <- length(fits)
 
-  p <- length(coefs[[1]])
-  nms <- names(coefs[[1]])
-  if (is.null(nms)) nms <- paste0("V", seq_len(p))
-
-  if (!all(vapply(coefs, length, integer(1)) == p)) {
-    stop("All models must have the same number of coefficients.", call. = FALSE)
-  }
-
-  # Stack coefficients into m x p matrix
-  Q <- do.call(rbind, coefs)
-
-  # Pooled estimate: Qbar (Rubin 3.1.2)
-  qbar <- colMeans(Q)
-
-  # Within-imputation variance: Ubar (Rubin 3.1.3)
-  ubar_mat <- Reduce("+", vcovs) / m
-
-  # Between-imputation variance: B (Rubin 3.1.4)
-  Q_centered <- sweep(Q, 2, qbar)
-  b_mat <- crossprod(Q_centered) / (m - 1)
-
-  # Total variance: T = Ubar + (1 + 1/m) * B (Rubin 3.1.5)
-  total_mat <- ubar_mat + (1 + 1 / m) * b_mat
-
-  # Diagonal elements for scalar per-parameter summaries
-  ubar_diag <- diag(ubar_mat)
-  b_diag <- diag(b_mat)
-  t_diag <- diag(total_mat)
-
-  # Relative increase in variance (Rubin 3.1.7)
-  riv <- (1 + 1 / m) * b_diag / ubar_diag
-
-  # Proportion of total variance attributable to missingness
-  lambda <- (1 + 1 / m) * b_diag / t_diag
-
-  # Complete-data degrees of freedom
-  if (is.null(dfcom)) {
-    dfcom_val <- tryCatch(
-      {
-        dfs <- vapply(fits, function(f) {
-          r <- stats::df.residual(f)
-          if (is.null(r)) NA_real_ else as.double(r)
-        }, double(1))
-        if (any(is.na(dfs))) Inf else mean(dfs)
-      },
-      error = function(e) Inf
+    # Extract coefficients and vcov from each fit
+    coefs <- tryCatch(
+        lapply(fits, stats::coef),
+        error = function(e) {
+            stop(
+                "All models must support coef(). Error: ",
+                e$message,
+                call. = FALSE
+            )
+        }
     )
-  } else {
-    dfcom_val <- as.double(dfcom)
-    stopifnot(dfcom_val > 0)
-  }
+    vcovs <- tryCatch(
+        lapply(fits, stats::vcov),
+        error = function(e) {
+            stop(
+                "All models must support vcov(). Error: ",
+                e$message,
+                call. = FALSE
+            )
+        }
+    )
 
-  # Degrees of freedom: Barnard-Rubin (1999)
-  df_old <- (m - 1) / lambda^2
+    # Parameter names and dimension
 
-  if (is.finite(dfcom_val)) {
-    df_obs <- ((dfcom_val + 1) / (dfcom_val + 3)) * dfcom_val * (1 - lambda)
-    df <- (df_old * df_obs) / (df_old + df_obs)
-  } else {
-    df <- df_old
-  }
+    p <- length(coefs[[1]])
+    nms <- names(coefs[[1]])
+    if (is.null(nms)) {
+        nms <- paste0("V", seq_len(p))
+    }
 
-  # Standard errors, t-statistics, p-values
-  se <- sqrt(t_diag)
-  statistic <- qbar / se
-  p_value <- 2 * stats::pt(-abs(statistic), df = df)
+    if (!all(vapply(coefs, length, integer(1)) == p)) {
+        stop(
+            "All models must have the same number of coefficients.",
+            call. = FALSE
+        )
+    }
 
-  # Fraction of missing information (Rubin 3.1.10)
-  fmi <- (riv + 2 / (df + 3)) / (riv + 1)
+    # Stack coefficients into m x p matrix
+    Q <- do.call(rbind, coefs)
 
-  # 95% confidence intervals
-  crit <- stats::qt(0.975, df = df)
-  conf_low <- qbar - crit * se
-  conf_high <- qbar + crit * se
+    # Pooled estimate: Qbar (Rubin 3.1.2)
+    qbar <- colMeans(Q)
 
-  result <- data.frame(
-    term = nms,
-    m = m,
-    estimate = qbar,
-    std.error = se,
-    statistic = statistic,
-    p.value = p_value,
-    df = df,
-    riv = riv,
-    lambda = lambda,
-    fmi = fmi,
-    ubar = ubar_diag,
-    b = b_diag,
-    t = t_diag,
-    dfcom = dfcom_val,
-    conf.low = conf_low,
-    conf.high = conf_high,
-    row.names = NULL,
-    stringsAsFactors = FALSE
-  )
-  class(result) <- c("miceFast_pool", "data.frame")
-  result
+    # Within-imputation variance: Ubar (Rubin 3.1.3)
+    ubar_mat <- Reduce("+", vcovs) / m
+
+    # Between-imputation variance: B (Rubin 3.1.4)
+    Q_centered <- sweep(Q, 2, qbar)
+    b_mat <- crossprod(Q_centered) / (m - 1)
+
+    # Total variance: T = Ubar + (1 + 1/m) * B (Rubin 3.1.5)
+    total_mat <- ubar_mat + (1 + 1 / m) * b_mat
+
+    # Diagonal elements for scalar per-parameter summaries
+    ubar_diag <- diag(ubar_mat)
+    b_diag <- diag(b_mat)
+    t_diag <- diag(total_mat)
+
+    # Relative increase in variance (Rubin 3.1.7)
+    riv <- (1 + 1 / m) * b_diag / ubar_diag
+
+    # Proportion of total variance attributable to missingness
+    lambda <- (1 + 1 / m) * b_diag / t_diag
+
+    # Complete-data degrees of freedom
+    if (is.null(dfcom)) {
+        dfcom_val <- tryCatch(
+            {
+                dfs <- vapply(
+                    fits,
+                    function(f) {
+                        r <- stats::df.residual(f)
+                        if (is.null(r)) NA_real_ else as.double(r)
+                    },
+                    double(1)
+                )
+                if (any(is.na(dfs))) Inf else mean(dfs)
+            },
+            error = function(e) Inf
+        )
+    } else {
+        dfcom_val <- as.double(dfcom)
+        stopifnot(dfcom_val > 0)
+    }
+
+    # Degrees of freedom: Barnard-Rubin (1999)
+    df_old <- (m - 1) / lambda^2
+
+    if (is.finite(dfcom_val)) {
+        df_obs <- ((dfcom_val + 1) / (dfcom_val + 3)) * dfcom_val * (1 - lambda)
+        df <- (df_old * df_obs) / (df_old + df_obs)
+    } else {
+        df <- df_old
+    }
+
+    # Standard errors, t-statistics, p-values
+    se <- sqrt(t_diag)
+    statistic <- qbar / se
+    p_value <- 2 * stats::pt(-abs(statistic), df = df)
+
+    # Fraction of missing information (Rubin 3.1.10)
+    fmi <- (riv + 2 / (df + 3)) / (riv + 1)
+
+    # 95% confidence intervals
+    crit <- stats::qt(0.975, df = df)
+    conf_low <- qbar - crit * se
+    conf_high <- qbar + crit * se
+
+    result <- data.frame(
+        term = nms,
+        m = m,
+        estimate = qbar,
+        std.error = se,
+        statistic = statistic,
+        p.value = p_value,
+        df = df,
+        riv = riv,
+        lambda = lambda,
+        fmi = fmi,
+        ubar = ubar_diag,
+        b = b_diag,
+        t = t_diag,
+        dfcom = dfcom_val,
+        conf.low = conf_low,
+        conf.high = conf_high,
+        row.names = NULL,
+        stringsAsFactors = FALSE
+    )
+    class(result) <- c("miceFast_pool", "data.frame")
+    result
 }
 
 #' Print method for pooled MI results
@@ -208,19 +228,19 @@ pool <- function(fits, dfcom = NULL) {
 #' @return Invisibly returns \code{x}.
 #' @export
 print.miceFast_pool <- function(x, ...) {
-  cat("Pooled results from", x$m[1], "imputed datasets\n")
-  cat("Rubin's rules with Barnard-Rubin df adjustment\n\n")
-  display <- data.frame(
-    term = x$term,
-    estimate = x$estimate,
-    std.error = x$std.error,
-    statistic = x$statistic,
-    df = x$df,
-    p.value = x$p.value,
-    stringsAsFactors = FALSE
-  )
-  print(display, row.names = FALSE, digits = 4)
-  invisible(x)
+    cat("Pooled results from", x$m[1], "imputed datasets\n")
+    cat("Rubin's rules with Barnard-Rubin df adjustment\n\n")
+    display <- data.frame(
+        term = x$term,
+        estimate = x$estimate,
+        std.error = x$std.error,
+        statistic = x$statistic,
+        df = x$df,
+        p.value = x$p.value,
+        stringsAsFactors = FALSE
+    )
+    print(display, row.names = FALSE, digits = 4)
+    invisible(x)
 }
 
 #' Summary method for pooled MI results
@@ -234,34 +254,34 @@ print.miceFast_pool <- function(x, ...) {
 #' @return Invisibly returns the full diagnostics data.frame.
 #' @export
 summary.miceFast_pool <- function(object, ...) {
-  cat("Pooled results from", object$m[1], "imputed datasets\n")
-  cat("Rubin's rules with Barnard-Rubin df adjustment\n")
-  cat("Complete-data df:", object$dfcom[1], "\n\n")
-  cat("Coefficients:\n")
-  coef_df <- data.frame(
-    term = object$term,
-    estimate = object$estimate,
-    std.error = object$std.error,
-    statistic = object$statistic,
-    df = object$df,
-    p.value = object$p.value,
-    `conf.low` = object$conf.low,
-    `conf.high` = object$conf.high,
-    stringsAsFactors = FALSE,
-    check.names = FALSE
-  )
-  print(coef_df, row.names = FALSE, digits = 4)
-  cat("\nPooling diagnostics:\n")
-  diag_df <- data.frame(
-    term = object$term,
-    ubar = object$ubar,
-    b = object$b,
-    t = object$t,
-    riv = object$riv,
-    lambda = object$lambda,
-    fmi = object$fmi,
-    stringsAsFactors = FALSE
-  )
-  print(diag_df, row.names = FALSE, digits = 4)
-  invisible(object)
+    cat("Pooled results from", object$m[1], "imputed datasets\n")
+    cat("Rubin's rules with Barnard-Rubin df adjustment\n")
+    cat("Complete-data df:", object$dfcom[1], "\n\n")
+    cat("Coefficients:\n")
+    coef_df <- data.frame(
+        term = object$term,
+        estimate = object$estimate,
+        std.error = object$std.error,
+        statistic = object$statistic,
+        df = object$df,
+        p.value = object$p.value,
+        `conf.low` = object$conf.low,
+        `conf.high` = object$conf.high,
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+    )
+    print(coef_df, row.names = FALSE, digits = 4)
+    cat("\nPooling diagnostics:\n")
+    diag_df <- data.frame(
+        term = object$term,
+        ubar = object$ubar,
+        b = object$b,
+        t = object$t,
+        riv = object$riv,
+        lambda = object$lambda,
+        fmi = object$fmi,
+        stringsAsFactors = FALSE
+    )
+    print(diag_df, row.names = FALSE, digits = 4)
+    invisible(object)
 }

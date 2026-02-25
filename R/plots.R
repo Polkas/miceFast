@@ -32,13 +32,21 @@ compare_imp <- function(df, origin, target) {
   stopifnot(inherits(target, "character"))
   stopifnot(all(c(origin, target) %in% colnames(df)))
 
-  if (suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))) {
+  if (
+    suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))
+  ) {
     data <- as.data.frame(df)
     data$origin_NA <- ifelse(is.na(data[[origin]]), "missing", "complete")
     data_long <- utils::stack(data[, c(origin, target)])
-    data_long <- cbind(data_long, origin_NA = rep(data$origin_NA, length(c(origin, target))))
+    data_long <- cbind(
+      data_long,
+      origin_NA = rep(data$origin_NA, length(c(origin, target)))
+    )
     colnames(data_long) <- c("value", "name", "origin_NA")
-    data_final <- data_long[(((data_long$origin_NA == "missing") & (data_long$name %in% target)) | ((data_long$origin_NA == "complete") & (data_long$name == origin))), ]
+    data_final <- data_long[
+      (((data_long$origin_NA == "missing") & (data_long$name %in% target)) |
+        ((data_long$origin_NA == "complete") & (data_long$name == origin))),
+    ]
     ggplot2::ggplot(
       data_final,
       ggplot2::aes(
@@ -48,7 +56,7 @@ compare_imp <- function(df, origin, target) {
         group = !!as.name("name")
       )
     ) +
-    ggplot2::geom_density(alpha = 0.4)
+      ggplot2::geom_density(alpha = 0.4)
   } else {
     stop("Please install ggplot2 package to use the compare_imp function.")
   }

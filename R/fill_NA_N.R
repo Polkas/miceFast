@@ -1,4 +1,3 @@
-
 #' \code{fill_NA_N} function for the multiple imputations purpose
 #'
 #' @description
@@ -67,8 +66,21 @@
 #'
 #' @export
 
-fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
-  if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
+fill_NA_N <- function(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  ridge = 1e-6
+) {
+  if (
+    inherits(x, "data.frame") ||
+      inherits(x, "matrix") ||
+      inherits(x, "data.table")
+  ) {
     if (posit_y %in% posit_x) {
       stop("the same variable is dependent and independent")
     }
@@ -99,7 +111,16 @@ fill_NA_N <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 
 
 #' @describeIn fill_NA_N s3 method for data.frame
 
-fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
+fill_NA_N.data.frame <- function(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  ridge = 1e-6
+) {
   ww <- if (is.null(w)) vector() else w
 
   yy <- x[[posit_y]]
@@ -108,7 +129,9 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
   is_factor_y <- yy_class == "factor"
   is_character_y <- yy_class == "character"
-  is_numeric_y <- (yy_class == "numeric") || (yy_class == "integer") || (yy_class == "logical")
+  is_numeric_y <- (yy_class == "numeric") ||
+    (yy_class == "integer") ||
+    (yy_class == "logical")
 
   all_pos_y <- FALSE
   if (is_numeric_y) {
@@ -116,7 +139,9 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   }
 
   if ((is_character_y || is_factor_y || (model == "lda")) && logreg) {
-    stop("logreg works only for a non-negative numeric dependent variable and lm models")
+    stop(
+      "logreg works only for a non-negative numeric dependent variable and lm models"
+    )
   } else if (all_pos_y && logreg) {
     yy <- log(yy + 1e-8)
   }
@@ -124,7 +149,9 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   x_small <- x[, posit_x]
   types <- lapply(x_small, class)
   x_ncols <- length(posit_x)
-  p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
+  p_x_factor_character <- which(unlist(lapply(types, function(i) {
+    !all(is.na(match(c("factor", "character"), i)))
+  })))
   len_p_x_factor_character <- length(p_x_factor_character)
 
   xx <- vector("list", 2)
@@ -147,15 +174,35 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
+    f <- round(fill_NA_N_(
+      cbind(yy, xx),
+      model,
+      1,
+      2:(ncol(xx) + 1),
+      ww,
+      k,
+      ridge
+    ))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy)))) else factor(yy)
+    yy <- if (model != "lda") {
+      factor(yy, levels = sort(as.numeric(unique(yy))))
+    } else {
+      factor(yy)
+    }
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
+    f <- round(fill_NA_N_(
+      cbind(yy, xx),
+      model,
+      1,
+      2:(ncol(xx) + 1),
+      ww,
+      k,
+      ridge
+    ))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
@@ -172,7 +219,16 @@ fill_NA_N.data.frame <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for data.table
 
-fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
+fill_NA_N.data.table <- function(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  ridge = 1e-6
+) {
   ww <- if (is.null(w)) vector() else w
 
   yy <- x[[posit_y]]
@@ -181,7 +237,9 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
   is_factor_y <- yy_class == "factor"
   is_character_y <- yy_class == "character"
-  is_numeric_y <- (yy_class == "numeric") || (yy_class == "integer") || (yy_class == "logical")
+  is_numeric_y <- (yy_class == "numeric") ||
+    (yy_class == "integer") ||
+    (yy_class == "logical")
 
   all_pos_y <- FALSE
   if (is_numeric_y) {
@@ -189,7 +247,9 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   }
 
   if ((is_character_y || is_factor_y || (model == "lda")) && logreg) {
-    stop("logreg works only for a non-negative numeric dependent variable and lm models")
+    stop(
+      "logreg works only for a non-negative numeric dependent variable and lm models"
+    )
   } else if (all_pos_y && logreg) {
     yy <- log(yy + 1e-8)
   }
@@ -197,7 +257,9 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   x_small <- x[, posit_x, with = FALSE]
   types <- lapply(x_small, class)
   x_ncols <- length(posit_x)
-  p_x_factor_character <- which(unlist(lapply(types, function(i) !all(is.na(match(c("factor", "character"), i))))))
+  p_x_factor_character <- which(unlist(lapply(types, function(i) {
+    !all(is.na(match(c("factor", "character"), i)))
+  })))
   len_p_x_factor_character <- length(p_x_factor_character)
 
   xx <- vector("list", 2)
@@ -220,15 +282,35 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
   if (is_factor_y) {
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
+    f <- round(fill_NA_N_(
+      cbind(yy, xx),
+      model,
+      1,
+      2:(ncol(xx) + 1),
+      ww,
+      k,
+      ridge
+    ))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- if (model != "lda") factor(yy, levels = sort(as.numeric(unique(yy)))) else factor(yy)
+    yy <- if (model != "lda") {
+      factor(yy, levels = sort(as.numeric(unique(yy))))
+    } else {
+      factor(yy)
+    }
     l <- levels(yy)
     yy <- as.numeric(yy)
-    f <- round(fill_NA_N_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, k, ridge))
+    f <- round(fill_NA_N_(
+      cbind(yy, xx),
+      model,
+      1,
+      2:(ncol(xx) + 1),
+      ww,
+      k,
+      ridge
+    ))
     f[f <= 0] <- 1
     f[f > length(l)] <- length(l)
     ff <- l[f]
@@ -245,7 +327,16 @@ fill_NA_N.data.table <- function(x, model, posit_y, posit_x, w = NULL, logreg = 
 
 #' @describeIn fill_NA_N S3 method for matrix
 
-fill_NA_N.matrix <- function(x, model, posit_y, posit_x, w = NULL, logreg = FALSE, k = 10, ridge = 1e-6) {
+fill_NA_N.matrix <- function(
+  x,
+  model,
+  posit_y,
+  posit_x,
+  w = NULL,
+  logreg = FALSE,
+  k = 10,
+  ridge = 1e-6
+) {
   ww <- if (is.null(w)) vector() else w
 
   all_pos_y <- !any(x[, posit_y] < 0, na.rm = TRUE)
