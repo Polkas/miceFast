@@ -21,7 +21,20 @@ Major speed improvements occur when:
 
 For performance details, see `performance_validity.R` in the `extdata` folder.
 
-[It is recommended to read the Advanced Usage Vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html).
+**Vignettes:**
+
+- [Introduction and Advanced Usage](https://polkas.github.io/miceFast/articles/miceFast-intro.html)
+- [Missing Data Mechanisms and Multiple Imputation](https://polkas.github.io/miceFast/articles/missing-data-and-imputation.html)
+
+## Multiple Imputation and mice
+
+[mice](https://cran.r-project.org/package=mice) implements the full MI pipeline (impute, analyze, pool). **miceFast** focuses on the computationally expensive part: fitting the imputation models. Two usage modes:
+
+1. **MI with Rubin's rules** — call `fill_NA()` with a stochastic model (`lm_bayes`, `lm_noise`, or `lda` with a random `ridge`) in a loop to create *m* completed datasets, then `pool()` the fitted models.
+
+2. **Single-dataset averaging** — `fill_NA_N()` returns the mean of *k* draws per missing value. Handy for exploration, but not for Rubin's rules (between-imputation variance is lost).
+
+See the [MI vignette](https://polkas.github.io/miceFast/articles/missing-data-and-imputation.html) for worked examples.
 
 ## Installation
 
@@ -37,10 +50,9 @@ devtools::install_github("polkas/miceFast")
 
 ## Quick Example
 
-Below is a short demonstration. See the [vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html) for advanced usage and best practices.
-
 ```r
 library(miceFast)
+library(dplyr)
 
 set.seed(1234)
 data(air_miss)
@@ -48,64 +60,29 @@ data(air_miss)
 # Visualize the NA structure
 upset_NA(air_miss, 6)
 
-# Simple and naive fill
-imputed_data <- naive_fill_NA(air_miss)
+# Naive imputation (quick, but biased — see ?naive_fill_NA)
+naive_fill_NA(air_miss)
 
-# Compare with other packages:
-# Hmisc
-library(Hmisc)
-data.frame(Map(function(x) Hmisc::impute(x, "random"), air_miss))
+# Model-based single imputation with fill_NA
+air_miss %>%
+  mutate(Ozone_imp = fill_NA(
+    x = ., model = "lm_bayes",
+    posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp")
+  ))
 
-# mice
-library(mice)
-mice::complete(mice::mice(air_miss, printFlag = FALSE))
+# Proper MI: impute m times, fit models, pool with Rubin's rules
+completed <- lapply(1:5, function(i) {
+  air_miss %>%
+    mutate(Ozone_imp = fill_NA(
+      x = ., model = "lm_bayes",
+      posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp")
+    ))
+})
+fits <- lapply(completed, function(d) lm(Ozone_imp ~ Wind + Temp, data = d))
+pool(fits)
 ```
 
-## Loop example
-
-Multiple imputations are performed in a loop where a continuous variable is imputed using a Bayesian linear model (lm_bayes) that incorporates relevant predictors and weights for robust estimation. Simultaneously, a categorical variable is imputed using linear discriminant analysis (LDA) augmented with a randomly generated ridge penalty.
-
-```r
-library(dplyr)
-
-# Define a function that performs the imputation on the dataset
-impute_data <- function(data) {
-  data %>%
-    mutate(
-      # Impute the continuous variable using lm_bayes
-      Solar_R_imp = fill_NA(
-        x = .,
-        model = "lm_bayes",
-        posit_y = "Solar.R",
-        posit_x = c("Wind", "Temp", "Intercept"),
-        w = weights  # assuming 'weights' is a column in data
-      ),
-      # Impute the categorical variable using lda with a random ridge parameter
-      Ozone_chac_imp = fill_NA(
-        x = .,
-        model = "lda",
-        posit_y = "Ozone_chac",
-        posit_x = c("Wind", "Temp"),
-        ridge = runif(1, 0, 50)
-      )
-    )
-}
-
-# Set seed for reproducibility
-set.seed(123456)
-
-# Run the imputation process 3 times using replicate()
-# This returns a list of imputed datasets.
-res <- replicate(n = 3, expr = impute_data(air_miss), simplify = FALSE)
-
-# Check results: Calculate the mean of the imputed Solar.R values in each dataset
-means_imputed <- lapply(res, function(x) mean(x$Solar_R_imp, na.rm = TRUE))
-print(means_imputed)
-
-# Check results: Tabulate the imputed categorical variable for each dataset
-tables_imputed <- lapply(res, function(x) table(x$Ozone_chac_imp))
-print(tables_imputed)
-```
+See the [Introduction vignette](https://polkas.github.io/miceFast/articles/miceFast-intro.html) for grouped imputation, data.table syntax, the OOP interface, and more.
 
 ---
 
@@ -115,6 +92,7 @@ print(tables_imputed)
 - **Convenient Helpers**:  
   - `fill_NA()`: Single imputation (`lda`, `lm_pred`, `lm_bayes`, `lm_noise`).  
   - `fill_NA_N()`: Multiple imputations (`pmm`, `lm_bayes`, `lm_noise`).  
+  - `pool()`: Pool multiply imputed results using Rubin's rules.  
   - `VIF()`: Variance Inflation Factor calculations.  
   - `naive_fill_NA()`: Automatic naive imputations.  
   - `compare_imp()`: Compare original vs. imputed values.  
@@ -126,7 +104,8 @@ print(tables_imputed)
 |-----------------|-----------------------------------------------------------------------------|
 | `new(miceFast)` | Creates an OOP instance with numerous imputation methods (see the vignette). |
 | `fill_NA()`     | Single imputation: `lda`, `lm_pred`, `lm_bayes`, `lm_noise`.                   |
-| `fill_NA_N()`   | Multiple imputations (N repeats): `pmm`, `lm_bayes`, `lm_noise`.               |
+| `fill_NA_N()`   | Averaged multiple imputations (mean of N draws): `pmm`, `lm_bayes`, `lm_noise`. |
+| `pool()`        | Pools estimates from *m* imputed datasets using Rubin's rules. Works with any model that has `coef()` and `vcov()`. |
 | `VIF()`         | Computes Variance Inflation Factors.                                         |
 | `naive_fill_NA()` | Performs automatic, naive imputations.                                     |
 | `compare_imp()` | Compares imputations vs. original data.                                      |
@@ -136,14 +115,10 @@ print(tables_imputed)
 
 ## Performance Highlights
 
-Benchmark testing (on R 4.4.3, macOS M3 Pro, [optimized BLAS and LAPACK](https://cran.r-project.org/bin/macosx/RMacOSX-FAQ.html#Which-BLAS-is-used-and-how-can-it-be-changed_003f)) shows **miceFast** can significantly reduce computation time, especially in these scenarios:
+Median timings on 100k rows, 10 variables, 100 groups (R 4.4.3, macOS M3 Pro, [optimized BLAS/LAPACK](https://cran.r-project.org/bin/macosx/RMacOSX-FAQ.html#Which-BLAS-is-used-and-how-can-it-be-changed_003f)):
 
-- **Linear Discriminant Analysis (LDA)**: ~5x faster.  
-- **Grouping Variable Imputations**: ~10x faster (and can exceed 100x in some edge cases).  
-- **Multiple Imputations**: ~`x * (number of multiple imputations)` faster, since the model is computed only once.  
-- **Variance Inflation Factors (VIF)**: ~5x faster, because we only compute the inverse of X'X.  
-- **Predictive Mean Matching (PMM)**: ~3x faster, thanks to presorting and binary search.
+Imputation quality (SSE) is comparable to mice across all models.
 
 ![](man/figures/g_summary.png)
 
-For performance details, see `performance_validity.R` in the `extdata` folder.
+Full benchmark script: `inst/extdata/performance_validity.R`.

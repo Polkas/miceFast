@@ -1,1 +1,7 @@
 destination: docs
+
+articles:
+  - title: Vignettes
+    contents:
+      - miceFast-intro
+      - missing-data-and-imputation

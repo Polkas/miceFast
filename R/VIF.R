@@ -50,7 +50,7 @@ VIF <- function(x, posit_y, posit_x, correct = FALSE) {
     stopifnot(is.logical(correct))
 
     if (posit_y %in% posit_x) {
-      stop("the same variable is dependent and indepentent")
+      stop("the same variable is dependent and independent")
     }
 
     cols <- colnames(x)

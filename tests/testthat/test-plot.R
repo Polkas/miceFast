@@ -16,6 +16,7 @@ testthat::test_that("compare_imp", {
 })
 
 testthat::test_that("upset_NA", {
+  testthat::skip_if_not_installed("UpSetR")
   testthat::expect_silent(upset_NA(airquality))
 })
 

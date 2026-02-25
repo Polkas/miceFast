@@ -69,11 +69,11 @@ compare_imp <- function(df, origin, target) {
 #' IEEE Transactions on Visualization and Computer Graphics (Proceedings of InfoVis 2014), vol 20, pp. 1983-1992, (2014).
 #' @references Lex and Gehlenborg (2014). Points of view: Sets and intersections. Nature Methods 11, 779 (2014). \url{https://www.nature.com/articles/nmeth.3033}
 #' @examples
-#' library(miceFast)
-#' library(UpSetR)
-#' upset_NA(airquality)
-#' upset_NA(air_miss, 6)
-#'
+#' if (requireNamespace("UpSetR", quietly = TRUE)) {
+#'   library(UpSetR)
+#'   upset_NA(airquality)
+#'   upset_NA(air_miss, 6)
+#' }
 upset_NA <- function(...) {
   args <- list(...)
   stopifnot(inherits(args[[1]], "data.frame"))

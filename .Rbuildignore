@@ -13,3 +13,4 @@ TODO.md
 ^\.github$
 ^\revdep$
 codecov.yml
+^\.vscode$

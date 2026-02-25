@@ -107,6 +107,38 @@ testthat::test_that("fill_NA_N lm_noise accuracy", {
   testthat::expect_true(cor(cbind(pred_lm_noise_N[index_NA], data_con[index_NA, 1]))[1, 2] > 0.5)
 })
 
+testthat::test_that("fill_NA lm_pred weighted matches R lm.wfit()", {
+  # Build a simple dataset with known NAs, weights, and intercept
+  set.seed(42)
+  n <- 200
+  x1 <- rnorm(n)
+  x2 <- rnorm(n)
+  w <- rgamma(n, 3, 3)
+  y_true <- 1 + 2 * x1 - 0.5 * x2 + rnorm(n)
+  y <- y_true
+  na_idx <- sample(seq_len(n), 40)
+  y[na_idx] <- NA
+  mat <- cbind(y = y, intercept = 1, x1 = x1, x2 = x2, w = w)
+
+  # miceFast weighted prediction (user provides intercept column)
+  pred_mf <- fill_NA(
+    x = mat,
+    model = "lm_pred",
+    posit_y = 1,
+    posit_x = c(2, 3, 4),
+    w = mat[, 5],
+    ridge = 0
+  )
+
+  # R's WLS on complete cases using lm.wfit (no formula intercept — matches miceFast)
+  cc <- !is.na(mat[, 1])
+  fit_r <- lm.wfit(x = mat[cc, 2:4], y = mat[cc, 1], w = w[cc])
+  pred_r <- mat[na_idx, 2:4] %*% fit_r$coefficients
+
+  # Predictions should match to machine precision
+  testthat::expect_true(max(abs(pred_mf[na_idx] - pred_r)) < 1e-10)
+})
+
 testthat::test_that("fill_NA lda accuracy", {
   pred_lda <- fill_NA(
     x = as.matrix(data_bin_NA),
@@ -192,7 +224,7 @@ testthat::test_that("fill_NA error", {
     posit_y = 1,
     posit_x = c(1, 3),
     w = data_df[["weights"]]
-  ), "the same variable is dependent and indepentent")
+  ), "the same variable is dependent and independent")
 
   expect_error(fill_NA(
     x = data_df,
@@ -251,7 +283,7 @@ testthat::test_that("fill_NA_N error", {
     posit_y = 1,
     posit_x = c(1, 3),
     w = data_df[["weights"]]
-  ), "the same variable is dependent and indepentent")
+  ), "the same variable is dependent and independent")
 
   expect_error(fill_NA_N(
     x = data_df,

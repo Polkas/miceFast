@@ -32,7 +32,7 @@ test_that("VIF correct", {
 testthat::test_that("VIF error", {
   expect_error(VIF(airquality2, 1, NULL, correct = 2), "is.logical\\(correct\\) is not TRUE")
   expect_error(VIF(airquality2, 1, NULL, correct = FALSE), "at least two independent variables should be provided")
-  expect_error(VIF(airquality2, 1, 1, correct = FALSE), "the same variable is dependent and indepentent")
+  expect_error(VIF(airquality2, 1, 1, correct = FALSE), "the same variable is dependent and independent")
   expect_error(VIF(airquality2, 2, 22:23, correct = FALSE), "posit_x %in% ")
   expect_error(VIF(airquality2, 22, 2:3, correct = FALSE), "posit_y %in%")
   expect_error(VIF(2, 22, 2:3, correct = FALSE), "wrong data type - it should be data.frame, matrix or data.table")

@@ -2,20 +2,22 @@
 % Please edit documentation in R/RcppExports.R
 \name{neibo}
 \alias{neibo}
-\title{Finding in random manner one of the k closets points in a certain vector for each value in a second vector}
+\title{Finding in random manner one of the k closest points in a certain vector
+for each value in a second vector}
 \usage{
 neibo(y, miss, k)
 }
 \arguments{
-\item{y}{numeric vector values to be look up}
+\item{y}{numeric vector values to be looked up}
 
-\item{miss}{numeric vector a values to be look for}
+\item{miss}{numeric vector values to be looked for}
 
-\item{k}{integer a number of values which should be taken into account during sampling one of the k closest point}
+\item{k}{integer number of nearest neighbours to sample from}
 }
 \value{
 a numeric vector
 }
 \description{
-this function using pre-sorting of a y and the binary search the one of the k closest value for each miss is returned.
+This function uses pre-sorting of y and binary search to find
+  one of the k closest values for each miss.
 }
