@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -197,7 +197,7 @@ The package includes convenient helper functions compatible with <strong>data.ta
 <code><a href="reference/fill_NA.html">fill_NA()</a></code>: Single imputation (<code>lda</code>, <code>lm_pred</code>, <code>lm_bayes</code>, <code>lm_noise</code>).<br>
 </li>
 <li>
-<code><a href="reference/fill_NA_N.html">fill_NA_N()</a></code>: Multiple imputations (<code>pmm</code>, <code>lm_bayes</code>, <code>lm_noise</code>).<br>
+<code><a href="reference/fill_NA_N.html">fill_NA_N()</a></code>: Averaged multiple imputations (mean of N draws) (<code>pmm</code>, <code>lm_bayes</code>, <code>lm_noise</code>).<br>
 </li>
 <li>
 <code><a href="reference/pool.html">pool()</a></code>: Pool multiply imputed results using Rubin’s rules.<br>
@@ -267,6 +267,8 @@ The package includes convenient helper functions compatible with <strong>data.ta
 <h2 id="practical-advice">Practical Advice<a class="anchor" aria-label="anchor" href="#practical-advice"></a>
 </h2>
 <ul>
+<li>
+<strong>Only need a filled-in dataset for exploration or ML?</strong> A single imputation with <code><a href="reference/fill_NA.html">fill_NA()</a></code> or averaging draws with <code><a href="reference/fill_NA_N.html">fill_NA_N()</a></code> is fast and convenient. For any inferential statement use full MI with <code><a href="reference/pool.html">pool()</a></code>.</li>
 <li>
 <strong>Little missing data + MCAR?</strong> Consider using <code><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases()</a></code> — listwise deletion is unbiased under MCAR and may be sufficient when the fraction of incomplete rows is small.</li>
 <li>

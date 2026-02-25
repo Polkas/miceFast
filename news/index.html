@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -51,21 +51,21 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.8.5.9000" id="micefast-0859000">miceFast 0.8.5.9000<a class="anchor" aria-label="anchor" href="#micefast-0859000"></a></h2>
+<h2 class="page-header" data-toc-text="0.9.0" id="micefast-090">miceFast 0.9.0<a class="anchor" aria-label="anchor" href="#micefast-090"></a></h2>
 <p>Kota Hattori, thank you for your feedback and for motivating me for this deep update.</p>
 <div class="section level3">
-<h3 id="new-features-0-8-5-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-5-9000"></a></h3>
+<h3 id="new-features-0-9-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-0"></a></h3>
 <ul><li>
 <code><a href="../reference/pool.html">pool()</a></code> function for combining results from multiply imputed datasets (Rubin’s rules, Barnard-Rubin df adjustment). Works with <code>lm</code>, <code>glm</code>, and other models that support <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>. Validated against <code>mice</code>.</li>
 <li>
 <code>print</code> and <code>summary</code> methods for pooled results.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-8-5-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-5-9000"></a></h3>
+<h3 id="bug-fixes-0-9-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-0"></a></h3>
 <ul><li>fixed residual variance estimator in <code>lm_noise</code> and <code>lm_bayes</code> stochastic models: divisor changed from <code>n-p-1</code> to <code>n-p</code>, where <code>p</code> already counts the intercept column supplied by the user. The previous formula over-corrected by one degree of freedom.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="documentation-and-internals-0-8-5-9000">Documentation and internals<a class="anchor" aria-label="anchor" href="#documentation-and-internals-0-8-5-9000"></a></h3>
+<h3 id="documentation-and-internals-0-9-0">Documentation and internals<a class="anchor" aria-label="anchor" href="#documentation-and-internals-0-9-0"></a></h3>
 <ul><li>new vignette on missing data mechanisms (MCAR/MAR/MNAR) and MI workflows.</li>
 <li>refactored introduction vignette with <code><a href="../reference/pool.html">pool()</a></code> examples.</li>
 <li>improved README with MI section and benchmark table.</li>
