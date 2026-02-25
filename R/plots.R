@@ -32,13 +32,21 @@ compare_imp <- function(df, origin, target) {
   stopifnot(inherits(target, "character"))
   stopifnot(all(c(origin, target) %in% colnames(df)))
 
-  if (suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))) {
+  if (
+    suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))
+  ) {
     data <- as.data.frame(df)
     data$origin_NA <- ifelse(is.na(data[[origin]]), "missing", "complete")
     data_long <- utils::stack(data[, c(origin, target)])
-    data_long <- cbind(data_long, origin_NA = rep(data$origin_NA, length(c(origin, target))))
+    data_long <- cbind(
+      data_long,
+      origin_NA = rep(data$origin_NA, length(c(origin, target)))
+    )
     colnames(data_long) <- c("value", "name", "origin_NA")
-    data_final <- data_long[(((data_long$origin_NA == "missing") & (data_long$name %in% target)) | ((data_long$origin_NA == "complete") & (data_long$name == origin))), ]
+    data_final <- data_long[
+      (((data_long$origin_NA == "missing") & (data_long$name %in% target)) |
+        ((data_long$origin_NA == "complete") & (data_long$name == origin))),
+    ]
     ggplot2::ggplot(
       data_final,
       ggplot2::aes(
@@ -48,7 +56,7 @@ compare_imp <- function(df, origin, target) {
         group = !!as.name("name")
       )
     ) +
-    ggplot2::geom_density(alpha = 0.4)
+      ggplot2::geom_density(alpha = 0.4)
   } else {
     stop("Please install ggplot2 package to use the compare_imp function.")
   }
@@ -69,11 +77,11 @@ compare_imp <- function(df, origin, target) {
 #' IEEE Transactions on Visualization and Computer Graphics (Proceedings of InfoVis 2014), vol 20, pp. 1983-1992, (2014).
 #' @references Lex and Gehlenborg (2014). Points of view: Sets and intersections. Nature Methods 11, 779 (2014). \url{https://www.nature.com/articles/nmeth.3033}
 #' @examples
-#' library(miceFast)
-#' library(UpSetR)
-#' upset_NA(airquality)
-#' upset_NA(air_miss, 6)
-#'
+#' if (requireNamespace("UpSetR", quietly = TRUE)) {
+#'   library(UpSetR)
+#'   upset_NA(airquality)
+#'   upset_NA(air_miss, 6)
+#' }
 upset_NA <- function(...) {
   args <- list(...)
   stopifnot(inherits(args[[1]], "data.frame"))

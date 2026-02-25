@@ -46,11 +46,15 @@
 #' @export
 
 VIF <- function(x, posit_y, posit_x, correct = FALSE) {
-  if (inherits(x, "data.frame") || inherits(x, "matrix") || inherits(x, "data.table")) {
+  if (
+    inherits(x, "data.frame") ||
+      inherits(x, "matrix") ||
+      inherits(x, "data.table")
+  ) {
     stopifnot(is.logical(correct))
 
     if (posit_y %in% posit_x) {
-      stop("the same variable is dependent and indepentent")
+      stop("the same variable is dependent and independent")
     }
 
     cols <- colnames(x)
@@ -63,7 +67,9 @@ VIF <- function(x, posit_y, posit_x, correct = FALSE) {
       stopifnot(posit_x %in% seq_len(dim(x)[2]))
     }
 
-    if (length(posit_x) < 2) stop("at least two independent variables should be provided")
+    if (length(posit_x) < 2) {
+      stop("at least two independent variables should be provided")
+    }
 
     # contains_intercept <- any(unlist(apply(x[, posit_x], 2, function(i) all(duplicated(i)[-1L]))))
     # if (contains_intercept) stop("Do not include an intercept")

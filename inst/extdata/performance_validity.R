@@ -1,24 +1,42 @@
-# library(devtools)
-# install_github("Rcpp","RcppCore")
-# install.packages("pacman")
-library(pacman)
+# Performance & Validity Benchmarks for miceFast
+# Run from the package root: Rscript inst/extdata/performance_validity.R
+#
+# Compares miceFast vs mice on every imputation model (LDA, lm_pred,
+# lm_noise, lm_bayes, PMM, weighted variants, grouped, multiple) and VIF.
+# Saves benchmark plots to inst/extdata/images/.
 
-p_load(
-  Rcpp,
-  mice,
-  tidyverse,
-  ggthemes,
-  broom,
-  miceFast,
-  data.table,
-  microbenchmark,
-  car,
-  ggplot2
-)
+suppressPackageStartupMessages({
+  library(Rcpp)
+  library(mice)
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(ggthemes)
+  library(miceFast)
+  library(data.table)
+  library(microbenchmark)
+  library(car)
+  library(rprojroot)
+})
 
 set.seed(1234)
 
-base_path <- "/Users/maciejnasinski/Documents/miceFast"
+# Portable base_path: works from package root or from this script's dir
+base_path <- tryCatch(
+  rprojroot::find_package_root_file(),
+  error = function(e) {
+    normalizePath(
+      file.path(dirname(sys.frame(1)$ofile), "..", ".."),
+      mustWork = FALSE
+    )
+  }
+)
+dir.create(
+  file.path(base_path, "inst", "extdata", "images"),
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+cat("Saving plots to:", file.path(base_path, "inst", "extdata", "images"), "\n")
 
 # parameters
 power <- 5 # power of 10 - number of observations - should be adjusted to a computer capabilities
@@ -107,7 +125,7 @@ data_bin_NA <- cbind(
   index
 )
 
-colnames(data_bin_NA) <- c(
+col_names <- c(
   "y",
   paste0("x", posit_x),
   "weights",
@@ -115,26 +133,13 @@ colnames(data_bin_NA) <- c(
   "index_NA",
   "index"
 )
-colnames(data_disc_NA) <- c(
-  "y",
-  paste0("x", posit_x),
-  "weights",
-  "group",
-  "index_NA",
-  "index"
-)
-colnames(data_con_NA) <- c(
-  "y",
-  paste0("x", posit_x),
-  "weights",
-  "group",
-  "index_NA",
-  "index"
-)
+colnames(data_bin_NA) <- col_names
+colnames(data_disc_NA) <- col_names
+colnames(data_con_NA) <- col_names
 
 ###################### Discrete
 
-mice.impute.lda <- mice.impute.lda(
+pred_lda_disc_mice <- mice::mice.impute.lda(
   data_disc[, posit_y],
   !index_NA,
   data_disc[, posit_x]
@@ -147,10 +152,10 @@ pred_miceFast <- model$impute("lda", posit_y, posit_x)
 rm(model)
 
 table(pred_miceFast$imputations[index_NA], data_disc[index_NA, posit_y])
-table(as.numeric(mice.impute.lda), data_disc[index_NA, posit_y])
+table(as.numeric(pred_lda_disc_mice), data_disc[index_NA, posit_y])
 
 m1 <- microbenchmark::microbenchmark(
-  R_mice = mice.impute.lda(
+  R_mice = mice::mice.impute.lda(
     data_disc[, posit_y],
     !index_NA,
     data_disc[, posit_x]
@@ -175,11 +180,6 @@ ggsave(sprintf("%s/inst/extdata/images/g1.png", base_path), g1)
 
 index_sort <- sort(data_disc_NA[, posit_grs], index.return = TRUE)$ix
 
-index_rev <- sort(
-  sort(data_disc_NA[, posit_grs], index.return = TRUE)$ix,
-  index.return = TRUE
-)$ix
-
 data_disc_NA_sort <- data_disc_NA[index_sort, ]
 
 data_disc_NA_sort_DF <- as.data.frame(data_disc_NA_sort)
@@ -190,7 +190,11 @@ pred_Rbase <- NULL
 for (i in unique(data_disc_NA_sort[, posit_grs])) {
   sub <- data_disc_NA_sort[, posit_grs] == i
   temp <- data_disc_NA_sort[sub, ]
-  pred <- mice.impute.lda(temp[, posit_y], !temp[, posit_NA], temp[, posit_x])
+  pred <- mice::mice.impute.lda(
+    temp[, posit_y],
+    !temp[, posit_NA],
+    temp[, posit_x]
+  )
   pred_Rbase <- c(pred_Rbase, as.numeric(pred))
 }
 
@@ -199,7 +203,7 @@ table(pred_Rbase, true_y)
 pred_dplyr <- tibble(data_disc_NA_sort_DF) %>%
   group_by(group) %>%
   do(
-    im = mice.impute.lda(
+    im = mice::mice.impute.lda(
       as.matrix(.[, posit_y]),
       !.$index_NA,
       as.matrix(.[, posit_x])
@@ -216,7 +220,7 @@ table(pred_dplyr, true_y)
 data_disc_NA_sort_DT <- data.table(data_disc_NA_sort)
 pred_datatable <- data_disc_NA_sort_DT[,
   {
-    im <- mice.impute.lda(
+    im <- mice::mice.impute.lda(
       as.matrix(.SD[["y"]]),
       !index_NA,
       as.matrix(.SD[, posit_x, with = F])
@@ -268,7 +272,7 @@ m2 <- microbenchmark::microbenchmark(
     pred_dplyr <- data_disc_NA_sort_DF %>%
       group_by(group) %>%
       do(
-        im = mice.impute.lda(
+        im = mice::mice.impute.lda(
           as.matrix(.[, posit_y]),
           !.$index_NA,
           as.matrix(.[, posit_x])
@@ -282,7 +286,7 @@ m2 <- microbenchmark::microbenchmark(
   DT_mice = {
     pred_datatable <- data_disc_NA_sort_DT[,
       {
-        im <- mice.impute.lda(
+        im <- mice::mice.impute.lda(
           as.matrix(.SD[["y"]]),
           !index_NA,
           as.matrix(.SD[, posit_x, with = F])
@@ -304,12 +308,12 @@ m2 <- microbenchmark::microbenchmark(
     for (i in unique(data_disc_NA_sort[, nr_var])) {
       sub <- data_disc_NA_sort[, posit_grs] == i
       temp <- data_disc_NA_sort[sub, ]
-      pred <- mice.impute.lda(
+      pred <- mice::mice.impute.lda(
         temp[, posit_y],
         !temp[, posit_NA],
         temp[, posit_x]
       )
-      pred_Rbase <- c(pred_Rbase, as.numeric(pred))
+      pred_all <- c(pred_all, as.numeric(pred))
     }
   },
   miceFast = {
@@ -333,7 +337,7 @@ ggsave(sprintf("%s/inst/extdata/images/g2.png", base_path), g2)
 
 ####################### Binom
 
-mice.impute.lda <- mice.impute.lda(
+pred_lda_bin_mice <- mice::mice.impute.lda(
   data_bin[, posit_y],
   !index_NA,
   data_bin[, posit_x]
@@ -347,11 +351,11 @@ pred_miceFast <- model$impute("lda", posit_y, posit_x)
 rm(model)
 
 table(pred_miceFast$imputations[index_NA], data_bin[index_NA, posit_y])
-table(mice.impute.lda, data_bin[index_NA, posit_y])
+table(pred_lda_bin_mice, data_bin[index_NA, posit_y])
 
 m3 <- microbenchmark::microbenchmark(
   R_mice = {
-    mice.impute.lda <- mice.impute.lda(
+    mice::mice.impute.lda(
       data_bin[, posit_y],
       !index_NA,
       data_bin[, posit_x]
@@ -377,7 +381,7 @@ ggsave(sprintf("%s/inst/extdata/images/g3.png", base_path), g3)
 
 ##################### Continous - LM Noise
 
-mice.impute.norm.nob <- mice.impute.norm.nob(
+pred_noise_mice <- mice::mice.impute.norm.nob(
   data_con[, posit_y],
   !index_NA,
   data_con[, posit_x]
@@ -391,11 +395,11 @@ pred_miceFast <- model$impute("lm_noise", posit_y, posit_x)
 rm(model)
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
-sum((mice.impute.norm.nob - data_con[index_NA, posit_y])^2)
+sum((pred_noise_mice - data_con[index_NA, posit_y])^2)
 
 m4 <- microbenchmark::microbenchmark(
   R_mice = {
-    mice.impute.norm.nob <- mice.impute.norm.nob(
+    mice::mice.impute.norm.nob(
       data_con[, posit_y],
       !index_NA,
       data_con[, posit_x]
@@ -419,7 +423,7 @@ ggsave(sprintf("%s/inst/extdata/images/g4.png", base_path), g4)
 
 ##################### Continous - LM Bayes
 
-mice.impute.norm.bayes <- mice.impute.norm(
+pred_bayes_mice <- mice::mice.impute.norm(
   data_con[, posit_y],
   !index_NA,
   data_con[, posit_x]
@@ -433,10 +437,10 @@ pred_miceFast <- model$impute("lm_bayes", posit_y, posit_x)
 rm(model)
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
-sum((mice.impute.norm.bayes - data_con[index_NA, posit_y])^2)
+sum((pred_bayes_mice - data_con[index_NA, posit_y])^2)
 
 m5 <- microbenchmark::microbenchmark(
-  R_mice = mice.impute.norm(
+  R_mice = mice::mice.impute.norm(
     data_con[, posit_y],
     !index_NA,
     data_con[, posit_x]
@@ -459,7 +463,7 @@ ggsave(sprintf("%s/inst/extdata/images/g5.png", base_path), g5)
 
 ##################### Continous - LM Predict
 
-mice.impute.norm.pred <- mice.impute.norm.predict(
+pred_lmpred_mice <- mice::mice.impute.norm.predict(
   data_con[, posit_y],
   !index_NA,
   data_con[, posit_x]
@@ -473,11 +477,11 @@ pred_miceFast <- model$impute("lm_pred", posit_y, c(posit_x, max(posit_x) + 1))
 rm(model)
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
-sum((mice.impute.norm.pred - data_con[index_NA, posit_y])^2)
+sum((pred_lmpred_mice - data_con[index_NA, posit_y])^2)
 
 m6 <- microbenchmark::microbenchmark(
   R_mice = {
-    mice.impute.norm.pred <- mice.impute.norm.predict(
+    mice::mice.impute.norm.predict(
       data_con[, posit_y],
       !index_NA,
       data_con[, posit_x]
@@ -505,18 +509,13 @@ ggsave(sprintf("%s/inst/extdata/images/g6.png", base_path), g6)
 
 index_sort <- sort(data_con_NA[, posit_grs], index.return = TRUE)$ix
 
-index_rev <- sort(
-  sort(data_con_NA[, posit_grs], index.return = TRUE)$ix,
-  index.return = TRUE
-)$ix
-
 data_con_NA_sort <- data_con_NA[index_sort, ]
 
 pred_Rbase <- NULL
 for (i in unique(data_con_NA_sort[, posit_grs])) {
   sub <- data_con_NA_sort[, posit_grs] == i
   temp <- data_con_NA_sort[sub, ]
-  pred <- mice.impute.norm.predict(
+  pred <- mice::mice.impute.norm.predict(
     as.matrix(temp[, posit_y]),
     !temp[, posit_NA],
     as.matrix(temp[, posit_x])
@@ -528,7 +527,7 @@ pred_dplyr <- data_con_NA_sort %>%
   as.data.frame() %>%
   group_by(group) %>%
   do(
-    im = mice.impute.norm.predict(
+    im = mice::mice.impute.norm.predict(
       as.matrix(.[, posit_y]),
       !.$index_NA,
       as.matrix(.[, posit_x])
@@ -544,7 +543,7 @@ data_con_NA_sort_DT <- data.table(data_con_NA_sort)
 
 pred_datatable <- data_con_NA_sort_DT[,
   {
-    im <- mice.impute.norm.predict(
+    im <- mice::mice.impute.norm.predict(
       as.matrix(.SD[, 1]),
       !index_NA,
       as.matrix(.SD[, posit_x, with = F])
@@ -588,7 +587,7 @@ m7 <- microbenchmark::microbenchmark(
       as.data.frame() %>%
       group_by(group) %>%
       do(
-        im = mice.impute.norm.predict(
+        im = mice::mice.impute.norm.predict(
           as.matrix(.[, posit_y]),
           !.$index_NA,
           as.matrix(.[, posit_x])
@@ -605,7 +604,7 @@ m7 <- microbenchmark::microbenchmark(
     for (i in unique(data_con_NA_sort[, posit_grs])) {
       sub <- data_con_NA_sort[, posit_grs] == i
       temp <- data_con_NA_sort[sub, ]
-      pred <- mice.impute.norm.predict(
+      pred <- mice::mice.impute.norm.predict(
         as.matrix(temp[, posit_y]),
         !temp[, posit_NA],
         as.matrix(temp[, posit_x])
@@ -622,9 +621,9 @@ m7 <- microbenchmark::microbenchmark(
   },
   times = iters,
   DT_mice = {
-    pred_datatable <- data_disc_NA_sort_DT[,
+    pred_datatable <- data_con_NA_sort_DT[,
       {
-        im <- mice.impute.norm.predict(
+        im <- mice::mice.impute.norm.predict(
           as.matrix(.SD[, 1]),
           !index_NA,
           as.matrix(.SD[, posit_x, with = F])
@@ -634,7 +633,7 @@ m7 <- microbenchmark::microbenchmark(
     ]
   },
   DT_miceFast = {
-    pred_datatable_DT <- data_disc_NA_sort_DT[,
+    pred_datatable_DT <- data_con_NA_sort_DT[,
       {
         im <- fill_NA(as.matrix(.SD), "lm_pred", posit_y, posit_x)
       },
@@ -655,10 +654,15 @@ ggsave(sprintf("%s/inst/extdata/images/g7.png", base_path), g7)
 #### Multiple Imputations
 ####
 
-mice.impute.norm.nob <- rowMeans(sapply(
+mice_multi_noise <- rowMeans(sapply(
   1:10,
-  function(x)
-    mice.impute.norm.nob(data_con[, posit_y], !index_NA, data_con[, posit_x])
+  function(x) {
+    mice::mice.impute.norm.nob(
+      data_con[, posit_y],
+      !index_NA,
+      data_con[, posit_x]
+    )
+  }
 ))
 
 data <- data_con_NA[, c(posit_y, posit_x)]
@@ -669,18 +673,19 @@ pred_miceFast <- model$impute_N("lm_noise", posit_y, posit_x, 10)
 rm(model)
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
-sum((mice.impute.norm.nob - data_con[index_NA, posit_y])^2)
+sum((mice_multi_noise - data_con[index_NA, posit_y])^2)
 
 m8 <- microbenchmark::microbenchmark(
   R_mice = {
-    mice.impute.norm.nob <- rowMeans(sapply(
+    rowMeans(sapply(
       1:10,
-      function(x)
-        mice.impute.norm.nob(
+      function(x) {
+        mice::mice.impute.norm.nob(
           data_con[, posit_y],
           !index_NA,
           data_con[, posit_x]
         )
+      }
     ))
   },
   miceFast = {
@@ -701,10 +706,11 @@ ggsave(sprintf("%s/inst/extdata/images/g8.png", base_path), g8)
 
 ##################### Continous - LM Bayes - multiple
 
-mice.impute.norm.bayes <- rowMeans(sapply(
+mice_multi_bayes <- rowMeans(sapply(
   1:10,
-  function(x)
-    mice.impute.norm(data_con[, posit_y], !index_NA, data_con[, posit_x])
+  function(x) {
+    mice::mice.impute.norm(data_con[, posit_y], !index_NA, data_con[, posit_x])
+  }
 ))
 
 data <- data_con_NA[, c(posit_y, posit_x)]
@@ -715,14 +721,19 @@ pred_miceFast <- model$impute_N("lm_bayes", posit_y, posit_x, 10)
 rm(model)
 
 sum((pred_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
-sum((mice.impute.norm.bayes - data_con[index_NA, posit_y])^2)
+sum((mice_multi_bayes - data_con[index_NA, posit_y])^2)
 
 m9 <- microbenchmark::microbenchmark(
   R_mice = {
-    mice.impute.norm.bayes <- rowMeans(sapply(
+    rowMeans(sapply(
       1:10,
-      function(x)
-        mice.impute.norm(data_con[, posit_y], !index_NA, data_con[, posit_x])
+      function(x) {
+        mice::mice.impute.norm(
+          data_con[, posit_y],
+          !index_NA,
+          data_con[, posit_x]
+        )
+      }
     ))
   },
   miceFast = {
@@ -782,18 +793,18 @@ model$set_data(data)
 pmm_miceFast <- model$impute_N("pmm", posit_y, posit_x, k = 5)
 rm(model)
 
-mice.impute.pmm <- mice.impute.pmm(
+pred_pmm_mice <- mice::mice.impute.pmm(
   data_con[, posit_y],
   !index_NA,
   data_con[, posit_x]
 )
 
 sum((pmm_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2)
-sum((mice.impute.pmm - data_con[index_NA, posit_y])^2)
+sum((pred_pmm_mice - data_con[index_NA, posit_y])^2)
 
 m11 <- microbenchmark::microbenchmark(
   R_mice = {
-    mice.impute.pmm(data_con[, posit_y], !index_NA, data_con[, posit_x])
+    mice::mice.impute.pmm(data_con[, posit_y], !index_NA, data_con[, posit_x])
   },
   miceFast = {
     model <- new(miceFast)
@@ -805,9 +816,87 @@ m11 <- microbenchmark::microbenchmark(
 )
 m11
 
-g11 <- autoplot(m10, log = FALSE) + theme_economist() + ggtitle("pmm")
+g11 <- autoplot(m11, log = FALSE) + theme_economist() + ggtitle("pmm")
 
 ggsave(sprintf("%s/inst/extdata/images/g11.png", base_path), g11)
+
+##################### Weighted LM Predict
+
+data_w <- data_con_NA[, c(posit_y, posit_x)]
+
+model <- new(miceFast)
+model$set_data(data_w)
+model$set_w(w_c)
+pred_w_miceFast <- model$impute("lm_pred", posit_y, posit_x)
+rm(model)
+
+cat(
+  "Weighted lm_pred SSE:",
+  sum((pred_w_miceFast$imputations[index_NA] - data_con[index_NA, posit_y])^2),
+  "\n"
+)
+
+m12 <- microbenchmark::microbenchmark(
+  miceFast_weighted = {
+    model <- new(miceFast)
+    model$set_data(data_w)
+    model$set_w(w_c)
+    model$impute("lm_pred", posit_y, posit_x)
+    rm(model)
+  },
+  miceFast_unweighted = {
+    model <- new(miceFast)
+    model$set_data(data_w)
+    model$impute("lm_pred", posit_y, posit_x)
+    rm(model)
+  },
+  times = iters
+)
+m12
+
+g12 <- autoplot(m12, log = FALSE) +
+  theme_economist() +
+  ggtitle("weighted vs unweighted lm_pred")
+
+ggsave(sprintf("%s/inst/extdata/images/g12.png", base_path), g12)
+
+##################### fill_NA / fill_NA_N functional interface
+
+data_fill <- data_con_NA[, c(posit_y, posit_x)]
+
+res_fill <- fill_NA(data_fill, "lm_pred", posit_y, posit_x)
+res_fill_N <- fill_NA_N(data_fill, "lm_noise", posit_y, posit_x, k = 10)
+
+cat(
+  "fill_NA  lm_pred SSE:",
+  sum((res_fill[index_NA] - data_con[index_NA, posit_y])^2),
+  "\n"
+)
+cat(
+  "fill_NA_N lm_noise (k=10) SSE:",
+  sum((res_fill_N[index_NA] - data_con[index_NA, posit_y])^2),
+  "\n"
+)
+
+m13 <- microbenchmark::microbenchmark(
+  fill_NA_lm_pred = fill_NA(data_fill, "lm_pred", posit_y, posit_x),
+  fill_NA_N_lm_noise = fill_NA_N(
+    data_fill,
+    "lm_noise",
+    posit_y,
+    posit_x,
+    k = 10
+  ),
+  fill_NA_N_pmm = fill_NA_N(data_fill, "pmm", posit_y, posit_x, k = 5),
+  times = iters
+)
+m13
+
+g13 <- autoplot(m13, log = FALSE) +
+  theme_economist() +
+  ggtitle("fill_NA / fill_NA_N functional interface")
+
+ggsave(sprintf("%s/inst/extdata/images/g13.png", base_path), g13)
 
 # plot for README/Intro
 
@@ -828,12 +917,14 @@ dats <- bind_rows(list(
   data.frame(m9) %>%
     mutate(model = "linear regression bayes - without grouping - multiple 10"),
   data.frame(m10) %>% mutate(model = "VIF"),
-  data.frame(m11) %>% mutate(model = "pmm")
+  data.frame(m11) %>% mutate(model = "pmm"),
+  data.frame(m12) %>% mutate(model = "weighted vs unweighted lm_pred"),
+  data.frame(m13) %>% mutate(model = "fill_NA / fill_NA_N")
 ))
 
 dats_plot <- dats %>%
   group_by(model, expr) %>%
-  summarise(mean_time_sec = mean(time / 10**9)) %>%
+  summarise(mean_time_sec = mean(time / 10**9), .groups = "drop") %>%
   group_by(model) %>%
   mutate(relative_time = mean_time_sec / min(mean_time_sec)) %>%
   rename("package" = "expr")

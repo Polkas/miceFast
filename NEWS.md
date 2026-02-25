@@ -1,7 +1,24 @@
 # miceFast 0.8.5.9000
 
-* improve README file with loop example.
-* regenerate performance benchmarks on R 4.4.3 and M3.
+## New features
+
+* `pool()` function for combining results from multiply imputed datasets (Rubin's rules, Barnard-Rubin df adjustment). Works with `lm`, `glm`, and other models that support `coef()` and `vcov()`.
+* `print` and `summary` methods for pooled results.
+
+## Bug fixes
+
+* fixed residual variance estimator in `lm_noise` and `lm_bayes` stochastic models: divisor changed from `n-p-1` to `n-p`, where `p` already counts the intercept column supplied by the user. The previous formula over-corrected by one degree of freedom.
+
+## Documentation and internals
+
+* new vignette on missing data mechanisms (MCAR/MAR/MNAR) and MI workflows.
+* refactored introduction vignette with `pool()` examples.
+* improved README with MI section and benchmark table.
+* test suite for `pool()`, including comparison against `mice::pool()`.
+* new weighted regression validation test against `lm.wfit()`.
+* refactored C++ source code for clarity.
+* fixed typos in error messages and documentation.
+* regenerated performance benchmarks on R 4.4.3, macOS M3 Pro.
 
 # miceFast 0.8.5
 

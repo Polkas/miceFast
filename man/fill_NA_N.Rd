@@ -54,7 +54,7 @@ fill_NA_N(
 \arguments{
 \item{x}{a numeric matrix or data.frame/data.table (factor/character/numeric/logical) - variables}
 
-\item{model}{a character - posibble options ("lm_bayes","lm_noise","pmm")}
+\item{model}{a character - possible options ("lm_bayes","lm_noise","pmm")}
 
 \item{posit_y}{an integer/character - a position/name of dependent variable}
 
@@ -66,7 +66,7 @@ fill_NA_N(
 
 \item{k}{an integer - a number of multiple imputations or for pmm a number of closest points from which a one random value is taken, Default:10}
 
-\item{ridge}{a numeric - a value added to diagonal elements of the x'x matrix, Default:1e-5}
+\item{ridge}{a numeric - a value added to diagonal elements of the x'x matrix, Default: 1e-6}
 }
 \value{
 load imputations in a numeric/character/factor (similar to the input type) vector format
@@ -89,224 +89,47 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
 There is assumed that users add the intercept by their own.
 The miceFast module provides the most efficient environment, the second recommended option is to use data.table and the numeric matrix data type.
 The lda model is assessed only if there are more than 15 complete observations
-and for the lms models if number of variables is smaller than number of observations.
+and for the lms models if number of independent variables is smaller than number of observations.
 }
 \examples{
 library(miceFast)
 library(dplyr)
 library(data.table)
-### Data
-# airquality dataset with additional variables
+
 data(air_miss)
-### Intro: dplyr
-# IMPUTATIONS
-air_miss <- air_miss \%>\%
-  # Imputations with a grouping option (models are separately assessed for each group)
-  # taking into account provided weights
-  group_by(groups) \%>\%
-  do(mutate(., Solar_R_imp = fill_NA(
-    x = .,
-    model = "lm_pred",
-    posit_y = "Solar.R",
-    posit_x = c("Wind", "Temp", "Intercept"),
-    w = .[["weights"]]
-  ))) \%>\%
-  ungroup() \%>\%
-  # Imputations - discrete variable
-  mutate(x_character_imp = fill_NA(
-    x = .,
-    model = "lda",
-    posit_y = "x_character",
-    posit_x = c("Wind", "Temp")
-  )) \%>\%
-  # logreg was used because almost log-normal distribution of Ozone
-  # imputations around mean
-  mutate(Ozone_imp1 = fill_NA(
-    x = .,
-    model = "lm_bayes",
-    posit_y = "Ozone",
-    posit_x = c("Intercept"),
-    logreg = TRUE
-  )) \%>\%
-  # imputations using positions - Intercept, Temp
-  mutate(Ozone_imp2 = fill_NA(
-    x = .,
-    model = "lm_bayes",
-    posit_y = 1,
-    posit_x = c(4, 6),
-    logreg = TRUE
-  )) \%>\%
-  # multiple imputations (average of x30 imputations)
-  # with a factor independent variable, weights and logreg options
-  mutate(Ozone_imp3 = fill_NA_N(
-    x = .,
-    model = "lm_noise",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .[["weights"]],
-    logreg = TRUE,
-    k = 30
-  )) \%>\%
-  mutate(Ozone_imp4 = fill_NA_N(
-    x = .,
-    model = "lm_bayes",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .[["weights"]],
-    logreg = TRUE,
-    k = 30
-  )) \%>\%
-  group_by(groups) \%>\%
-  do(mutate(., Ozone_imp5 = fill_NA(
-    x = .,
-    model = "lm_pred",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .[["weights"]],
-    logreg = TRUE
-  ))) \%>\%
-  do(mutate(., Ozone_imp6 = fill_NA_N(
-    x = .,
-    model = "pmm",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .[["weights"]],
-    logreg = TRUE,
+
+# dplyr: PMM with 20 draws
+air_miss \%>\%
+  mutate(Ozone_pmm = fill_NA_N(
+    x = ., model = "pmm",
+    posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp"),
     k = 20
-  ))) \%>\%
-  ungroup() \%>\%
-  # Average of a few methods
-  mutate(Ozone_imp_mix = rowMeans(select(., starts_with("Ozone_imp")))) \%>\%
-  # Protecting against collinearity or low number of observations - across small groups
-  # Be carful when using a grouping option
-  # because of lack of protection against collinearity or low number of observations.
-  # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
-  group_by(groups) \%>\%
-  do(mutate(., Ozone_chac_imp = tryCatch(
-    fill_NA(
-      x = .,
-      model = "lda",
-      posit_y = "Ozone_chac",
-      posit_x = c(
-        "Intercept",
-        "Month",
-        "Day",
-        "Temp",
-        "x_character_imp"
-      ),
-      w = .[["weights"]]
-    ),
-    error = function(e) .[["Ozone_chac"]]
-  ))) \%>\%
-  ungroup()
+  ))
 
-# Sample of results
-air_miss[which(is.na(air_miss[, 1]))[1:5], ]
+# dplyr: lm_noise with weights
+air_miss \%>\%
+  mutate(Ozone_imp = fill_NA_N(
+    x = ., model = "lm_noise",
+    posit_y = "Ozone",
+    posit_x = c("Solar.R", "Wind", "Temp"),
+    w = .[["weights"]],
+    logreg = TRUE, k = 30
+  ))
 
-### Intro: data.table
-# IMPUTATIONS
-# Imputations with a grouping option (models are separately assessed for each group)
-# taking into account provided weights
+# data.table: PMM grouped
 data(air_miss)
 setDT(air_miss)
-air_miss[, Solar_R_imp := fill_NA_N(
-  x = .SD,
-  model = "lm_bayes",
-  posit_y = "Solar.R",
+air_miss[, Ozone_pmm := fill_NA_N(
+  x = .SD, model = "pmm",
+  posit_y = "Ozone",
   posit_x = c("Wind", "Temp", "Intercept"),
-  w = .SD[["weights"]],
-  k = 100
-), by = .(groups)] \%>\%
-  # Imputations - discrete variable
-  .[, x_character_imp := fill_NA(
-    x = .SD,
-    model = "lda",
-    posit_y = "x_character",
-    posit_x = c("Wind", "Temp", "groups")
-  )] \%>\%
-  # logreg was used because almost log-normal distribution of Ozone
-  # imputations around mean
-  .[, Ozone_imp1 := fill_NA(
-    x = .SD,
-    model = "lm_bayes",
-    posit_y = "Ozone",
-    posit_x = c("Intercept"),
-    logreg = TRUE
-  )] \%>\%
-  # imputations using positions - Intercept, Temp
-  .[, Ozone_imp2 := fill_NA(
-    x = .SD,
-    model = "lm_bayes",
-    posit_y = 1,
-    posit_x = c(4, 6),
-    logreg = TRUE
-  )] \%>\%
-  # model with a factor independent variable
-  # multiple imputations (average of x30 imputations)
-  # with a factor independent variable, weights and logreg options
-  .[, Ozone_imp3 := fill_NA_N(
-    x = .SD,
-    model = "lm_noise",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE,
-    k = 30
-  )] \%>\%
-  .[, Ozone_imp4 := fill_NA_N(
-    x = .SD,
-    model = "lm_bayes",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE,
-    k = 30
-  )] \%>\%
-  .[, Ozone_imp5 := fill_NA(
-    x = .SD,
-    model = "lm_pred",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE
-  ), .(groups)] \%>\%
-  .[, Ozone_imp6 := fill_NA_N(
-    x = .SD,
-    model = "pmm",
-    posit_y = "Ozone",
-    posit_x = c("Intercept", "x_character_imp", "Wind", "Temp"),
-    w = .SD[["weights"]],
-    logreg = TRUE,
-    k = 10
-  ), .(groups)] \%>\%
-  # Average of a few methods
-  .[, Ozone_imp_mix := apply(.SD, 1, mean), .SDcols = Ozone_imp1:Ozone_imp6] \%>\%
-  # Protecting against collinearity or low number of observations - across small groups
-  # Be carful when using a data.table grouping option
-  # because of lack of protection against collinearity or low number of observations.
-  # There could be used a tryCatch(fill_NA(...),error=function(e) return(...))
+  k = 20
+), by = .(groups)]
 
-  .[, Ozone_chac_imp := tryCatch(
-    fill_NA(
-      x = .SD,
-      model = "lda",
-      posit_y = "Ozone_chac",
-      posit_x = c(
-        "Intercept",
-        "Month",
-        "Day",
-        "Temp",
-        "x_character_imp"
-      ),
-      w = .SD[["weights"]]
-    ),
-    error = function(e) .SD[["Ozone_chac"]]
-  ), .(groups)]
-
-# Sample of results
-air_miss[which(is.na(air_miss[, 1]))[1:5], ]
+# See the vignette for full examples:
+# vignette("miceFast-intro", package = "miceFast")
 
 }
 \seealso{
-\code{\link{fill_NA}} \code{\link{VIF}}
+\code{\link{fill_NA}} \code{\link{VIF}}  \code{vignette("miceFast-intro", package = "miceFast")}
 }

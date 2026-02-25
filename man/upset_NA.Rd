@@ -26,11 +26,11 @@ Depending on how the features are selected, UpSet can display between 25-65 sets
 Data set must be formatted as described on the original UpSet github page: \url{https://github.com/VCG/upset/wiki}.
 }
 \examples{
-library(miceFast)
-library(UpSetR)
-upset_NA(airquality)
-upset_NA(air_miss, 6)
-
+if (requireNamespace("UpSetR", quietly = TRUE)) {
+  library(UpSetR)
+  upset_NA(airquality)
+  upset_NA(air_miss, 6)
+}
 }
 \references{
 Lex et al. (2014). UpSet: Visualization of Intersecting Sets

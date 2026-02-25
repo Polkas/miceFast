@@ -2,7 +2,7 @@ import(Rcpp)
 
 import(methods)
 
-importFrom(stats, model.matrix.lm, median, na.omit, prcomp)
+importFrom(stats, model.matrix.lm, median, na.omit, prcomp, coef, vcov, df.residual, pt, qt)
 
 importFrom(data.table, `:=`)
 importFrom(data.table, data.table)
@@ -17,6 +17,9 @@ export(neibo)
 
 export(upset_NA)
 export(compare_imp)
+export(pool)
+S3method(print, miceFast_pool)
+S3method(summary, miceFast_pool)
 
 export(naive_fill_NA)
 S3method(naive_fill_NA, data.table)
