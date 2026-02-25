@@ -25,16 +25,9 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
-
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/miceFast-intro.html">miceFast - Introduction</a>
-    </li>
-  </ul></li>
+<li>
+  <a href="../articles/index.html">Articles</a>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -59,9 +52,29 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.8.5.9000" id="micefast-0859000">miceFast 0.8.5.9000<a class="anchor" aria-label="anchor" href="#micefast-0859000"></a></h2>
-<ul><li>improve README file with loop example.</li>
-<li>regenerate performance benchmarks on R 4.4.3 and M3.</li>
+<div class="section level3">
+<h3 id="new-features-0-8-5-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-5-9000"></a></h3>
+<ul><li>
+<code><a href="../reference/pool.html">pool()</a></code> function for combining results from multiply imputed datasets (Rubin’s rules, Barnard-Rubin df adjustment). Works with <code>lm</code>, <code>glm</code>, and other models that support <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>.</li>
+<li>
+<code>print</code> and <code>summary</code> methods for pooled results.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-8-5-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-5-9000"></a></h3>
+<ul><li>fixed residual variance estimator in <code>lm_noise</code> and <code>lm_bayes</code> stochastic models: divisor changed from <code>n-p-1</code> to <code>n-p</code>, where <code>p</code> already counts the intercept column supplied by the user. The previous formula over-corrected by one degree of freedom.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-and-internals-0-8-5-9000">Documentation and internals<a class="anchor" aria-label="anchor" href="#documentation-and-internals-0-8-5-9000"></a></h3>
+<ul><li>new vignette on missing data mechanisms (MCAR/MAR/MNAR) and MI workflows.</li>
+<li>refactored introduction vignette with <code><a href="../reference/pool.html">pool()</a></code> examples.</li>
+<li>improved README with MI section and benchmark table.</li>
+<li>test suite for <code><a href="../reference/pool.html">pool()</a></code>, including comparison against <code><a href="https://amices.org/mice/reference/pool.html" class="external-link">mice::pool()</a></code>.</li>
+<li>new weighted regression validation test against <code><a href="https://rdrr.io/r/stats/lmfit.html" class="external-link">lm.wfit()</a></code>.</li>
+<li>refactored C++ source code for clarity.</li>
+<li>fixed typos in error messages and documentation.</li>
+<li>regenerated performance benchmarks on R 4.4.3, macOS M3 Pro.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.8.5" id="micefast-085">miceFast 0.8.5<small>2025-02-03</small><a class="anchor" aria-label="anchor" href="#micefast-085"></a></h2>
 <ul><li>cran related update, <code>OMP_THREAD_LIMIT</code>.</li>
@@ -186,7 +199,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
 </div>
 
       </footer></div>

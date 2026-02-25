@@ -1,6 +1,7 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1.9000
-pkgdown_sha: 62d5c5a0fc12899aae97f6ce14018d2784bf308b
+pkgdown: 2.2.0.9000
+pkgdown_sha: f3ec6e2bb122e10436eccda7b221e297ab9d395a
 articles:
   miceFast-intro: miceFast-intro.html
-last_built: 2025-04-15T20:36Z
+  missing-data-and-imputation: missing-data-and-imputation.html
+last_built: 2026-02-25T21:43Z

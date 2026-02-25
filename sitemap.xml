@@ -2,6 +2,7 @@
 <url><loc>/404.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/articles/miceFast-intro.html</loc></url>
+<url><loc>/articles/missing-data-and-imputation.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
@@ -16,6 +17,9 @@
 <url><loc>/reference/miceFast-package.html</loc></url>
 <url><loc>/reference/naive_fill_NA.html</loc></url>
 <url><loc>/reference/neibo.html</loc></url>
+<url><loc>/reference/pool.html</loc></url>
+<url><loc>/reference/print.miceFast_pool.html</loc></url>
+<url><loc>/reference/summary.miceFast_pool.html</loc></url>
 <url><loc>/reference/upset_NA.html</loc></url>
 </urlset>
 
