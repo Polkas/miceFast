@@ -35,6 +35,26 @@ library(ggplot2)
 set.seed(2025)
 ```
 
+## Quick-start: MI in 10 lines
+
+If you just want the recipe, here it is. The rest of this vignette explains
+**why** each step matters.
+
+```{r quickstart}
+data(air_miss)
+
+# 1. Impute m = 10 completed datasets
+completed <- lapply(1:10, function(i) {
+  air_miss %>%
+    mutate(Ozone_imp = fill_NA(x = ., model = "lm_bayes",
+      posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp")))
+})
+# 2. Fit the analysis model on each
+fits <- lapply(completed, function(d) lm(Ozone_imp ~ Wind + Temp, data = d))
+# 3. Pool using Rubin's rules
+summary(pool(fits))
+```
+
 ---
 
 # Missing-Data Mechanisms
@@ -265,6 +285,10 @@ identical imputations across datasets.
 
 ## Basic MI workflow
 
+The three-step MI workflow uses `fill_NA()` in a loop, any model with `coef()`/`vcov()`,
+and `pool()`. For more imputation examples (grouping, weights, data.table, OOP),
+see the [Introduction vignette](miceFast-intro.html).
+
 ```{r mi-basic}
 data(air_miss)
 
@@ -465,6 +489,7 @@ compare_imp(air_sensitivity, origin = "Ozone",
 Check whether results stabilize as *m* increases:
 
 ```{r sensitivity-m}
+set.seed(2025)
 results <- data.frame()
 
 for (m_val in c(3, 5, 10, 20, 50)) {
@@ -492,28 +517,36 @@ results %>%
   theme_minimal()
 ```
 
-## Comparing with naive imputation
+## Comparing with base methods
 
-Demonstrate how naive (mean) imputation underestimates uncertainty compared to
-proper MI:
+Always compare MI results against simple baselines. If conclusions differ,
+investigate why — it may reveal problems with your imputation model or
+indicate that the missing-data mechanism matters.
 
-```{r sensitivity-naive}
+```{r sensitivity-baselines}
 data(air_miss)
+set.seed(2025)
 
-# Naive: fill_NA with lm_pred + Intercept only = mean imputation
-air_naive <- air_miss %>%
-  mutate(
-    Ozone_mean = fill_NA(
-      x = ., model = "lm_pred",
-      posit_y = "Ozone",
-      posit_x = "Intercept"
-    )
-  )
+# 1. Complete cases (listwise deletion) — unbiased under MCAR
+fit_cc <- lm(Ozone ~ Wind + Temp, data = air_miss[complete.cases(air_miss[, c("Ozone", "Wind", "Temp")]), ])
+ci_cc <- confint(fit_cc)
 
-fit_naive <- lm(Ozone_mean ~ Wind + Temp, data = air_naive)
-ci_naive <- confint(fit_naive)
+# 2. Mean imputation — biased, underestimates variance
+air_mean <- air_miss
+air_mean$Ozone[is.na(air_mean$Ozone)] <- mean(air_mean$Ozone, na.rm = TRUE)
+fit_mean <- lm(Ozone ~ Wind + Temp, data = air_mean)
+ci_mean <- confint(fit_mean)
 
-# Proper MI
+# 3. Deterministic regression imputation (lm_pred) — no residual noise
+air_pred <- air_miss %>%
+  mutate(Ozone_imp = fill_NA(
+    x = ., model = "lm_pred",
+    posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp")
+  ))
+fit_pred <- lm(Ozone_imp ~ Wind + Temp, data = air_pred)
+ci_pred <- confint(fit_pred)
+
+# 4. Proper MI with Rubin's rules (lm_bayes, m = 20)
 completed <- lapply(1:20, function(i) {
   air_miss %>%
     mutate(Ozone_imp = fill_NA(
@@ -522,16 +555,28 @@ completed <- lapply(1:20, function(i) {
     ))
 })
 fits <- lapply(completed, function(d) lm(Ozone_imp ~ Wind + Temp, data = d))
-pool_summary <- summary(pool(fits))
+pool_s <- summary(pool(fits))
 
-cat("Naive imputation CI for Wind:\n")
-print(ci_naive["Wind", ])
-
-cat("\nMI pooled CI for Wind:\n")
-cat(sprintf("  2.5%%: %.4f  97.5%%: %.4f\n",
-    pool_summary$conf.low[pool_summary$term == "Wind"],
-    pool_summary$conf.high[pool_summary$term == "Wind"]))
+# Compare Wind coefficient across all methods
+comparison <- data.frame(
+  method = c("Complete cases", "Mean imputation", "Regression (lm_pred)", "MI (lm_bayes, m=20)"),
+  estimate = c(coef(fit_cc)["Wind"], coef(fit_mean)["Wind"],
+               coef(fit_pred)["Wind"], pool_s$estimate[pool_s$term == "Wind"]),
+  ci_low = c(ci_cc["Wind", 1], ci_mean["Wind", 1],
+             ci_pred["Wind", 1], pool_s$conf.low[pool_s$term == "Wind"]),
+  ci_high = c(ci_cc["Wind", 2], ci_mean["Wind", 2],
+              ci_pred["Wind", 2], pool_s$conf.high[pool_s$term == "Wind"]),
+  n_used = c(nrow(air_miss[complete.cases(air_miss[, c("Ozone", "Wind", "Temp")]), ]),
+             nrow(air_miss), nrow(air_miss), nrow(air_miss))
+)
+comparison$ci_width <- comparison$ci_high - comparison$ci_low
+comparison
 ```
+
+Notice that mean imputation and deterministic regression produce artificially
+narrow confidence intervals (they ignore imputation uncertainty), while
+complete-case analysis uses fewer observations. MI properly reflects both
+sources of uncertainty.
 
 ---
 
@@ -554,17 +599,59 @@ stabilize (see the sensitivity analysis above).
 
 # Practical Checklist
 
-Before imputing, examine the missingness pattern (`upset_NA()`) and check
-collinearity (`VIF()` — values above 10 are problematic). Include auxiliary
-variables that predict missingness even if they are not in the analysis model.
+1. **Examine missingness patterns:** Use `upset_NA()` to visualize which variables are
+   jointly missing.
+   ```r
+   upset_NA(air_miss, 6)
+   ```
 
-For continuous variables use `lm_bayes` or `lm_noise`; for categorical
-variables use `lda` with a random `ridge`; for right-skewed data consider
-`logreg = TRUE`. Use at least $m = 20$ imputations, pool with `pool()`,
-and run sensitivity analyses varying the model and $m$.
+2. **Check collinearity:** Run `VIF()` on your predictor set. Drop or combine predictors
+   with VIF > 10.
+   ```r
+   VIF(air_miss, posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp"))
+   ```
 
-Report the imputation model, number of imputations, and any assumptions
-about the missing-data mechanism.
+3. **Choose imputation models:** `lm_bayes` for continuous, `lda` with random `ridge`
+   for categorical, `logreg = TRUE` for right-skewed variables.
+
+4. **Include auxiliary variables:** Add predictors of missingness to the imputation model
+   even if they are not in the analysis model — this makes MAR more plausible.
+
+5. **Set *m* ≥ 20.** Since miceFast is fast, there is little cost. Increase until
+   estimates and standard errors stabilize (see sensitivity analysis above).
+
+6. **Pool and report:** Use `pool()` for Rubin's rules. Report the imputation model,
+   *m*, pooled estimates, and confidence intervals.
+
+7. **Run sensitivity analyses:** Vary the model (`lm_bayes` vs `lm_noise` vs `pmm`),
+   vary *m*, and compare results. Check base methods too.
+
+## Von Hippel's two-stage rule for *m*
+
+Von Hippel (2020) proposed a two-stage procedure: run a pilot with small *m*,
+estimate FMI from the pooled output, then use the FMI to calculate how many
+imputations are needed for stable SE estimates. The R package
+**howManyImputations** (available on CRAN) implements this calculation directly
+from a `mice` mids object. For a miceFast workflow you can use the FMI from
+`pool()` as input:
+
+```{r vonhippel}
+# Pilot with m = 5
+set.seed(2025)
+pilot <- lapply(1:5, function(i) {
+  air_miss %>%
+    mutate(Ozone_imp = fill_NA(x = ., model = "lm_bayes",
+      posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp")))
+})
+pilot_pool <- pool(lapply(pilot, function(d) lm(Ozone_imp ~ Wind + Temp, data = d)))
+
+# Inspect FMI — the key input for deciding m
+data.frame(term = pilot_pool$term, fmi = round(pilot_pool$fmi, 3))
+
+# For the exact formula and its derivation see:
+# von Hippel (2020) "How many imputations do you need?", Sociological Methods & Research
+# R implementation: install.packages("howManyImputations")
+```
 
 ---
 
@@ -574,7 +661,7 @@ about the missing-data mechanism.
 |---------|------|----------|
 | MI framework | Complete (FCS/MICE algorithm) | Building blocks for MI |
 | Imputation models | 25+ built-in methods | `lm_pred`, `lm_bayes`, `lm_noise`, `lda`, `pmm` |
-| Chained equations | Yes (iterative multivariate) | Manual chaining possible |
+| Chained equations | Yes (iterative multivariate) | Single-pass sequential; not iterative FCS |
 | Speed | R-based | C++/Armadillo — significantly faster |
 | Grouping | Via `blocks` | Built-in, auto-sorted |
 | Weights | Limited | Full support |
@@ -587,6 +674,15 @@ tooling.
 **miceFast** is useful when speed matters (large data, many groups, many imputations)
 or when you want imputation inside `dplyr`/`data.table` pipelines.
 The two can be combined: use **miceFast** for imputation and **mice** for diagnostics, or vice versa.
+
+**Important caveat:** miceFast fills variables in a single pass — each variable's
+imputation conditions on the previously imputed columns but there is no iterative
+cycling back (unlike mice's FCS algorithm, which iterates until convergence).
+For datasets where the missing-data pattern is monotone or nearly so, a single pass
+is often sufficient. With complex interlocking patterns, the single-pass approach
+may introduce some bias because later variables are imputed conditional on
+already-imputed (not yet converged) earlier variables. Consider using mice for
+datasets with heavy non-monotone missingness.
 
 ---
 
