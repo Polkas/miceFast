@@ -127,7 +127,7 @@ See the [Introduction vignette](https://polkas.github.io/miceFast/articles/miceF
 - **Object-Oriented Interface** via `miceFast` objects (Rcpp modules).
 - **Convenient Helpers**:  
   - `fill_NA()`: Single imputation (`lda`, `lm_pred`, `lm_bayes`, `lm_noise`).  
-  - `fill_NA_N()`: Multiple imputations (`pmm`, `lm_bayes`, `lm_noise`).  
+  - `fill_NA_N()`: Averaged multiple imputations (mean of N draws) (`pmm`, `lm_bayes`, `lm_noise`).  
   - `pool()`: Pool multiply imputed results using Rubin's rules.  
   - `VIF()`: Variance Inflation Factor calculations.  
   - `naive_fill_NA()`: Automatic naive imputations.  
@@ -151,6 +151,7 @@ See the [Introduction vignette](https://polkas.github.io/miceFast/articles/miceF
 
 ## Practical Advice
 
+- **Only need a filled-in dataset for exploration or ML?** A single imputation with `fill_NA()` or averaging draws with `fill_NA_N()` is fast and convenient. For any inferential statement use full MI with `pool()`.
 - **Little missing data + MCAR?** Consider using `complete.cases()` — listwise deletion is unbiased under MCAR and may be sufficient when the fraction of incomplete rows is small.
 - **For publication**, always run a **sensitivity analysis**: compare MI results against base methods (`complete.cases()`, mean imputation) and across different imputation models (`lm_bayes`, `lm_noise`, `pmm`). Vary the number of imputations. If conclusions change, investigate why. Report the imputation model, *m*, and any assumptions about the missing-data mechanism.
 - See the [MI vignette](https://polkas.github.io/miceFast/articles/missing-data-and-imputation.html) for details on MCAR/MAR/MNAR mechanisms and a practical checklist.
