@@ -72,7 +72,9 @@ upset_NA(air_miss, 6)
 
 ## Checking for Collinearity
 
-Before imputing, check Variance Inflation Factors. Values above ~10 suggest problematic collinearity.
+Before imputing, check Variance Inflation Factors. Values above ~10 suggest
+problematic collinearity that can destabilize imputation models — consider
+dropping or combining redundant predictors before imputing.
 
 ```{r vif}
 VIF(
@@ -140,7 +142,8 @@ head(result_grouped[, c("Solar.R", "Solar_R_imp", "groups")])
 
 ## Log-transformation
 
-For right-skewed variables (like Ozone), use `logreg = TRUE` to impute on the log scale:
+For right-skewed variables (like Ozone), use `logreg = TRUE` to impute on the log scale.
+The model fits on $\log(y)$ and back-transforms the predictions:
 
 ```{r fill-na-logreg}
 data(air_miss)
@@ -153,11 +156,15 @@ result_log <- air_miss %>%
     posit_x = c("Solar.R", "Wind", "Temp", "Intercept"),
     logreg = TRUE
   ))
+
+# Compare distributions: log imputation avoids negative values
+summary(result_log[c("Ozone", "Ozone_imp")])
 ```
 
 ## Using column position indices
 
-You can refer to columns by position instead of name:
+You can refer to columns by position instead of name.
+Check `names(air_miss)` to find the right positions:
 
 ```{r fill-na-position}
 data(air_miss)
@@ -170,7 +177,8 @@ result_pos <- air_miss %>%
     posit_x = c(4, 6),
     logreg = TRUE
   ))
-```
+
+head(result_pos[, c("Ozone", "Ozone_imp")])
 
 ## Basic usage (data.table)
 
@@ -309,37 +317,6 @@ pool_res
 summary(pool_res)
 ```
 
-## MI with continuous and categorical variables
-
-For a complete MI workflow imputing both continuous and categorical variables:
-
-```{r mi-mixed}
-data(air_miss)
-
-impute_data <- function(data) {
-  data %>%
-    mutate(
-      Solar_R_imp = fill_NA(
-        x = ., model = "lm_bayes",
-        posit_y = "Solar.R",
-        posit_x = c("Wind", "Temp", "Intercept"),
-        w = weights
-      ),
-      Ozone_chac_imp = fill_NA(
-        x = ., model = "lda",
-        posit_y = "Ozone_chac",
-        posit_x = c("Wind", "Temp"),
-        ridge = runif(1, 0, 50)  # random ridge makes LDA stochastic
-      )
-    )
-}
-
-set.seed(42)
-res <- replicate(n = 5, expr = impute_data(air_miss), simplify = FALSE)
-fits <- lapply(res, function(d) lm(Solar_R_imp ~ Wind + Temp, data = d))
-pool(fits)
-```
-
 ---
 
 # Full Imputation: Filling All Variables and MI with Rubin's Rules
@@ -469,21 +446,19 @@ use `get_index()` to recover the original row order.
 
 ## Simple example
 
-```{r oop-simple, eval=requireNamespace("mice", quietly=TRUE)}
-data <- cbind(as.matrix(mice::nhanes), intercept = 1, index = 1:nrow(mice::nhanes))
+```{r oop-simple}
+data <- cbind(as.matrix(airquality[, 1:4]), intercept = 1, index = 1:nrow(airquality))
 model <- new(miceFast)
 model$set_data(data)
 
-# Single imputation with linear model
-model$update_var(2, model$impute("lm_pred", 2, 5)$imputations)
+# Single imputation with linear model (col 1 = Ozone)
+model$update_var(1, model$impute("lm_pred", 1, 5)$imputations)
 
-# LDA for a categorical variable
-model$update_var(3, model$impute("lda", 3, c(1, 2))$imputations)
-
-# Averaged multiple imputation (Bayesian, k=10 draws)
-model$update_var(4, model$impute_N("lm_bayes", 4, c(1, 2, 3), k = 10)$imputations)
+# Averaged multiple imputation for Solar.R (col 2, Bayesian, k=10 draws)
+model$update_var(2, model$impute_N("lm_bayes", 2, c(1, 3, 4, 5), k = 10)$imputations)
 
 model$which_updated()
+head(model$get_data(), 4)
 ```
 
 ## With weights and groups
@@ -565,17 +540,28 @@ summary(pool(fits))
 
 # Generating Correlated Data with `corrData`
 
-The `corrData` module generates correlated data for simulations:
+The `corrData` module generates correlated data for simulations.
+This is useful for creating test datasets with known properties.
 
-```r
-# Constructors:
-new(corrData, nr_cat, n_obs, means, cor_matrix)
-new(corrData, n_obs, means, cor_matrix)
+```{r corrdata-example}
+# 3 continuous variables, 100 observations
+means <- c(10, 20, 30)
+cor_matrix <- matrix(c(
+  1.0, 0.7, 0.3,
+  0.7, 1.0, 0.5,
+  0.3, 0.5, 1.0
+), nrow = 3)
 
-# Methods:
-cd_obj$fill("contin")   # continuous data
-cd_obj$fill("binom")    # binary data
-cd_obj$fill("discrete") # multi-category discrete data
+cd <- new(corrData, 100, means, cor_matrix)
+sim_data <- cd$fill("contin")
+round(cor(sim_data), 2)
+```
+
+```{r corrdata-discrete}
+# With 2 categorical variables: first argument is nr_cat
+cd2 <- new(corrData, 2, 200, means, cor_matrix)
+sim_discrete <- cd2$fill("discrete")
+head(sim_discrete)
 ```
 
 ---
