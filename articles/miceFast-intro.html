@@ -206,7 +206,9 @@ variable, weights, groups, and a categorized Ozone variable.</p>
 <h3 id="checking-for-collinearity">Checking for Collinearity<a class="anchor" aria-label="anchor" href="#checking-for-collinearity"></a>
 </h3>
 <p>Before imputing, check Variance Inflation Factors. Values above ~10
-suggest problematic collinearity.</p>
+suggest problematic collinearity that can destabilize imputation models
+— consider dropping or combining redundant predictors before
+imputing.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span></span>
 <span>  <span class="va">air_miss</span>,</span>
@@ -300,7 +302,9 @@ allow for heteroscedasticity or survey designs.</p>
 <h3 id="log-transformation">Log-transformation<a class="anchor" aria-label="anchor" href="#log-transformation"></a>
 </h3>
 <p>For right-skewed variables (like Ozone), use
-<code>logreg = TRUE</code> to impute on the log scale:</p>
+<code>logreg = TRUE</code> to impute on the log scale. The model fits on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log(y)</annotation></semantics></math>
+and back-transforms the predictions:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
@@ -311,13 +315,25 @@ allow for heteroscedasticity or survey designs.</p>
 <span>    posit_y <span class="op">=</span> <span class="st">"Ozone"</span>,</span>
 <span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compare distributions: log imputation avoids negative values</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_log</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Ozone_imp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##      Ozone          Ozone_imp     </span></span>
+<span><span class="co">##  Min.   :  1.00   Min.   :  1.00  </span></span>
+<span><span class="co">##  1st Qu.: 18.00   1st Qu.: 18.55  </span></span>
+<span><span class="co">##  Median : 31.50   Median : 30.00  </span></span>
+<span><span class="co">##  Mean   : 42.13   Mean   : 41.12  </span></span>
+<span><span class="co">##  3rd Qu.: 63.25   3rd Qu.: 59.00  </span></span>
+<span><span class="co">##  Max.   :168.00   Max.   :168.00  </span></span>
+<span><span class="co">##  NA's   :37       NA's   :2</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="using-column-position-indices">Using column position indices<a class="anchor" aria-label="anchor" href="#using-column-position-indices"></a>
 </h3>
-<p>You can refer to columns by position instead of name:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>You can refer to columns by position instead of name. Check
+<code>names(air_miss)</code> to find the right positions:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">result_pos</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -327,12 +343,19 @@ allow for heteroscedasticity or survey designs.</p>
 <span>    posit_y <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>    posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>    logreg <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="basic-usage-data-table">Basic usage (data.table)<a class="anchor" aria-label="anchor" href="#basic-usage-data-table"></a>
-</h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<span>  <span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result_pos</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Ozone_imp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   Ozone Ozone_imp</span></span>
+<span><span class="co">## 1    41 41.000000</span></span>
+<span><span class="co">## 2    36 36.000000</span></span>
+<span><span class="co">## 3    12 12.000000</span></span>
+<span><span class="co">## 4    18 18.000000</span></span>
+<span><span class="co">## 5    NA  4.793808</span></span>
+<span><span class="co">## 6    28 28.000000</span></span></code></pre>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Basic usage (data.table)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
@@ -373,7 +396,7 @@ instead.</p>
 <div class="section level3">
 <h3 id="dplyr">dplyr<a class="anchor" aria-label="anchor" href="#dplyr"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">result_n</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -399,7 +422,7 @@ instead.</p>
 <div class="section level3">
 <h3 id="data-table-with-grouping">data.table with grouping<a class="anchor" aria-label="anchor" href="#data-table-with-grouping"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
@@ -420,7 +443,7 @@ instead.</p>
 </h2>
 <p>Use <code><a href="../reference/compare_imp.html">compare_imp()</a></code> to visually compare the distribution
 of observed vs. imputed values:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">air_miss_imp</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -449,7 +472,7 @@ stochastic imputation).</li>
 </ol>
 <p><code><a href="../reference/pool.html">pool()</a></code> works with any model that has <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>
 and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code> methods.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 1: Generate m = 5 completed datasets</span></span>
@@ -476,7 +499,7 @@ and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov
 <span><span class="co">##  (Intercept)  -62.880   25.4366    -2.472 29.24 1.949e-02</span></span>
 <span><span class="co">##         Wind   -3.378    0.7308    -4.622 24.29 1.057e-04</span></span>
 <span><span class="co">##         Temp    1.774    0.2575     6.889 44.98 1.491e-08</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pool_res</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Pooled results from 5 imputed datasets</span></span>
 <span><span class="co">## Rubin's rules with Barnard-Rubin df adjustment</span></span>
@@ -493,45 +516,7 @@ and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov
 <span><span class="co">##  (Intercept) 445.46980 167.95979 647.02154 0.4524 0.3115 0.3542</span></span>
 <span><span class="co">##         Wind   0.34710   0.15578   0.53404 0.5386 0.3500 0.3977</span></span>
 <span><span class="co">##         Temp   0.05098   0.01276   0.06628 0.3003 0.2309 0.2630</span></span></code></pre>
-<div class="section level3">
-<h3 id="mi-with-continuous-and-categorical-variables">MI with continuous and categorical variables<a class="anchor" aria-label="anchor" href="#mi-with-continuous-and-categorical-variables"></a>
-</h3>
-<p>For a complete MI workflow imputing both continuous and categorical
-variables:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">impute_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      Solar_R_imp <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
-<span>        x <span class="op">=</span> <span class="va">.</span>, model <span class="op">=</span> <span class="st">"lm_bayes"</span>,</span>
-<span>        posit_y <span class="op">=</span> <span class="st">"Solar.R"</span>,</span>
-<span>        posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span>,</span>
-<span>        w <span class="op">=</span> <span class="va">weights</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      Ozone_chac_imp <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
-<span>        x <span class="op">=</span> <span class="va">.</span>, model <span class="op">=</span> <span class="st">"lda"</span>,</span>
-<span>        posit_y <span class="op">=</span> <span class="st">"Ozone_chac"</span>,</span>
-<span>        posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span>,</span>
-<span>        ridge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span>  <span class="co"># random ridge makes LDA stochastic</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span>, expr <span class="op">=</span> <span class="fu">impute_data</span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">res</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Solar_R_imp</span> <span class="op">~</span> <span class="va">Wind</span> <span class="op">+</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/pool.html">pool</a></span><span class="op">(</span><span class="va">fits</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Pooled results from 5 imputed datasets</span></span>
-<span><span class="co">## Rubin's rules with Barnard-Rubin df adjustment</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##         term estimate std.error statistic     df   p.value</span></span>
-<span><span class="co">##  (Intercept)  -75.283    81.254   -0.9265 118.30 0.3560666</span></span>
-<span><span class="co">##         Wind    2.163     2.459    0.8796  68.22 0.3821774</span></span>
-<span><span class="co">##         Temp    3.065     0.855    3.5844 134.31 0.0004717</span></span></code></pre>
 <hr>
-</div>
 </div>
 <div class="section level2">
 <h2 id="full-imputation-filling-all-variables-and-mi-with-rubins-rules">Full Imputation: Filling All Variables and MI with Rubin’s
@@ -540,7 +525,7 @@ Rules<a class="anchor" aria-label="anchor" href="#full-imputation-filling-all-va
 <p>In practice you often need to impute every variable that has missing
 values, then run MI with proper pooling. Below is a complete workflow
 using <code>air_miss</code>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define a function that fills all variables with NAs in one pass</span></span>
@@ -599,7 +584,7 @@ using <code>air_miss</code>.</p>
 <span><span class="co">##         Wind  -2.53190   0.67967    -3.725 68.08 3.986e-04</span></span>
 <span><span class="co">##         Temp   1.77575   0.28604     6.208 47.86 1.218e-07</span></span>
 <span><span class="co">##  Solar_R_imp   0.07218   0.02492     2.897 59.38 5.275e-03</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pool_result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Pooled results from 10 imputed datasets</span></span>
 <span><span class="co">## Rubin's rules with Barnard-Rubin df adjustment</span></span>
@@ -619,7 +604,7 @@ using <code>air_miss</code>.</p>
 <span><span class="co">##         Temp 5.623e-02 2.326e-02 8.182e-02 0.4549 0.3127 0.3397</span></span>
 <span><span class="co">##  Solar_R_imp 4.595e-04 1.469e-04 6.210e-04 0.3517 0.2602 0.2839</span></span></code></pre>
 <p>The same workflow using data.table:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
@@ -739,27 +724,31 @@ to recover the original row order.</p>
 <div class="section level3">
 <h3 id="simple-example">Simple example<a class="anchor" aria-label="anchor" href="#simple-example"></a>
 </h3>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">mice</span><span class="fu">::</span><span class="va"><a href="https://amices.org/mice/reference/nhanes.html" class="external-link">nhanes</a></span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">miceFast</span><span class="op">)</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Single imputation with linear model</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="co"># Single imputation with linear model (col 1 = Ozone)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_pred"</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># LDA for a categorical variable</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">3</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lda"</span>, <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Averaged multiple imputation (Bayesian, k=10 draws)</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">4</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="co"># Averaged multiple imputation for Solar.R (col 2, Bayesian, k=10 draws)</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute_N</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="fu">which_updated</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 2 3 4</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 1 2</span></span></code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##      [,1] [,2] [,3] [,4] [,5] [,6]</span></span>
+<span><span class="co">## [1,]   41  190  7.4   67    1    1</span></span>
+<span><span class="co">## [2,]   36  118  8.0   72    1    2</span></span>
+<span><span class="co">## [3,]   12  149 12.6   74    1    3</span></span>
+<span><span class="co">## [4,]   18  313 11.5   62    1    4</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="with-weights-and-groups">With weights and groups<a class="anchor" aria-label="anchor" href="#with-weights-and-groups"></a>
 </h3>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
@@ -785,7 +774,7 @@ to recover the original row order.</p>
 </h3>
 <p>When groups are not pre-sorted, the data is automatically sorted on
 first imputation:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="fl">1</span>, index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
@@ -811,7 +800,7 @@ first imputation:</p>
 <p>The OOP interface can also drive the full MI loop. Each iteration
 creates a fresh model, imputes all variables with missing values, and
 returns the completed matrix in the original row order.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Prepare a numeric matrix with an intercept and row index</span></span>
@@ -845,7 +834,7 @@ returns the completed matrix in the original row order.</p>
 <span><span class="co">##  (Intercept)  -69.010   25.8410    -2.671 62.19 9.651e-03</span></span>
 <span><span class="co">##           V3   -2.659    0.7687    -3.459 43.12 1.233e-03</span></span>
 <span><span class="co">##           V4    1.751    0.2681     6.530 76.01 6.646e-09</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/pool.html">pool</a></span><span class="op">(</span><span class="va">fits</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Pooled results from 10 imputed datasets</span></span>
 <span><span class="co">## Rubin's rules with Barnard-Rubin df adjustment</span></span>
@@ -869,16 +858,36 @@ returns the completed matrix in the original row order.</p>
 <h2 id="generating-correlated-data-with-corrdata">Generating Correlated Data with <code>corrData</code><a class="anchor" aria-label="anchor" href="#generating-correlated-data-with-corrdata"></a>
 </h2>
 <p>The <code>corrData</code> module generates correlated data for
-simulations:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Constructors:</span></span>
-<span><span class="fu">new</span><span class="op">(</span><span class="va">corrData</span>, <span class="va">nr_cat</span>, <span class="va">n_obs</span>, <span class="va">means</span>, <span class="va">cor_matrix</span><span class="op">)</span></span>
-<span><span class="fu">new</span><span class="op">(</span><span class="va">corrData</span>, <span class="va">n_obs</span>, <span class="va">means</span>, <span class="va">cor_matrix</span><span class="op">)</span></span>
+simulations. This is useful for creating test datasets with known
+properties.</p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 3 continuous variables, 100 observations</span></span>
+<span><span class="va">means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">cor_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="fl">1.0</span>, <span class="fl">0.7</span>, <span class="fl">0.3</span>,</span>
+<span>  <span class="fl">0.7</span>, <span class="fl">1.0</span>, <span class="fl">0.5</span>,</span>
+<span>  <span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span></span>
+<span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Methods:</span></span>
-<span><span class="va">cd_obj</span><span class="op">$</span><span class="fu">fill</span><span class="op">(</span><span class="st">"contin"</span><span class="op">)</span>   <span class="co"># continuous data</span></span>
-<span><span class="va">cd_obj</span><span class="op">$</span><span class="fu">fill</span><span class="op">(</span><span class="st">"binom"</span><span class="op">)</span>    <span class="co"># binary data</span></span>
-<span><span class="va">cd_obj</span><span class="op">$</span><span class="fu">fill</span><span class="op">(</span><span class="st">"discrete"</span><span class="op">)</span> <span class="co"># multi-category discrete data</span></span></code></pre></div>
+<span><span class="va">cd</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">corrData</span>, <span class="fl">100</span>, <span class="va">means</span>, <span class="va">cor_matrix</span><span class="op">)</span></span>
+<span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="va">cd</span><span class="op">$</span><span class="fu">fill</span><span class="op">(</span><span class="st">"contin"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">sim_data</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##      [,1] [,2] [,3]</span></span>
+<span><span class="co">## [1,] 1.00 0.78 0.32</span></span>
+<span><span class="co">## [2,] 0.78 1.00 0.46</span></span>
+<span><span class="co">## [3,] 0.32 0.46 1.00</span></span></code></pre>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># With 2 categorical variables: first argument is nr_cat</span></span>
+<span><span class="va">cd2</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">corrData</span>, <span class="fl">2</span>, <span class="fl">200</span>, <span class="va">means</span>, <span class="va">cor_matrix</span><span class="op">)</span></span>
+<span><span class="va">sim_discrete</span> <span class="op">&lt;-</span> <span class="va">cd2</span><span class="op">$</span><span class="fu">fill</span><span class="op">(</span><span class="st">"discrete"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_discrete</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##      [,1]     [,2]     [,3]</span></span>
+<span><span class="co">## [1,]    1 19.68768 29.40270</span></span>
+<span><span class="co">## [2,]    2 20.13020 28.32714</span></span>
+<span><span class="co">## [3,]    1 19.49938 30.97424</span></span>
+<span><span class="co">## [4,]    2 19.80052 30.02937</span></span>
+<span><span class="co">## [5,]    1 19.34898 29.39342</span></span>
+<span><span class="co">## [6,]    2 19.83346 29.67114</span></span></code></pre>
 <hr>
 </div>
 <div class="section level2">
@@ -889,7 +898,7 @@ simulations:</p>
 <p><strong>Creating matrices from data frames:</strong> R matrices
 hold only one type. Convert factors with
 <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix()</a></code>:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span>, na.action <span class="op">=</span> <span class="st">"na.pass"</span><span class="op">)</span></span></code></pre></div>
 </li>
@@ -900,7 +909,7 @@ destabilize imputation models.</p></li>
 <p><strong>Error handling with groups:</strong> Small groups may not
 have enough observations. Wrap <code><a href="../reference/fill_NA.html">fill_NA()</a></code> calls in
 <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code>:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.</span>, model <span class="op">=</span> <span class="st">"lda"</span>, posit_y <span class="op">=</span> <span class="st">"y"</span>, posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="va">.</span><span class="op">[[</span><span class="st">"y"</span><span class="op">]</span><span class="op">]</span></span>
