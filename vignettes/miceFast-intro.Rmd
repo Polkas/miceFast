@@ -21,9 +21,9 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 **miceFast** provides fast imputation methods built on C++/RcppArmadillo
 (Eddelbuettel & Sanderson, 2014). The main interfaces are:
 
-- `fill_NA` and `fill_NA_N` — work with **dplyr** and **data.table** pipelines.
-- `new(miceFast)` — OOP interface for maximum control.
-- `pool()` — combine results from multiply imputed datasets using Rubin's rules
+- `fill_NA` and `fill_NA_N` work with **dplyr** and **data.table** pipelines.
+- `new(miceFast)` provides an OOP interface for maximum control.
+- `pool()` combines results from multiply imputed datasets using Rubin's rules
   (Rubin, 1987) with the Barnard-Rubin (1999) degrees-of-freedom adjustment.
 
 For missing-data theory (MCAR/MAR/MNAR) and full MI workflows,
@@ -46,13 +46,24 @@ set.seed(123456)
 | Model | Type | Stochastic? | Use case |
 |-------|------|-------------|----------|
 | `lm_pred` | Linear regression | No | Deterministic point prediction. With only an `Intercept` column, equivalent to mean imputation. |
-| `lm_bayes` | Bayesian linear regression | Yes | Draws coefficients from their posterior — recommended for MI of continuous variables. |
-| `lm_noise` | Linear regression + noise | Yes | Adds residual noise to predictions — alternative stochastic model. |
-| `lda` | Linear Discriminant Analysis | Conditional | For **categorical** variables. With a random `ridge` parameter it becomes stochastic, suitable for MI. |
-| `pmm` | Predictive Mean Matching | Yes | Imputes from observed values via nearest-neighbor matching. Only available through `fill_NA_N()` / `impute_N()`. |
+| `lm_bayes` | Bayesian linear regression | Yes | Draws coefficients from their posterior. Recommended for MI of continuous variables. |
+| `lm_noise` | Linear regression + noise | Yes (improper) | Adds residual noise but omits parameter uncertainty. Useful for sensitivity analysis, not recommended as the primary MI model. |
+| `lda` | Linear Discriminant Analysis | Approximate | For **categorical** variables. With a random `ridge` parameter it becomes stochastic. Suitable for MI but not strictly proper (uses ad-hoc perturbation, not a posterior draw). |
+| `pmm` | Predictive Mean Matching | Yes (proper) | Imputes from observed values via nearest-neighbour matching on Bayesian-posterior predictions. Works for both **continuous** and **categorical** variables. Available through `fill_NA_N()` / OOP `impute()` / `impute_N()`. |
 
-For proper MI you need a stochastic model: `lm_bayes` or `lm_noise` for
-continuous variables, `lda` with `ridge = runif(1, ...)` for categorical.
+For MI you need a stochastic model. **`lm_bayes`** is strictly
+**proper** (Rubin, 1987): it draws both coefficients and residual
+variance from their posterior. **`pmm`** is also **proper**. It draws
+coefficients from the posterior for predictions on missing rows, then
+matches to the nearest observed values (Type II PMM; van Buuren, 2018).
+It works for both continuous and categorical variables and naturally
+preserves the observed data distribution. For categorical variables,
+**`lda`** with `ridge = runif(1, ...)` is an **approximate** approach.
+The random ridge creates between-imputation variability, but it is not a
+true posterior draw. `lm_noise` is **improper**. It adds residual noise
+but omits parameter uncertainty. Both `lda + ridge` and `lm_noise` work
+well in practice and are useful for sensitivity analysis.
+See the [MI vignette](missing-data-and-imputation.html).
 
 # Example Data
 
@@ -73,7 +84,7 @@ upset_NA(air_miss, 6)
 ## Checking for Collinearity
 
 Before imputing, check Variance Inflation Factors. Values above ~10 suggest
-problematic collinearity that can destabilize imputation models — consider
+problematic collinearity that can destabilize imputation models. Consider
 dropping or combining redundant predictors before imputing.
 
 ```{r vif}
@@ -179,6 +190,7 @@ result_pos <- air_miss %>%
   ))
 
 head(result_pos[, c("Ozone", "Ozone_imp")])
+```
 
 ## Basic usage (data.table)
 
@@ -212,12 +224,18 @@ air_miss[, Solar_R_imp := fill_NA(
 
 ---
 
-# Averaged Multiple Imputation with `fill_NA_N()`
+# Multiple Imputation with `fill_NA_N()`
 
-`fill_NA_N()` generates *k* imputed values per missing observation and returns their
-**average**. This is useful for exploratory analysis or ML pipelines,
-but between-imputation variance is lost so Rubin's rules cannot be applied.
-For inference, use the MI workflow with `fill_NA()` + `pool()` instead.
+For `lm_bayes` and `lm_noise`, `fill_NA_N()` generates *k* stochastic draws
+per missing observation and returns their **average**. For `pmm`, *k* is the
+number of nearest observed neighbours from which one value is randomly selected
+(no averaging). In both cases the result is a single filled-in dataset.
+Between-imputation variance is lost, so Rubin's rules cannot be applied.
+For MI with continuous variables, use `fill_NA()` + `pool()` with `lm_bayes`.
+For MI with **PMM** (proper, works for both continuous and categorical
+variables), use the OOP interface: call `impute("pmm", ...)` in a loop
+(see the [OOP section](#oop-interface) and the
+[MI vignette](missing-data-and-imputation.html)).
 
 ## dplyr
 
@@ -225,7 +243,7 @@ For inference, use the MI workflow with `fill_NA()` + `pool()` instead.
 data(air_miss)
 
 result_n <- air_miss %>%
-  # PMM with 20 draws — imputes from observed values
+  # PMM with 20 draws. Imputes from observed values.
   mutate(Ozone_pmm = fill_NA_N(
     x = .,
     model = "pmm",
@@ -297,19 +315,22 @@ For proper statistical inference on incomplete data, use the MI workflow:
 ```{r mi-workflow}
 data(air_miss)
 
-# Step 1: Generate m = 5 completed datasets
-completed <- lapply(1:5, function(i) {
-  air_miss %>%
-    mutate(
-      Ozone_imp = fill_NA(
-        x = ., model = "lm_bayes",
-        posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp")
-      )
-    )
+# Select the 4 core variables: Ozone and Solar.R have NAs; Wind and Temp are complete.
+df <- air_miss[, c("Ozone", "Solar.R", "Wind", "Temp")]
+
+# Step 1: Generate m = 10 completed datasets.
+# Impute Solar.R first (predictors fully observed), then Ozone
+# (can now use the freshly imputed Solar.R). This sequential order
+# ensures all NAs are filled in a single pass.
+set.seed(1234)
+completed <- lapply(1:10, function(i) {
+  df %>%
+    mutate(Solar.R = fill_NA(., "lm_bayes", "Solar.R", c("Wind", "Temp"))) %>%
+    mutate(Ozone   = fill_NA(., "lm_bayes", "Ozone",   c("Solar.R", "Wind", "Temp")))
 })
 
-# Step 2: Fit a model on each
-fits <- lapply(completed, function(d) lm(Ozone_imp ~ Wind + Temp, data = d))
+# Step 2: Fit the analysis model on each completed dataset
+fits <- lapply(completed, function(d) lm(Ozone ~ Solar.R + Wind + Temp, data = d))
 
 # Step 3: Pool using Rubin's rules
 pool_res <- pool(fits)
@@ -322,30 +343,35 @@ summary(pool_res)
 # Full Imputation: Filling All Variables and MI with Rubin's Rules
 
 In practice you often need to impute every variable that has missing values,
-then run MI with proper pooling. Below is a complete workflow using `air_miss`.
+then run MI with proper pooling. The key is **ordering**: impute variables
+whose predictors are complete first, then variables that depend on the
+freshly imputed ones. This sequential chain resolves joint missingness
+in a single pass without iterative FCS.
+
+Below is a complete workflow using `air_miss`.
 
 ```{r full-impute-all}
 data(air_miss)
 
-# Define a function that fills all variables with NAs in one pass
+# Define a function that fills all variables with NAs in one pass.
+# Order matters: Solar.R first (Wind, Temp are complete), then Ozone
+# (uses the freshly imputed Solar.R), then categorical variables.
 impute_all <- function(data) {
   data %>%
-    # Continuous: Ozone (log-normal, use logreg)
-    mutate(Ozone_imp = fill_NA(
-      x = ., model = "lm_bayes",
-      posit_y = "Ozone",
-      posit_x = c("Solar.R", "Wind", "Temp"),
-      logreg = TRUE
-    )) %>%
-    # Continuous: Solar.R
-    mutate(Solar_R_imp = fill_NA(
+    # Continuous: Solar.R (predictors fully observed)
+    mutate(Solar.R = fill_NA(
       x = ., model = "lm_bayes",
       posit_y = "Solar.R",
-      posit_x = c("Wind", "Temp", "Intercept"),
-      w = weights
+      posit_x = c("Wind", "Temp")
+    )) %>%
+    # Continuous: Ozone (Solar.R now complete)
+    mutate(Ozone = fill_NA(
+      x = ., model = "lm_bayes",
+      posit_y = "Ozone",
+      posit_x = c("Solar.R", "Wind", "Temp")
     )) %>%
     # Categorical: x_character (LDA with random ridge for stochasticity)
-    mutate(x_char_imp = fill_NA(
+    mutate(x_character = fill_NA(
       x = ., model = "lda",
       posit_y = "x_character",
       posit_x = c("Wind", "Temp"),
@@ -353,7 +379,7 @@ impute_all <- function(data) {
     )) %>%
     # Categorical: Ozone_chac (use tryCatch for safety with small groups)
     group_by(groups) %>%
-    do(mutate(., Ozone_chac_imp = tryCatch(
+    do(mutate(., Ozone_chac = tryCatch(
       fill_NA(
         x = ., model = "lda",
         posit_y = "Ozone_chac",
@@ -370,7 +396,7 @@ m <- 10
 completed <- lapply(1:m, function(i) impute_all(air_miss))
 
 # Fit the analysis model on each completed dataset
-fits <- lapply(completed, function(d) lm(Ozone_imp ~ Wind + Temp + Solar_R_imp, data = d))
+fits <- lapply(completed, function(d) lm(Ozone ~ Solar.R + Wind + Temp, data = d))
 
 # Pool using Rubin's rules
 pool_result <- pool(fits)
@@ -386,23 +412,23 @@ setDT(air_miss)
 
 impute_all_dt <- function(dt) {
   d <- copy(dt)
-  d[, Ozone_imp := fill_NA(
-    x = .SD, model = "lm_bayes",
-    posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp"),
-    logreg = TRUE
-  )]
-  d[, Solar_R_imp := fill_NA(
+  # Order: Solar.R first (predictors complete), then Ozone, then categoricals
+  d[, Solar.R := fill_NA(
     x = .SD, model = "lm_bayes",
     posit_y = "Solar.R",
-    posit_x = c("Wind", "Temp", "Intercept"),
-    w = .SD[["weights"]]
+    posit_x = c("Wind", "Temp")
   )]
-  d[, x_char_imp := fill_NA(
+  d[, Ozone := fill_NA(
+    x = .SD, model = "lm_bayes",
+    posit_y = "Ozone",
+    posit_x = c("Solar.R", "Wind", "Temp")
+  )]
+  d[, x_character := fill_NA(
     x = .SD, model = "lda",
     posit_y = "x_character", posit_x = c("Wind", "Temp"),
     ridge = runif(1, 0.5, 50)
   )]
-  d[, Ozone_chac_imp := tryCatch(
+  d[, Ozone_chac := tryCatch(
     fill_NA(
       x = .SD, model = "lda",
       posit_y = "Ozone_chac", posit_x = c("Temp", "Wind")
@@ -414,7 +440,7 @@ impute_all_dt <- function(dt) {
 
 set.seed(2024)
 completed_dt <- lapply(1:10, function(i) impute_all_dt(air_miss))
-fits_dt <- lapply(completed_dt, function(d) lm(Ozone_imp ~ Wind + Temp + Solar_R_imp, data = d))
+fits_dt <- lapply(completed_dt, function(d) lm(Ozone ~ Solar.R + Wind + Temp, data = d))
 pool(fits_dt)
 ```
 
@@ -432,8 +458,8 @@ This interface operates on numeric matrices and uses column position indices.
 | `set_data(x)` | Set the data matrix (by reference). |
 | `set_g(g)` | Set a grouping variable (positive numeric, no NAs). |
 | `set_w(w)` | Set a weighting variable (positive numeric, no NAs). |
-| `impute(model, y, x)` | Single imputation. |
-| `impute_N(model, y, x, k)` | Averaged multiple imputation (*k* draws). |
+| `impute(model, y, x)` | Single imputation. All models including `pmm` (k = 1). |
+| `impute_N(model, y, x, k)` | `lm_bayes`/`lm_noise`: averaged *k* draws. `pmm`: samples from *k* nearest observed values. |
 | `update_var(y, imps)` | Permanently update a column with imputations. |
 | `vifs(y, x)` | Variance Inflation Factors. |
 | `get_data()` / `get_g()` / `get_w()` / `get_index()` | Retrieve data or metadata. |
@@ -506,6 +532,10 @@ The OOP interface can also drive the full MI loop.
 Each iteration creates a fresh model, imputes all variables with missing values,
 and returns the completed matrix in the original row order.
 
+This example uses `lm_bayes`; for PMM (which also works for categorical variables),
+simply replace `"lm_bayes"` with `"pmm"`. PMM is proper and draws from the
+Bayesian posterior before matching to observed values.
+
 ```{r oop-mi}
 data(air_miss)
 
@@ -519,7 +549,7 @@ groups <- as.numeric(air_miss$groups)
 
 impute_oop <- function(mat, groups) {
   m <- new(miceFast)
-  m$set_data(mat + 0)  # copy — set_data uses the matrix by reference
+  m$set_data(mat + 0)  # copy. set_data uses the matrix by reference.
   m$set_g(groups)
   # col 1 = Ozone, col 2 = Solar.R, col 3 = Wind, col 4 = Temp, col 5 = intercept
   m$update_var(1, m$impute("lm_bayes", 1, c(2, 3, 4))$imputations)
@@ -535,6 +565,46 @@ fits <- lapply(completed, function(d) lm(V1 ~ V3 + V4, data = d))
 pool(fits)
 summary(pool(fits))
 ```
+
+## Iterative FCS (Chained Equations) with miceFast
+
+The mice package uses **Fully Conditional Specification** (FCS): it imputes each
+variable given all others and cycles through multiple iterations until convergence.
+miceFast can do exactly the same thing. The key is that `update_var()` modifies the
+data matrix in place, so each subsequent `impute()` call sees the freshly imputed
+values.
+
+### data.table (convenience functions)
+
+The same logic works with `fill_NA` and `:=`, which also updates columns in place:
+
+```{r fcs-dt}
+data(air_miss)
+setDT(air_miss)
+
+fcs_dt <- function(dt, n_iter = 5) {
+  d <- copy(dt)
+  na_ozone <- is.na(d$Ozone)
+  na_solar <- is.na(d[["Solar.R"]])
+  d <- naive_fill_NA(d)                          # initialise
+  for (iter in seq_len(n_iter)) {
+    set(d, which(na_ozone), "Ozone", NA_real_)   # restore NAs
+    d[, Ozone := fill_NA(.SD, "lm_bayes", "Ozone", c("Solar.R", "Wind", "Temp"))]
+    set(d, which(na_solar), "Solar.R", NA_real_)
+    d[, Solar.R := fill_NA_N(.SD, "pmm", "Solar.R", c("Ozone", "Wind", "Temp", "Intercept"))]
+  }
+  d
+}
+
+set.seed(2025)
+completed_dt <- lapply(1:10, function(i) fcs_dt(air_miss))
+fits_dt <- lapply(completed_dt, function(d) lm(Ozone ~ Wind + Temp, data = d))
+pool(fits_dt)
+```
+
+With a monotone missing-data pattern a single pass (`n_iter = 1`) is sufficient.
+For complex interlocking patterns, 5--10 iterations is typical. The OOP interface
+avoids R-level data copies and is fastest for large datasets.
 
 ---
 

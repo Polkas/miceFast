@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 Handling missing data is one of the most common challenges in applied statistics.
 The validity of any imputation strategy depends critically on **why** the data are
-missing. This vignette introduces the three missing-data mechanisms —
-MCAR, MAR, and MNAR - and then demonstrates how to use **miceFast** for proper
+missing. This vignette introduces the three missing-data mechanisms
+(MCAR, MAR, and MNAR) and then demonstrates how to use **miceFast** for proper
 Multiple Imputation (MI) with Rubin's rules.
 
 For the full API reference (all imputation models, `fill_NA()`, `fill_NA_N()`, and
@@ -62,7 +62,7 @@ summary(pool(fits))
 Little and Rubin (2002) defined three mechanisms that describe the relationship
 between the data and the probability of missingness:
 
-## MCAR — Missing Completely at Random
+## MCAR: Missing Completely at Random
 
 A variable is **MCAR** when the probability of being missing is the same for all
 observations, regardless of both observed and unobserved values.
@@ -79,7 +79,7 @@ to the measurements.
 MCAR is the only mechanism that can be tested from the observed data.
 Little's (1988) test compares the means of observed values across
 different missingness patterns; a significant result rejects MCAR.
-However, failure to reject does not prove MCAR — the test has limited
+However, failure to reject does not prove MCAR. The test has limited
 power, especially with small samples or few patterns. It is a necessary
 check, not a sufficient one.
 
@@ -91,7 +91,7 @@ check, not a sufficient one.
   the variance and covariance structure.
 - MI is valid and efficient.
 
-## MAR — Missing at Random
+## MAR: Missing at Random
 
 A variable is **MAR** when the probability of being missing depends on **observed**
 data but not on the missing values themselves, conditional on the observed data.
@@ -107,14 +107,15 @@ on blood pressure, not on the cholesterol value itself.
 - Complete-case analysis is generally biased.
 - Model-based imputation conditioning on observed predictors yields valid inferences.
 - MI with an appropriate imputation model is the standard approach.
-- **miceFast** models (`lm_bayes`, `lm_noise`, `lda`) condition on observed predictors,
+- **miceFast** models (`lm_bayes`, `lm_noise`, `pmm`, `lda`) condition on observed predictors,
   making them appropriate for MAR.
 
 **MAR cannot be tested.**
+
 Unlike MCAR, there is no test that can distinguish MAR from MNAR using the
 observed data alone, because the distinction depends on the unobserved values.
 The practical response is to make MAR more plausible by including **auxiliary
-variables** — variables that predict missingness or the missing values even
+variables**. These are variables that predict missingness or the missing values even
 if they are not part of the analysis model. The more information in the
 imputation model, the weaker the assumption required.
 
@@ -123,7 +124,7 @@ variables are conditioned on. A variable that appears MNAR with a sparse
 predictor set may be MAR once the right covariates are included (see Collins
 et al., 2001).
 
-## MNAR — Missing Not at Random
+## MNAR: Missing Not at Random
 
 A variable is **MNAR** when the probability of being missing depends on the
 **unobserved** (missing) value itself, even after conditioning on observed data.
@@ -131,7 +132,7 @@ A variable is **MNAR** when the probability of being missing depends on the
 $$P(R = 0 \mid Y_{obs}, Y_{mis}) \neq P(R = 0 \mid Y_{obs})$$
 
 **Example:** People with very high income are less likely to report their income
-in a survey — the missingness depends on the value that would have been reported.
+in a survey. The missingness depends on the value that would have been reported.
 
 **Implications:**
 
@@ -165,45 +166,76 @@ of MI, see van Buuren (2018).
 
 ## The MI procedure
 
-1. **Impute** — Create $m$ completed datasets by drawing from the predictive
+1. **Impute.** Create $m$ completed datasets by drawing from the predictive
    distribution of the missing values (each draw uses a different random seed or
    stochastic model).
-2. **Analyze** — Fit the analysis model of interest (e.g., `lm`, `glm`) separately
+2. **Analyze.** Fit the analysis model of interest (e.g., `lm`, `glm`) separately
    on each of the $m$ completed datasets.
-3. **Pool** — Combine the $m$ sets of estimates and standard errors using
+3. **Pool.** Combine the $m$ sets of estimates and standard errors using
    **Rubin's rules**.
 
 ## Rubin's rules
 
+Once the $m$ completed datasets have been analyzed, the $m$ sets of parameter
+estimates must be combined into a single set of inferences. Rubin (1987) provided a simple set of formulas for this pooling step, now
+universally known as **Rubin's rules**. The key insight is that the total
+uncertainty about a parameter has two components: the usual sampling
+variance (which would exist even without missing data) and an extra
+component that reflects not knowing the true missing values. The formulas
+below are implemented in `miceFast::pool()` (see `?pool` for details).
+
 Let $\hat{Q}_j$ and $\hat{U}_j$ denote the point estimate and variance estimate
 from the $j$-th completed dataset ($j = 1, \ldots, m$).
 
-**Pooled estimate:**
+**Pooled estimate** (Rubin, 1987, eq. 3.1.2):
 $$\bar{Q} = \frac{1}{m} \sum_{j=1}^{m} \hat{Q}_j$$
 
-**Within-imputation variance:**
+The pooled point estimate is simply the average across imputations.
+
+**Within-imputation variance** (Rubin, 1987, eq. 3.1.3):
 $$\bar{U} = \frac{1}{m} \sum_{j=1}^{m} \hat{U}_j$$
 
-**Between-imputation variance:**
+This is the average of the $m$ variance estimates. It captures the
+sampling variability that would be present even if there were no missing data.
+
+**Between-imputation variance** (Rubin, 1987, eq. 3.1.4):
 $$B = \frac{1}{m-1} \sum_{j=1}^{m} (\hat{Q}_j - \bar{Q})^2$$
 
-**Total variance:**
+This is the variance of the point estimates across imputations. It captures
+the extra uncertainty caused by not observing the missing values: if the
+imputations agree closely, $B$ is small and missingness has little impact.
+
+**Total variance** (Rubin, 1987, eq. 3.1.5):
 $$T = \bar{U} + \left(1 + \frac{1}{m}\right) B$$
 
-The degrees of freedom for inference use the **Barnard-Rubin adjustment**
-(Barnard & Rubin, 1999):
+The factor $(1 + 1/m)$ corrects for using a finite number of imputations
+rather than infinitely many. Inference (confidence intervals, $t$-tests)
+uses $\bar{Q} \pm t_{\nu}\sqrt{T}$.
+
+### Degrees of freedom
+
+With complete data, a $t$-test would use the residual degrees of freedom. With
+MI, the reference distribution is a $t$ with degrees of freedom $\nu$ that
+accounts for both the finite $m$ and the fraction of information lost to
+missingness. Rubin's (1987) large-sample approximation is:
 
 $$\nu = (m - 1)\left(1 + \frac{1}{r}\right)^{2}$$
 
-where $r = (1 + 1/m)B / \bar{U}$ is the **relative increase in variance** due to
-missingness. With finite complete-data degrees of freedom $\nu_{com}$, the adjusted
-degrees of freedom are:
+where $r = (1 + 1/m)B / \bar{U}$ is the **relative increase in variance** (RIV)
+due to missingness (Rubin, 1987, eq. 3.1.7). When $r$ is small (little missing
+information), $\nu$ is large and inference resembles the complete-data case.
+
+For small samples, Barnard and Rubin (1999) proposed an adjustment that also
+incorporates the complete-data degrees of freedom $\nu_{com}$:
 
 $$\nu_{adj} = \left(\frac{1}{\nu} + \frac{1}{\hat{\nu}_{obs}}\right)^{-1}$$
 
 where $\hat{\nu}_{obs} = \nu_{com}(\nu_{com} + 1)(1 - \gamma) / (\nu_{com} + 3)$
 and $\gamma = (1 + 1/m)B / T$ is the **proportion of total variance** due to
-missingness (denoted $\lambda$ in the output of `pool()`).
+missingness (denoted $\lambda$ in the output of `pool()`). This adjusted $\nu_{adj}$
+is always $\leq \min(\nu, \nu_{com})$, producing more conservative inference when
+the sample is small. `pool()` applies this adjustment automatically when
+`df.residual()` is available from the fitted models.
 
 ### Diagnostic quantities
 
@@ -216,8 +248,8 @@ missingness (denoted $\lambda$ in the output of `pool()`).
 Each imputed dataset is a draw from the posterior predictive distribution
 $P(Y_{mis} \mid Y_{obs})$. The between-imputation variance $B$ captures
 the additional uncertainty from not knowing the missing values. Rubin (1987)
-showed that this procedure yields valid frequentist inference — confidence
-intervals with correct coverage — provided two conditions hold: the
+showed that this procedure yields valid frequentist inference (confidence
+intervals with correct coverage) provided two conditions hold: the
 imputations are **proper** and the imputation model is **congenial** with the
 analysis model. The efficiency of MI depends on the **fraction of missing
 information** (FMI), not on the fraction of missing data. A dataset
@@ -229,21 +261,30 @@ informative.
 An imputation procedure is **proper** (Rubin, 1987) if it propagates all
 sources of uncertainty: both the uncertainty about the model parameters and
 the residual variability. In practice this means each imputation must
+
 (1) draw model parameters from their posterior distribution, and then
 (2) draw imputed values from the predictive distribution given those parameters.
 
 `lm_bayes` in miceFast is a proper imputation method: it draws
 $\beta$ and $\sigma^2$ from the posterior under a non-informative prior,
 then generates imputed values from the resulting predictive distribution.
+`pmm` (predictive mean matching) is also proper: it draws $\beta$ from the
+same Bayesian posterior, computes predicted values for all rows, and then
+matches each missing-row prediction to the nearest observed-row predictions,
+returning the corresponding observed $y$ values. Because imputed values are
+always real observed values, PMM automatically preserves the data distribution
+and respects natural bounds (e.g., non-negativity) without extra constraints.
 `lm_noise`, which adds residual noise to point-estimate predictions, is
-**improper** — it omits the parameter uncertainty and tends to produce
+**improper**. It omits the parameter uncertainty and tends to produce
 confidence intervals that are slightly too narrow, though the bias is small
 when $n$ is large relative to $p$ (Schafer, 1997, Section 3.4).
+`lda` with a random `ridge` is **approximate**: different ridge values across
+imputations introduce variation, but this is not a formal posterior draw.
 
 ### Congeniality
 
 The imputation model is **congenial** with the analysis model (Meng, 1994)
-when the imputation model is at least as general as — or richer than — the
+when the imputation model is at least as general as (or richer than) the
 analysis model. If the analysis model includes an interaction term but the
 imputation model does not, the resulting MI inferences can be biased.
 Practically: include in the imputation model all variables that will appear
@@ -278,10 +319,16 @@ Deterministic models (like `lm_pred`) should *not* be used for MI because they p
 identical imputations across datasets.
 
 | Variable type | Recommended model | How it's stochastic | Proper? |
-|--------------|-------------------|---------------------|---------|
+|--------------|-------------------|---------------------|----------|
 | Continuous | `lm_bayes` | Draws regression coefficients from their posterior distribution | Yes |
-| Continuous | `lm_noise` | Adds residual noise drawn from the estimated error distribution | No (omits parameter uncertainty) |
+| Continuous / Categorical | `pmm` | Draws coefficients from the posterior, matches predictions to nearest observed values (Type II PMM) | Yes |
 | Categorical | `lda` + random `ridge` | Different ridge penalties across imputations create variation | Approximate |
+
+**PMM for MI:** `pmm` is proper and works for both continuous and categorical
+variables. It preserves the observed data distribution. Imputed values are
+always values that were actually observed. Since `fill_NA()` does not support
+`pmm`, use the OOP interface (`impute("pmm", ...)`) in a loop for MI
+(see example below and the [Introduction vignette](miceFast-intro.html)).
 
 ## Basic MI workflow
 
@@ -331,7 +378,7 @@ The output includes:
 ## MI with mixed variable types
 
 Real datasets often have both continuous and categorical variables with missing values.
-Use `lm_bayes` for continuous variables and `lda` with a random `ridge` for categorical variables:
+Use `lm_bayes` (or `pmm`) for continuous variables and `lda` with a random `ridge` (or `pmm`) for categorical variables:
 
 ```{r mi-mixed}
 data(air_miss)
@@ -451,6 +498,37 @@ fits_w <- lapply(completed_w, function(d) {
 pool(fits_w)
 ```
 
+## MI with PMM (OOP interface)
+
+PMM is a **proper** method that works for both continuous and categorical variables.
+It draws coefficients from the posterior, predicts on all rows, and matches each
+missing-row prediction to the nearest observed values. Imputed values are always
+values that were actually observed. Since `fill_NA()` does not support `pmm`, use
+the OOP interface for the MI loop:
+
+```{r mi-pmm-oop}
+data(air_miss)
+
+dat <- as.matrix(air_miss[, c("Ozone", "Solar.R", "Wind", "Temp")])
+dat <- cbind(dat, Intercept = 1)
+
+m <- 10
+completed <- lapply(1:m, function(i) {
+  model <- new(miceFast)
+  model$set_data(dat + 0)            # copy. set_data uses the matrix by reference.
+  # impute("pmm", ...) draws from the Bayesian posterior and matches to nearest observed value
+  model$update_var(1, model$impute("pmm", 1, c(3, 4, 5))$imputations)
+  d <- as.data.frame(model$get_data())
+  colnames(d) <- c("Ozone", "Solar.R", "Wind", "Temp", "Intercept")
+  d
+})
+
+fits_pmm <- lapply(completed, function(d) {
+  lm(Ozone ~ Wind + Temp, data = d)
+})
+pool(fits_pmm)
+```
+
 ---
 
 # Sensitivity Analysis
@@ -462,8 +540,9 @@ whether substantive conclusions are robust to different imputation approaches.
 
 ## Comparing models with `fill_NA_N()`
 
-`fill_NA_N()` averages over *k* imputed values, making it useful for quick sensitivity
-checks. Compare different imputation strategies on a single dataset:
+`fill_NA_N()` produces a single filled-in dataset: for `lm_bayes`/`lm_noise` it averages
+*k* draws; for `pmm` it samples from the *k* nearest observed values. This makes it
+useful for quick sensitivity checks. Compare different imputation strategies:
 
 ```{r sensitivity-models}
 data(air_miss)
@@ -520,24 +599,24 @@ results %>%
 ## Comparing with base methods
 
 Always compare MI results against simple baselines. If conclusions differ,
-investigate why — it may reveal problems with your imputation model or
+investigate why. It may reveal problems with your imputation model or
 indicate that the missing-data mechanism matters.
 
 ```{r sensitivity-baselines}
 data(air_miss)
 set.seed(2025)
 
-# 1. Complete cases (listwise deletion) — unbiased under MCAR
+# 1. Complete cases (listwise deletion). Unbiased under MCAR.
 fit_cc <- lm(Ozone ~ Wind + Temp, data = air_miss[complete.cases(air_miss[, c("Ozone", "Wind", "Temp")]), ])
 ci_cc <- confint(fit_cc)
 
-# 2. Mean imputation — biased, underestimates variance
+# 2. Mean imputation. Biased; underestimates variance.
 air_mean <- air_miss
 air_mean$Ozone[is.na(air_mean$Ozone)] <- mean(air_mean$Ozone, na.rm = TRUE)
 fit_mean <- lm(Ozone ~ Wind + Temp, data = air_mean)
 ci_mean <- confint(fit_mean)
 
-# 3. Deterministic regression imputation (lm_pred) — no residual noise
+# 3. Deterministic regression imputation (lm_pred). No residual noise.
 air_pred <- air_miss %>%
   mutate(Ozone_imp = fill_NA(
     x = ., model = "lm_pred",
@@ -611,11 +690,11 @@ stabilize (see the sensitivity analysis above).
    VIF(air_miss, posit_y = "Ozone", posit_x = c("Solar.R", "Wind", "Temp"))
    ```
 
-3. **Choose imputation models:** `lm_bayes` for continuous, `lda` with random `ridge`
-   for categorical, `logreg = TRUE` for right-skewed variables.
+3. **Choose imputation models:** `lm_bayes` or `pmm` for continuous, `lda` with random `ridge`
+   or `pmm` for categorical, `logreg = TRUE` for right-skewed variables.
 
 4. **Include auxiliary variables:** Add predictors of missingness to the imputation model
-   even if they are not in the analysis model — this makes MAR more plausible.
+   even if they are not in the analysis model. This makes MAR more plausible.
 
 5. **Set *m* ≥ 20.** Since miceFast is fast, there is little cost. Increase until
    estimates and standard errors stabilize (see sensitivity analysis above).
@@ -645,7 +724,7 @@ pilot <- lapply(1:5, function(i) {
 })
 pilot_pool <- pool(lapply(pilot, function(d) lm(Ozone_imp ~ Wind + Temp, data = d)))
 
-# Inspect FMI — the key input for deciding m
+# Inspect FMI, the key input for deciding m
 data.frame(term = pilot_pool$term, fmi = round(pilot_pool$fmi, 3))
 
 # For the exact formula and its derivation see:
@@ -662,7 +741,7 @@ data.frame(term = pilot_pool$term, fmi = round(pilot_pool$fmi, 3))
 | MI framework | Complete (FCS/MICE algorithm) | Building blocks for MI |
 | Imputation models | 25+ built-in methods | `lm_pred`, `lm_bayes`, `lm_noise`, `lda`, `pmm` |
 | Chained equations | Yes (iterative multivariate) | Single-pass sequential; not iterative FCS |
-| Speed | R-based | C++/Armadillo — significantly faster |
+| Speed | R-based | C++/Armadillo, significantly faster |
 | Grouping | Via `blocks` | Built-in, auto-sorted |
 | Weights | Limited | Full support |
 | Pooling | `mice::pool()` | `miceFast::pool()` |
@@ -675,14 +754,61 @@ tooling.
 or when you want imputation inside `dplyr`/`data.table` pipelines.
 The two can be combined: use **miceFast** for imputation and **mice** for diagnostics, or vice versa.
 
-**Important caveat:** miceFast fills variables in a single pass — each variable's
-imputation conditions on the previously imputed columns but there is no iterative
-cycling back (unlike mice's FCS algorithm, which iterates until convergence).
-For datasets where the missing-data pattern is monotone or nearly so, a single pass
-is often sufficient. With complex interlocking patterns, the single-pass approach
-may introduce some bias because later variables are imputed conditional on
-already-imputed (not yet converged) earlier variables. Consider using mice for
-datasets with heavy non-monotone missingness.
+**Important caveat:** The convenience functions (`fill_NA`, `fill_NA_N`) fill
+variables in a single pass. For datasets where the missing-data pattern is
+monotone or nearly so, a single pass is sufficient. With complex interlocking
+patterns, however, you can **mimic iterative FCS** (chained equations) using the
+OOP interface: call `update_var()` for each variable in a loop and cycle through
+multiple iterations, exactly like mice's algorithm:
+
+```r
+# Save which cells are originally NA
+na1 <- is.na(mat[, 1]); na2 <- is.na(mat[, 2]); na3 <- is.na(mat[, 3])
+# Initialise NAs (e.g. column means) so predictors are always complete
+for (j in seq_len(ncol(mat))) {
+  na_j <- is.na(mat[, j])
+  if (any(na_j)) mat[na_j, j] <- mean(mat[!na_j, j])
+}
+model$set_data(mat)
+for (iter in 1:5) {
+  col1 <- model$get_data()[, 1]; col1[na1] <- NaN; model$update_var(1, col1)
+  model$update_var(1, model$impute("lm_bayes", 1, c(2, 3, 4))$imputations)
+  col2 <- model$get_data()[, 2]; col2[na2] <- NaN; model$update_var(2, col2)
+  model$update_var(2, model$impute("lm_bayes", 2, c(1, 3, 4))$imputations)
+  col3 <- model$get_data()[, 3]; col3[na3] <- NaN; model$update_var(3, col3)
+  model$update_var(3, model$impute("lda",      3, c(1, 2, 4))$imputations)
+}
+```
+
+The key is the **save-restore-impute** cycle: record which cells are originally
+missing, initialise them so predictors are complete, then before each variable's
+imputation restore its original NAs. Without this step, rows where both the
+dependent variable and a predictor are jointly missing would never be imputed.
+
+`update_var()` permanently modifies the data matrix by reference, so each
+variable's imputation conditions on the most recently imputed values for all
+other variables -- the same sequential conditioning that defines the MICE/FCS
+algorithm. Wrap this in `lapply(1:m, ...)` and you have full iterative MI at
+C++ speed.
+
+The same logic works with `fill_NA` in a data.table pipeline, since `:=`
+updates columns in place:
+
+```r
+dt <- naive_fill_NA(copy(dt_orig))         # initialise
+na_oz <- is.na(dt_orig$Ozone); na_sr <- is.na(dt_orig[["Solar.R"]])
+for (iter in 1:5) {
+  set(dt, which(na_oz), "Ozone", NA_real_) # restore NAs
+  dt[, Ozone   := fill_NA(.SD, "lm_bayes", "Ozone",   c("Solar.R", "Wind", "Temp"))]
+  set(dt, which(na_sr), "Solar.R", NA_real_)
+  dt[, Solar.R := fill_NA(.SD, "lm_bayes", "Solar.R", c("Ozone", "Wind", "Temp"))]
+}
+```
+
+With dplyr the approach is the same, just re-`mutate` each variable in sequence
+inside the iteration loop. The OOP interface is fastest because it avoids
+R-level data copies, but the convenience functions work equally well for
+correctness.
 
 ---
 

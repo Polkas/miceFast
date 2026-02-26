@@ -306,6 +306,60 @@ arma::colvec neibo(arma::colvec &y, arma::colvec &miss, int k) {
   return result;
 }
 
+// ---------------------------------------------------------------------------
+// PMM donor matching: match on predicted values, return observed values
+// ---------------------------------------------------------------------------
+
+// Like neibo() but matches on ypred and returns the corresponding y_obs value.
+// ypred and y_obs must have the same length (one entry per observed row).
+static arma::colvec neibo_pmm(const arma::colvec &ypred,
+                               const arma::colvec &y_obs,
+                               const arma::colvec &miss, int k) {
+  int n = ypred.n_rows;
+  int n_miss = miss.n_rows;
+
+  k = std::min(k, n);
+  k = std::max(k, 1);
+
+  // Build (ypred, y_obs) pairs sorted by ypred
+  arma::uvec order = arma::sort_index(ypred);
+  std::vector<double> yp_sorted(n);
+  std::vector<double> yo_sorted(n);
+  for (int i = 0; i < n; i++) {
+    yp_sorted[i] = ypred(order(i));
+    yo_sorted[i] = y_obs(order(i));
+  }
+
+  arma::colvec result(n_miss);
+  arma::vec which_n = arma::floor(Rcpp::as<arma::vec>(Rcpp::runif(n_miss, 0, k)));
+  arma::uvec which = arma::conv_to<arma::uvec>::from(which_n);
+
+  for (int i = 0; i < n_miss; i++) {
+    double mm = miss[i];
+    int count = 0;
+    std::vector<int> resus(k);
+
+    auto iter_geq = std::lower_bound(yp_sorted.begin(), yp_sorted.end(), mm);
+    int r = iter_geq - yp_sorted.begin();
+    int l = r - 1;
+
+    while (l >= 0 && r < n && count < k) {
+      if (mm - yp_sorted[l] < yp_sorted[r] - mm)
+        resus[count++] = l--;
+      else
+        resus[count++] = r++;
+    }
+    while (count < k && l >= 0)
+      resus[count++] = l--;
+    while (count < k && r < n)
+      resus[count++] = r++;
+
+    // Return the OBSERVED y value at the matched donor position
+    result[i] = yo_sorted[resus[which[i]]];
+  }
+  return result;
+}
+
 // PMM core: fit Bayesian model, draw predictions, match to observed
 static arma::colvec pmm_core(const OlsFit &fit, const arma::colvec &y,
                               const arma::mat &X, const arma::mat &X1,
@@ -318,7 +372,8 @@ static arma::colvec pmm_core(const OlsFit &fit, const arma::colvec &y,
 
   arma::colvec ypred_mis  = X1 * d.coef + noise * d.sigma;
   arma::colvec ypred_full = X * fit.coef;
-  return neibo(ypred_full, ypred_mis, k);
+  // Match on predicted values, return actual observed y values (proper PMM)
+  return neibo_pmm(ypred_full, y, ypred_mis, k);
 }
 
 // [[Rcpp::export]]
