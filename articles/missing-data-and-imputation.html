@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.1</span>
       </span>
     </div>
 
@@ -73,7 +73,7 @@ with miceFast</h1>
                         <h4 data-toc-skip class="author">Maciej
 Nasinski</h4>
             
-            <h4 data-toc-skip class="date">2026-02-25</h4>
+            <h4 data-toc-skip class="date">2026-02-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/Polkas/miceFast/blob/main/vignettes/missing-data-and-imputation.Rmd" class="external-link"><code>vignettes/missing-data-and-imputation.Rmd</code></a></small>
       <div class="hidden name"><code>missing-data-and-imputation.Rmd</code></div>
@@ -88,7 +88,7 @@ Nasinski</h4>
 <p>Handling missing data is one of the most common challenges in applied
 statistics. The validity of any imputation strategy depends critically
 on <strong>why</strong> the data are missing. This vignette introduces
-the three missing-data mechanisms — MCAR, MAR, and MNAR - and then
+the three missing-data mechanisms (MCAR, MAR, and MNAR) and then
 demonstrates how to use <strong>miceFast</strong> for proper Multiple
 Imputation (MI) with Rubin’s rules.</p>
 <p>For the full API reference (all imputation models,
@@ -142,7 +142,7 @@ explains <strong>why</strong> each step matters.</p>
 <p>Little and Rubin (2002) defined three mechanisms that describe the
 relationship between the data and the probability of missingness:</p>
 <div class="section level3">
-<h3 id="mcar-missing-completely-at-random">MCAR — Missing Completely at Random<a class="anchor" aria-label="anchor" href="#mcar-missing-completely-at-random"></a>
+<h3 id="mcar-missing-completely-at-random">MCAR: Missing Completely at Random<a class="anchor" aria-label="anchor" href="#mcar-missing-completely-at-random"></a>
 </h3>
 <p>A variable is <strong>MCAR</strong> when the probability of being
 missing is the same for all observations, regardless of both observed
@@ -161,8 +161,8 @@ hardware glitch unrelated to the measurements.</p>
 can be tested from the observed data. Little’s (1988) test compares the
 means of observed values across different missingness patterns; a
 significant result rejects MCAR. However, failure to reject does not
-prove MCAR — the test has limited power, especially with small samples
-or few patterns. It is a necessary check, not a sufficient one.</p>
+prove MCAR. The test has limited power, especially with small samples or
+few patterns. It is a necessary check, not a sufficient one.</p>
 <p><strong>Implications:</strong></p>
 <ul>
 <li>Complete-case analysis (listwise deletion) produces unbiased
@@ -173,7 +173,7 @@ but distort the variance and covariance structure.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="mar-missing-at-random">MAR — Missing at Random<a class="anchor" aria-label="anchor" href="#mar-missing-at-random"></a>
+<h3 id="mar-missing-at-random">MAR: Missing at Random<a class="anchor" aria-label="anchor" href="#mar-missing-at-random"></a>
 </h3>
 <p>A variable is <strong>MAR</strong> when the probability of being
 missing depends on <strong>observed</strong> data but not on the missing
@@ -192,31 +192,31 @@ valid inferences.</li>
 approach.</li>
 <li>
 <strong>miceFast</strong> models (<code>lm_bayes</code>,
-<code>lm_noise</code>, <code>lda</code>) condition on observed
-predictors, making them appropriate for MAR.</li>
+<code>lm_noise</code>, <code>pmm</code>, <code>lda</code>) condition on
+observed predictors, making them appropriate for MAR.</li>
 </ul>
-<p><strong>MAR cannot be tested.</strong> Unlike MCAR, there is no test
-that can distinguish MAR from MNAR using the observed data alone,
-because the distinction depends on the unobserved values. The practical
-response is to make MAR more plausible by including <strong>auxiliary
-variables</strong> — variables that predict missingness or the missing
-values even if they are not part of the analysis model. The more
-information in the imputation model, the weaker the assumption
-required.</p>
+<p><strong>MAR cannot be tested.</strong></p>
+<p>Unlike MCAR, there is no test that can distinguish MAR from MNAR
+using the observed data alone, because the distinction depends on the
+unobserved values. The practical response is to make MAR more plausible
+by including <strong>auxiliary variables</strong>. These are variables
+that predict missingness or the missing values even if they are not part
+of the analysis model. The more information in the imputation model, the
+weaker the assumption required.</p>
 <p>Note also that the boundary between MAR and MNAR shifts depending on
 which variables are conditioned on. A variable that appears MNAR with a
 sparse predictor set may be MAR once the right covariates are included
 (see Collins et al., 2001).</p>
 </div>
 <div class="section level3">
-<h3 id="mnar-missing-not-at-random">MNAR — Missing Not at Random<a class="anchor" aria-label="anchor" href="#mnar-missing-not-at-random"></a>
+<h3 id="mnar-missing-not-at-random">MNAR: Missing Not at Random<a class="anchor" aria-label="anchor" href="#mnar-missing-not-at-random"></a>
 </h3>
 <p>A variable is <strong>MNAR</strong> when the probability of being
 missing depends on the <strong>unobserved</strong> (missing) value
 itself, even after conditioning on observed data.</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>R</mi><mo>=</mo><mn>0</mn><mo>∣</mo><msub><mi>Y</mi><mrow><mi>o</mi><mi>b</mi><mi>s</mi></mrow></msub><mo>,</mo><msub><mi>Y</mi><mrow><mi>m</mi><mi>i</mi><mi>s</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≠</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>R</mi><mo>=</mo><mn>0</mn><mo>∣</mo><msub><mi>Y</mi><mrow><mi>o</mi><mi>b</mi><mi>s</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(R = 0 \mid Y_{obs}, Y_{mis}) \neq P(R = 0 \mid Y_{obs})</annotation></semantics></math></p>
 <p><strong>Example:</strong> People with very high income are less
-likely to report their income in a survey — the missingness depends on
+likely to report their income in a survey. The missingness depends on
 the value that would have been reported.</p>
 <p><strong>Implications:</strong></p>
 <ul>
@@ -284,18 +284,18 @@ values. For a comprehensive modern treatment of MI, see van Buuren
 </h3>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Impute</strong> — Create
+<strong>Impute.</strong> Create
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
 completed datasets by drawing from the predictive distribution of the
 missing values (each draw uses a different random seed or stochastic
 model).</li>
 <li>
-<strong>Analyze</strong> — Fit the analysis model of interest (e.g.,
+<strong>Analyze.</strong> Fit the analysis model of interest (e.g.,
 <code>lm</code>, <code>glm</code>) separately on each of the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
 completed datasets.</li>
 <li>
-<strong>Pool</strong> — Combine the
+<strong>Pool.</strong> Combine the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
 sets of estimates and standard errors using <strong>Rubin’s
 rules</strong>.</li>
@@ -304,6 +304,18 @@ rules</strong>.</li>
 <div class="section level3">
 <h3 id="rubins-rules">Rubin’s rules<a class="anchor" aria-label="anchor" href="#rubins-rules"></a>
 </h3>
+<p>Once the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+completed datasets have been analyzed, the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+sets of parameter estimates must be combined into a single set of
+inferences. Rubin (1987) provided a simple set of formulas for this
+pooling step, now universally known as <strong>Rubin’s rules</strong>.
+The key insight is that the total uncertainty about a parameter has two
+components: the usual sampling variance (which would exist even without
+missing data) and an extra component that reflects not knowing the true
+missing values. The formulas below are implemented in
+<code><a href="../reference/pool.html">miceFast::pool()</a></code> (see <code><a href="../reference/pool.html">?pool</a></code> for details).</p>
 <p>Let
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>Q</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><annotation encoding="application/x-tex">\hat{Q}_j</annotation></semantics></math>
 and
@@ -312,23 +324,59 @@ denote the point estimate and variance estimate from the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>-th
 completed dataset
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">j = 1, \ldots, m</annotation></semantics></math>).</p>
-<p><strong>Pooled estimate:</strong>
+<p><strong>Pooled estimate</strong> (Rubin, 1987, eq. 3.1.2):
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>Q</mi><mo accent="true">‾</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>m</mi></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></munderover><msub><mover><mi>Q</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\bar{Q} = \frac{1}{m} \sum_{j=1}^{m} \hat{Q}_j</annotation></semantics></math></p>
-<p><strong>Within-imputation variance:</strong>
+<p>The pooled point estimate is simply the average across
+imputations.</p>
+<p><strong>Within-imputation variance</strong> (Rubin, 1987, eq. 3.1.3):
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>U</mi><mo accent="true">‾</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>m</mi></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></munderover><msub><mover><mi>U</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\bar{U} = \frac{1}{m} \sum_{j=1}^{m} \hat{U}_j</annotation></semantics></math></p>
-<p><strong>Between-imputation variance:</strong>
+<p>This is the average of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+variance estimates. It captures the sampling variability that would be
+present even if there were no missing data.</p>
+<p><strong>Between-imputation variance</strong> (Rubin, 1987, eq.
+3.1.4):
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mfrac><mn>1</mn><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>Q</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><mo>−</mo><mover><mi>Q</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">B = \frac{1}{m-1} \sum_{j=1}^{m} (\hat{Q}_j - \bar{Q})^2</annotation></semantics></math></p>
-<p><strong>Total variance:</strong>
+<p>This is the variance of the point estimates across imputations. It
+captures the extra uncertainty caused by not observing the missing
+values: if the imputations agree closely,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+is small and missingness has little impact.</p>
+<p><strong>Total variance</strong> (Rubin, 1987, eq. 3.1.5):
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mover><mi>U</mi><mo accent="true">‾</mo></mover><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mi>m</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">T = \bar{U} + \left(1 + \frac{1}{m}\right) B</annotation></semantics></math></p>
-<p>The degrees of freedom for inference use the <strong>Barnard-Rubin
-adjustment</strong> (Barnard &amp; Rubin, 1999):</p>
+<p>The factor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mn>1</mn><mi>/</mi><mi>m</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(1 + 1/m)</annotation></semantics></math>
+corrects for using a finite number of imputations rather than infinitely
+many. Inference (confidence intervals,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>-tests)
+uses
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>Q</mi><mo accent="true">‾</mo></mover><mo>±</mo><msub><mi>t</mi><mi>ν</mi></msub><msqrt><mi>T</mi></msqrt></mrow><annotation encoding="application/x-tex">\bar{Q} \pm t_{\nu}\sqrt{T}</annotation></semantics></math>.</p>
+<div class="section level4">
+<h4 id="degrees-of-freedom">Degrees of freedom<a class="anchor" aria-label="anchor" href="#degrees-of-freedom"></a>
+</h4>
+<p>With complete data, a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>-test
+would use the residual degrees of freedom. With MI, the reference
+distribution is a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+with degrees of freedom
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ν</mi><annotation encoding="application/x-tex">\nu</annotation></semantics></math>
+that accounts for both the finite
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+and the fraction of information lost to missingness. Rubin’s (1987)
+large-sample approximation is:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mi>r</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\nu = (m - 1)\left(1 + \frac{1}{r}\right)^{2}</annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mn>1</mn><mi>/</mi><mi>m</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>B</mi><mi>/</mi><mover><mi>U</mi><mo accent="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">r = (1 + 1/m)B / \bar{U}</annotation></semantics></math>
-is the <strong>relative increase in variance</strong> due to
-missingness. With finite complete-data degrees of freedom
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ν</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi></mrow></msub><annotation encoding="application/x-tex">\nu_{com}</annotation></semantics></math>,
-the adjusted degrees of freedom are:</p>
+is the <strong>relative increase in variance</strong> (RIV) due to
+missingness (Rubin, 1987, eq. 3.1.7). When
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+is small (little missing information),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ν</mi><annotation encoding="application/x-tex">\nu</annotation></semantics></math>
+is large and inference resembles the complete-data case.</p>
+<p>For small samples, Barnard and Rubin (1999) proposed an adjustment
+that also incorporates the complete-data degrees of freedom
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ν</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi></mrow></msub><annotation encoding="application/x-tex">\nu_{com}</annotation></semantics></math>:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ν</mi><mrow><mi>a</mi><mi>d</mi><mi>j</mi></mrow></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mi>ν</mi></mfrac><mo>+</mo><mfrac><mn>1</mn><msub><mover><mi>ν</mi><mo accent="true">̂</mo></mover><mrow><mi>o</mi><mi>b</mi><mi>s</mi></mrow></msub></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\nu_{adj} = \left(\frac{1}{\nu} + \frac{1}{\hat{\nu}_{obs}}\right)^{-1}</annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>ν</mi><mo accent="true">̂</mo></mover><mrow><mi>o</mi><mi>b</mi><mi>s</mi></mrow></msub><mo>=</mo><msub><mi>ν</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ν</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi></mrow></msub><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>γ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ν</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi></mrow></msub><mo>+</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\hat{\nu}_{obs} = \nu_{com}(\nu_{com} + 1)(1 - \gamma) / (\nu_{com} + 3)</annotation></semantics></math>
@@ -337,7 +385,14 @@ and
 is the <strong>proportion of total variance</strong> due to missingness
 (denoted
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-in the output of <code><a href="../reference/pool.html">pool()</a></code>).</p>
+in the output of <code><a href="../reference/pool.html">pool()</a></code>). This adjusted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ν</mi><mrow><mi>a</mi><mi>d</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\nu_{adj}</annotation></semantics></math>
+is always
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo><mo>min</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>ν</mi><mo>,</mo><msub><mi>ν</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\leq \min(\nu, \nu_{com})</annotation></semantics></math>,
+producing more conservative inference when the sample is small.
+<code><a href="../reference/pool.html">pool()</a></code> applies this adjustment automatically when
+<code><a href="https://rdrr.io/r/stats/df.residual.html" class="external-link">df.residual()</a></code> is available from the fitted models.</p>
+</div>
 <div class="section level4">
 <h4 id="diagnostic-quantities">Diagnostic quantities<a class="anchor" aria-label="anchor" href="#diagnostic-quantities"></a>
 </h4>
@@ -364,7 +419,7 @@ The between-imputation variance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
 captures the additional uncertainty from not knowing the missing values.
 Rubin (1987) showed that this procedure yields valid frequentist
-inference — confidence intervals with correct coverage — provided two
+inference (confidence intervals with correct coverage) provided two
 conditions hold: the imputations are <strong>proper</strong> and the
 imputation model is <strong>congenial</strong> with the analysis model.
 The efficiency of MI depends on the <strong>fraction of missing
@@ -378,31 +433,47 @@ predictors are highly informative.</p>
 <p>An imputation procedure is <strong>proper</strong> (Rubin, 1987) if
 it propagates all sources of uncertainty: both the uncertainty about the
 model parameters and the residual variability. In practice this means
-each imputation must (1) draw model parameters from their posterior
-distribution, and then (2) draw imputed values from the predictive
-distribution given those parameters.</p>
+each imputation must</p>
+<ol style="list-style-type: decimal">
+<li>draw model parameters from their posterior distribution, and
+then</li>
+<li>draw imputed values from the predictive distribution given those
+parameters.</li>
+</ol>
 <p><code>lm_bayes</code> in miceFast is a proper imputation method: it
 draws
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>
 from the posterior under a non-informative prior, then generates imputed
-values from the resulting predictive distribution.
+values from the resulting predictive distribution. <code>pmm</code>
+(predictive mean matching) is also proper: it draws
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+from the same Bayesian posterior, computes predicted values for all
+rows, and then matches each missing-row prediction to the nearest
+observed-row predictions, returning the corresponding observed
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+values. Because imputed values are always real observed values, PMM
+automatically preserves the data distribution and respects natural
+bounds (e.g., non-negativity) without extra constraints.
 <code>lm_noise</code>, which adds residual noise to point-estimate
-predictions, is <strong>improper</strong> — it omits the parameter
+predictions, is <strong>improper</strong>. It omits the parameter
 uncertainty and tends to produce confidence intervals that are slightly
 too narrow, though the bias is small when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
 is large relative to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
-(Schafer, 1997, Section 3.4).</p>
+(Schafer, 1997, Section 3.4). <code>lda</code> with a random
+<code>ridge</code> is <strong>approximate</strong>: different ridge
+values across imputations introduce variation, but this is not a formal
+posterior draw.</p>
 </div>
 <div class="section level4">
 <h4 id="congeniality">Congeniality<a class="anchor" aria-label="anchor" href="#congeniality"></a>
 </h4>
 <p>The imputation model is <strong>congenial</strong> with the analysis
-model (Meng, 1994) when the imputation model is at least as general as —
-or richer than — the analysis model. If the analysis model includes an
+model (Meng, 1994) when the imputation model is at least as general as
+(or richer than) the analysis model. If the analysis model includes an
 interaction term but the imputation model does not, the resulting MI
 inferences can be biased. Practically: include in the imputation model
 all variables that will appear in the analysis model, plus any auxiliary
@@ -461,12 +532,12 @@ linear, logistic, and Poisson regression.</p>
 <strong>random variation</strong>. Deterministic models (like
 <code>lm_pred</code>) should <em>not</em> be used for MI because they
 produce identical imputations across datasets.</p>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="22%">
-<col width="30%">
-<col width="33%">
-<col width="14%">
+<col width="21%">
+<col width="29%">
+<col width="32%">
+<col width="15%">
 </colgroup>
 <thead><tr class="header">
 <th>Variable type</th>
@@ -482,10 +553,11 @@ produce identical imputations across datasets.</p>
 <td>Yes</td>
 </tr>
 <tr class="even">
-<td>Continuous</td>
-<td><code>lm_noise</code></td>
-<td>Adds residual noise drawn from the estimated error distribution</td>
-<td>No (omits parameter uncertainty)</td>
+<td>Continuous / Categorical</td>
+<td><code>pmm</code></td>
+<td>Draws coefficients from the posterior, matches predictions to
+nearest observed values (Type II PMM)</td>
+<td>Yes</td>
 </tr>
 <tr class="odd">
 <td>Categorical</td>
@@ -497,6 +569,13 @@ produce identical imputations across datasets.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>PMM for MI:</strong> <code>pmm</code> is proper and works for
+both continuous and categorical variables. It preserves the observed
+data distribution. Imputed values are always values that were actually
+observed. Since <code><a href="../reference/fill_NA.html">fill_NA()</a></code> does not support
+<code>pmm</code>, use the OOP interface
+(<code>impute("pmm", ...)</code>) in a loop for MI (see example below
+and the <a href="miceFast-intro.html">Introduction vignette</a>).</p>
 </div>
 <div class="section level3">
 <h3 id="basic-mi-workflow">Basic MI workflow<a class="anchor" aria-label="anchor" href="#basic-mi-workflow"></a>
@@ -581,9 +660,9 @@ intervals.</li>
 <h3 id="mi-with-mixed-variable-types">MI with mixed variable types<a class="anchor" aria-label="anchor" href="#mi-with-mixed-variable-types"></a>
 </h3>
 <p>Real datasets often have both continuous and categorical variables
-with missing values. Use <code>lm_bayes</code> for continuous variables
-and <code>lda</code> with a random <code>ridge</code> for categorical
-variables:</p>
+with missing values. Use <code>lm_bayes</code> (or <code>pmm</code>) for
+continuous variables and <code>lda</code> with a random
+<code>ridge</code> (or <code>pmm</code>) for categorical variables:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
@@ -732,6 +811,44 @@ heteroscedasticity:</p>
 <span><span class="co">##  (Intercept)  -92.581   79.2008    -1.169 141.1 0.2443977</span></span>
 <span><span class="co">##         Wind    2.537    2.3296     1.089 116.8 0.2783382</span></span>
 <span><span class="co">##         Temp    3.226    0.8395     3.843 146.1 0.0001809</span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="mi-with-pmm-oop-interface">MI with PMM (OOP interface)<a class="anchor" aria-label="anchor" href="#mi-with-pmm-oop-interface"></a>
+</h3>
+<p>PMM is a <strong>proper</strong> method that works for both
+continuous and categorical variables. It draws coefficients from the
+posterior, predicts on all rows, and matches each missing-row prediction
+to the nearest observed values. Imputed values are always values that
+were actually observed. Since <code><a href="../reference/fill_NA.html">fill_NA()</a></code> does not support
+<code>pmm</code>, use the OOP interface for the MI loop:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">dat</span>, Intercept <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
+<span><span class="va">completed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">m</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">miceFast</span><span class="op">)</span></span>
+<span>  <span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">dat</span> <span class="op">+</span> <span class="fl">0</span><span class="op">)</span>            <span class="co"># copy. set_data uses the matrix by reference.</span></span>
+<span>  <span class="co"># impute("pmm", ...) draws from the Bayesian posterior and matches to nearest observed value</span></span>
+<span>  <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"pmm"</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span>  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Intercept"</span><span class="op">)</span></span>
+<span>  <span class="va">d</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fits_pmm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">completed</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Ozone</span> <span class="op">~</span> <span class="va">Wind</span> <span class="op">+</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/pool.html">pool</a></span><span class="op">(</span><span class="va">fits_pmm</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Pooled results from 10 imputed datasets</span></span>
+<span><span class="co">## Rubin's rules with Barnard-Rubin df adjustment</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##         term estimate std.error statistic    df   p.value</span></span>
+<span><span class="co">##  (Intercept)  -65.328   28.3811    -2.302 34.97 2.742e-02</span></span>
+<span><span class="co">##         Wind   -2.920    0.8038    -3.633 37.19 8.404e-04</span></span>
+<span><span class="co">##         Temp    1.765    0.2935     6.014 40.84 4.191e-07</span></span></code></pre>
 <hr>
 </div>
 </div>
@@ -748,10 +865,12 @@ different imputation approaches.</p>
 <div class="section level3">
 <h3 id="comparing-models-with-fill_na_n">Comparing models with <code>fill_NA_N()</code><a class="anchor" aria-label="anchor" href="#comparing-models-with-fill_na_n"></a>
 </h3>
-<p><code><a href="../reference/fill_NA_N.html">fill_NA_N()</a></code> averages over <em>k</em> imputed values,
-making it useful for quick sensitivity checks. Compare different
-imputation strategies on a single dataset:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/fill_NA_N.html">fill_NA_N()</a></code> produces a single filled-in dataset: for
+<code>lm_bayes</code>/<code>lm_noise</code> it averages <em>k</em>
+draws; for <code>pmm</code> it samples from the <em>k</em> nearest
+observed values. This makes it useful for quick sensitivity checks.
+Compare different imputation strategies:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">air_sensitivity</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -774,7 +893,7 @@ imputation strategies on a single dataset:</p>
 <h3 id="varying-the-number-of-imputations">Varying the number of imputations<a class="anchor" aria-label="anchor" href="#varying-the-number-of-imputations"></a>
 </h3>
 <p>Check whether results stabilize as <em>m</em> increases:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -866,7 +985,7 @@ imputation strategies on a single dataset:</p>
 <span><span class="co">##  (Intercept) 430.77041 162.69812 596.72249 0.3852 0.2781 0.2936</span></span>
 <span><span class="co">##         Wind   0.33565   0.13397   0.47230 0.4071 0.2893 0.3049</span></span>
 <span><span class="co">##         Temp   0.04929   0.01635   0.06597 0.3382 0.2528 0.2679</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">term</span> <span class="op">==</span> <span class="st">"Wind"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">m</span>, y <span class="op">=</span> <span class="va">estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -882,23 +1001,23 @@ imputation strategies on a single dataset:</p>
 <h3 id="comparing-with-base-methods">Comparing with base methods<a class="anchor" aria-label="anchor" href="#comparing-with-base-methods"></a>
 </h3>
 <p>Always compare MI results against simple baselines. If conclusions
-differ, investigate why — it may reveal problems with your imputation
+differ, investigate why. It may reveal problems with your imputation
 model or indicate that the missing-data mechanism matters.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 1. Complete cases (listwise deletion) — unbiased under MCAR</span></span>
+<span><span class="co"># 1. Complete cases (listwise deletion). Unbiased under MCAR.</span></span>
 <span><span class="va">fit_cc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Ozone</span> <span class="op">~</span> <span class="va">Wind</span> <span class="op">+</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">air_miss</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span><span class="va">air_miss</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">ci_cc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_cc</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Mean imputation — biased, underestimates variance</span></span>
+<span><span class="co"># 2. Mean imputation. Biased; underestimates variance.</span></span>
 <span><span class="va">air_mean</span> <span class="op">&lt;-</span> <span class="va">air_miss</span></span>
 <span><span class="va">air_mean</span><span class="op">$</span><span class="va">Ozone</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">air_mean</span><span class="op">$</span><span class="va">Ozone</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">air_mean</span><span class="op">$</span><span class="va">Ozone</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">fit_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Ozone</span> <span class="op">~</span> <span class="va">Wind</span> <span class="op">+</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">air_mean</span><span class="op">)</span></span>
 <span><span class="va">ci_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_mean</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Deterministic regression imputation (lm_pred) — no residual noise</span></span>
+<span><span class="co"># 3. Deterministic regression imputation (lm_pred). No residual noise.</span></span>
 <span><span class="va">air_pred</span> <span class="op">&lt;-</span> <span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Ozone_imp <span class="op">=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">.</span>, model <span class="op">=</span> <span class="st">"lm_pred"</span>,</span>
@@ -932,7 +1051,7 @@ model or indicate that the missing-data mechanism matters.</p>
 <span><span class="co">##  (Intercept) 444.52602 95.54381 544.84702 0.2257 0.1841 0.2002</span></span>
 <span><span class="co">##         Wind   0.34637  0.09960   0.45095 0.3019 0.2319 0.2493</span></span>
 <span><span class="co">##         Temp   0.05087  0.01078   0.06219 0.2226 0.1821 0.1981</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compare Wind coefficient across all methods</span></span>
 <span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Complete cases"</span>, <span class="st">"Mean imputation"</span>, <span class="st">"Regression (lm_pred)"</span>, <span class="st">"MI (lm_bayes, m=20)"</span><span class="op">)</span>,</span>
@@ -999,22 +1118,22 @@ analysis above).</p>
 <p><strong>Examine missingness patterns:</strong> Use
 <code><a href="../reference/upset_NA.html">upset_NA()</a></code> to visualize which variables are jointly
 missing.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/upset_NA.html">upset_NA</a></span><span class="op">(</span><span class="va">air_miss</span>, <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li>
 <p><strong>Check collinearity:</strong> Run <code><a href="../reference/VIF.html">VIF()</a></code> on
 your predictor set. Drop or combine predictors with VIF &gt; 10.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VIF.html">VIF</a></span><span class="op">(</span><span class="va">air_miss</span>, posit_y <span class="op">=</span> <span class="st">"Ozone"</span>, posit_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li><p><strong>Choose imputation models:</strong> <code>lm_bayes</code>
-for continuous, <code>lda</code> with random <code>ridge</code> for
-categorical, <code>logreg = TRUE</code> for right-skewed
-variables.</p></li>
+or <code>pmm</code> for continuous, <code>lda</code> with random
+<code>ridge</code> or <code>pmm</code> for categorical,
+<code>logreg = TRUE</code> for right-skewed variables.</p></li>
 <li><p><strong>Include auxiliary variables:</strong> Add predictors of
 missingness to the imputation model even if they are not in the analysis
-model — this makes MAR more plausible.</p></li>
+model. This makes MAR more plausible.</p></li>
 <li><p><strong>Set <em>m</em> ≥ 20.</strong> Since miceFast is fast,
 there is little cost. Increase until estimates and standard errors
 stabilize (see sensitivity analysis above).</p></li>
@@ -1035,7 +1154,7 @@ The R package <strong>howManyImputations</strong> (available on CRAN)
 implements this calculation directly from a <code>mice</code> mids
 object. For a miceFast workflow you can use the FMI from
 <code><a href="../reference/pool.html">pool()</a></code> as input:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Pilot with m = 5</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
 <span><span class="va">pilot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1045,13 +1164,13 @@ object. For a miceFast workflow you can use the FMI from
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="va">pilot_pool</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pool.html">pool</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">pilot</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Ozone_imp</span> <span class="op">~</span> <span class="va">Wind</span> <span class="op">+</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect FMI — the key input for deciding m</span></span>
+<span><span class="co"># Inspect FMI, the key input for deciding m</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>term <span class="op">=</span> <span class="va">pilot_pool</span><span class="op">$</span><span class="va">term</span>, fmi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pilot_pool</span><span class="op">$</span><span class="va">fmi</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##          term   fmi</span></span>
 <span><span class="co">## 1 (Intercept) 0.159</span></span>
 <span><span class="co">## 2        Wind 0.099</span></span>
 <span><span class="co">## 3        Temp 0.161</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># For the exact formula and its derivation see:</span></span>
 <span><span class="co"># von Hippel (2020) "How many imputations do you need?", Sociological Methods &amp; Research</span></span>
 <span><span class="co"># R implementation: install.packages("howManyImputations")</span></span></code></pre></div>
@@ -1094,7 +1213,7 @@ object. For a miceFast workflow you can use the FMI from
 <tr class="even">
 <td>Speed</td>
 <td>R-based</td>
-<td>C++/Armadillo — significantly faster</td>
+<td>C++/Armadillo, significantly faster</td>
 </tr>
 <tr class="odd">
 <td>Grouping</td>
@@ -1129,15 +1248,57 @@ or when you want imputation inside
 <code>dplyr</code>/<code>data.table</code> pipelines. The two can be
 combined: use <strong>miceFast</strong> for imputation and
 <strong>mice</strong> for diagnostics, or vice versa.</p>
-<p><strong>Important caveat:</strong> miceFast fills variables in a
-single pass — each variable’s imputation conditions on the previously
-imputed columns but there is no iterative cycling back (unlike mice’s
-FCS algorithm, which iterates until convergence). For datasets where the
-missing-data pattern is monotone or nearly so, a single pass is often
-sufficient. With complex interlocking patterns, the single-pass approach
-may introduce some bias because later variables are imputed conditional
-on already-imputed (not yet converged) earlier variables. Consider using
-mice for datasets with heavy non-monotone missingness.</p>
+<p><strong>Important caveat:</strong> The convenience functions
+(<code>fill_NA</code>, <code>fill_NA_N</code>) fill variables in a
+single pass. For datasets where the missing-data pattern is monotone or
+nearly so, a single pass is sufficient. With complex interlocking
+patterns, however, you can <strong>mimic iterative FCS</strong> (chained
+equations) using the OOP interface: call <code>update_var()</code> for
+each variable in a loop and cycle through multiple iterations, exactly
+like mice’s algorithm:</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Save which cells are originally NA</span></span>
+<span><span class="va">na1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mat</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span>; <span class="va">na2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mat</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span>; <span class="va">na3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mat</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co"># Initialise NAs (e.g. column means) so predictors are always complete</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">na_j</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mat</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">na_j</span><span class="op">)</span><span class="op">)</span> <span class="va">mat</span><span class="op">[</span><span class="va">na_j</span>, <span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mat</span><span class="op">[</span><span class="op">!</span><span class="va">na_j</span>, <span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">mat</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">col1</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>; <span class="va">col1</span><span class="op">[</span><span class="va">na1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span>; <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">col1</span><span class="op">)</span></span>
+<span>  <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">1</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span>  <span class="va">col2</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>; <span class="va">col2</span><span class="op">[</span><span class="va">na2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span>; <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">col2</span><span class="op">)</span></span>
+<span>  <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">2</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lm_bayes"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span>  <span class="va">col3</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span>; <span class="va">col3</span><span class="op">[</span><span class="va">na3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span>; <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">3</span>, <span class="va">col3</span><span class="op">)</span></span>
+<span>  <span class="va">model</span><span class="op">$</span><span class="fu">update_var</span><span class="op">(</span><span class="fl">3</span>, <span class="va">model</span><span class="op">$</span><span class="fu">impute</span><span class="op">(</span><span class="st">"lda"</span>,      <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">imputations</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The key is the <strong>save-restore-impute</strong> cycle: record
+which cells are originally missing, initialise them so predictors are
+complete, then before each variable’s imputation restore its original
+NAs. Without this step, rows where both the dependent variable and a
+predictor are jointly missing would never be imputed.</p>
+<p><code>update_var()</code> permanently modifies the data matrix by
+reference, so each variable’s imputation conditions on the most recently
+imputed values for all other variables – the same sequential
+conditioning that defines the MICE/FCS algorithm. Wrap this in
+<code>lapply(1:m, ...)</code> and you have full iterative MI at C++
+speed.</p>
+<p>The same logic works with <code>fill_NA</code> in a data.table
+pipeline, since <code>:=</code> updates columns in place:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/naive_fill_NA.html">naive_fill_NA</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/copy.html" class="external-link">copy</a></span><span class="op">(</span><span class="va">dt_orig</span><span class="op">)</span><span class="op">)</span>         <span class="co"># initialise</span></span>
+<span><span class="va">na_oz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">dt_orig</span><span class="op">$</span><span class="va">Ozone</span><span class="op">)</span>; <span class="va">na_sr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">dt_orig</span><span class="op">[[</span><span class="st">"Solar.R"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/assign.html" class="external-link">set</a></span><span class="op">(</span><span class="va">dt</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">na_oz</span><span class="op">)</span>, <span class="st">"Ozone"</span>, <span class="cn">NA_real_</span><span class="op">)</span> <span class="co"># restore NAs</span></span>
+<span>  <span class="va">dt</span><span class="op">[</span>, <span class="va">Ozone</span>   <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="st">"lm_bayes"</span>, <span class="st">"Ozone"</span>,   <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/assign.html" class="external-link">set</a></span><span class="op">(</span><span class="va">dt</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">na_sr</span><span class="op">)</span>, <span class="st">"Solar.R"</span>, <span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="va">dt</span><span class="op">[</span>, <span class="va">Solar.R</span> <span class="op">:=</span> <span class="fu"><a href="../reference/fill_NA.html">fill_NA</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="st">"lm_bayes"</span>, <span class="st">"Solar.R"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>With dplyr the approach is the same, just re-<code>mutate</code> each
+variable in sequence inside the iteration loop. The OOP interface is
+fastest because it avoids R-level data copies, but the convenience
+functions work equally well for correctness.</p>
 <hr>
 </div>
 <div class="section level2">

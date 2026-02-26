@@ -19,7 +19,7 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.1</span>
       </span>
     </div>
 
@@ -157,10 +157,10 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
 </ul></div>
     <div id="note">
     <h2>Note</h2>
-    <p>There is assumed that users add the intercept by their own.
-The miceFast module provides the most efficient environment, the second recommended option is to use data.table and the numeric matrix data type.
-The lda model is assessed only if there are more than 15 complete observations
-and for the lms models if number of independent variables is smaller than number of observations.</p>
+    <p>It is assumed that users add the intercept column themselves.
+The miceFast module provides the most efficient environment; the second recommended option is data.table with a numeric matrix.
+Only <code>"lm_bayes"</code>, <code>"lm_noise"</code>, and <code>"pmm"</code> models are supported.
+The model is fitted only when the number of complete observations exceeds the number of independent variables.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -337,159 +337,159 @@ and for the lms models if number of independent variables is smaller than number
 <span class="r-out co"><span class="r-pr">#&gt;</span> 152    18     131  8.0   76  29         1   152 0.9968826      9    (70,140]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 153    20     223 11.5   68  30         1   153 1.0056592      9   (210,280]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Ozone_chac   Ozone_f Ozone_high Ozone_pmm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      (40,60]   (40,60]      FALSE  41.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      (20,40]   (20,40]      FALSE  36.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       (0,20]    (0,20]      FALSE  12.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       (0,20]    (0,20]      FALSE  18.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      (40,60]   (40,60]      FALSE        41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      (20,40]   (20,40]      FALSE        36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       (0,20]    (0,20]      FALSE        12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       (0,20]    (0,20]      FALSE        18</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5         &lt;NA&gt;      &lt;NA&gt;         NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      (20,40]   (20,40]      FALSE  28.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7      (20,40]   (20,40]      FALSE  23.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8       (0,20]    (0,20]      FALSE  19.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9       (0,20]    (0,20]      FALSE   8.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10        &lt;NA&gt;      &lt;NA&gt;         NA  64.93543</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11      (0,20]    (0,20]      FALSE   7.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12      (0,20]    (0,20]      FALSE  16.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13      (0,20]    (0,20]      FALSE  11.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14      (0,20]    (0,20]      FALSE  14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15      (0,20]    (0,20]      FALSE  18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16      (0,20]    (0,20]      FALSE  14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17     (20,40]   (20,40]      FALSE  34.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18      (0,20]    (0,20]      FALSE   6.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19     (20,40]   (20,40]      FALSE  30.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20      (0,20]    (0,20]      FALSE  11.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21      (0,20]    (0,20]      FALSE   1.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22      (0,20]    (0,20]      FALSE  11.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23      (0,20]    (0,20]      FALSE   4.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24     (20,40]   (20,40]      FALSE  32.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25        &lt;NA&gt;      &lt;NA&gt;         NA  19.38623</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26        &lt;NA&gt;      &lt;NA&gt;         NA  14.02533</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      (20,40]   (20,40]      FALSE        28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      (20,40]   (20,40]      FALSE        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       (0,20]    (0,20]      FALSE        19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       (0,20]    (0,20]      FALSE         8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10        &lt;NA&gt;      &lt;NA&gt;         NA       110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11      (0,20]    (0,20]      FALSE         7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12      (0,20]    (0,20]      FALSE        16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13      (0,20]    (0,20]      FALSE        11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14      (0,20]    (0,20]      FALSE        14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15      (0,20]    (0,20]      FALSE        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16      (0,20]    (0,20]      FALSE        14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17     (20,40]   (20,40]      FALSE        34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18      (0,20]    (0,20]      FALSE         6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19     (20,40]   (20,40]      FALSE        30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20      (0,20]    (0,20]      FALSE        11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21      (0,20]    (0,20]      FALSE         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22      (0,20]    (0,20]      FALSE        11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23      (0,20]    (0,20]      FALSE         4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24     (20,40]   (20,40]      FALSE        32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25        &lt;NA&gt;      &lt;NA&gt;         NA        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26        &lt;NA&gt;      &lt;NA&gt;         NA         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 27        &lt;NA&gt;      &lt;NA&gt;         NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28     (20,40]   (20,40]      FALSE  23.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29     (40,60]   (40,60]       TRUE  45.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30   (100,120] (100,120]       TRUE 115.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31     (20,40]   (20,40]      FALSE  37.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32        &lt;NA&gt;      &lt;NA&gt;         NA  53.33277</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33        &lt;NA&gt;      &lt;NA&gt;         NA  51.44975</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34        &lt;NA&gt;      &lt;NA&gt;         NA  20.91517</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35        &lt;NA&gt;      &lt;NA&gt;         NA  27.93720</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36        &lt;NA&gt;      &lt;NA&gt;         NA  61.90018</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37        &lt;NA&gt;      &lt;NA&gt;         NA  56.67508</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38     (20,40]   (20,40]      FALSE  29.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39        &lt;NA&gt;      &lt;NA&gt;         NA  68.45690</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40     (60,80]   (60,80]       TRUE  71.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41     (20,40]   (20,40]      FALSE  39.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42        &lt;NA&gt;      &lt;NA&gt;         NA  56.67508</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43        &lt;NA&gt;      &lt;NA&gt;         NA  34.71628</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44     (20,40]   (20,40]      FALSE  23.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45        &lt;NA&gt;      &lt;NA&gt;         NA  17.28048</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46        &lt;NA&gt;      &lt;NA&gt;         NA  53.30719</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47     (20,40]   (20,40]      FALSE  21.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48     (20,40]   (20,40]      FALSE  37.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49      (0,20]    (0,20]      FALSE  20.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50      (0,20]    (0,20]      FALSE  12.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51      (0,20]    (0,20]      FALSE  13.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52        &lt;NA&gt;      &lt;NA&gt;         NA  61.01819</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53        &lt;NA&gt;      &lt;NA&gt;         NA  96.22492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54        &lt;NA&gt;      &lt;NA&gt;         NA  44.19043</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55        &lt;NA&gt;      &lt;NA&gt;         NA  74.05507</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56        &lt;NA&gt;      &lt;NA&gt;         NA  43.35495</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57        &lt;NA&gt;      &lt;NA&gt;         NA  38.27053</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58        &lt;NA&gt;      &lt;NA&gt;         NA  19.25131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59        &lt;NA&gt;      &lt;NA&gt;         NA  46.34923</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60        &lt;NA&gt;      &lt;NA&gt;         NA  19.92993</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61        &lt;NA&gt;      &lt;NA&gt;         NA  53.51353</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62   (120,140] (120,140]       TRUE 135.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63     (40,60]   (40,60]       TRUE  49.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64     (20,40]   (20,40]      FALSE  32.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65        &lt;NA&gt;      &lt;NA&gt;         NA  43.64745</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66     (60,80]   (60,80]       TRUE  64.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67     (20,40]   (20,40]      FALSE  40.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68     (60,80]   (60,80]       TRUE  77.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69    (80,100]  (80,100]       TRUE  97.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70    (80,100]  (80,100]       TRUE  97.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71    (80,100]  (80,100]       TRUE  85.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72        &lt;NA&gt;      &lt;NA&gt;         NA  48.09953</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73      (0,20]    (0,20]      FALSE  10.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74     (20,40]   (20,40]      FALSE  27.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75        &lt;NA&gt;      &lt;NA&gt;         NA  20.17504</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76      (0,20]    (0,20]      FALSE   7.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77     (40,60]   (40,60]       TRUE  48.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78     (20,40]   (20,40]      FALSE  35.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79     (60,80]   (60,80]       TRUE  61.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 80     (60,80]   (60,80]       TRUE  79.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 81     (60,80]   (60,80]       TRUE  63.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 82      (0,20]    (0,20]      FALSE  16.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 83        &lt;NA&gt;      &lt;NA&gt;         NA  24.35920</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 84        &lt;NA&gt;      &lt;NA&gt;         NA  28.52608</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 85     (60,80]   (60,80]       TRUE  80.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 86   (100,120] (100,120]       TRUE 108.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 87      (0,20]    (0,20]      FALSE  20.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 88     (40,60]   (40,60]       TRUE  52.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 89    (80,100]  (80,100]       TRUE  82.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90     (40,60]   (40,60]       TRUE  50.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91     (60,80]   (60,80]       TRUE  64.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 92     (40,60]   (40,60]       TRUE  59.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 93     (20,40]   (20,40]      FALSE  39.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 94      (0,20]    (0,20]      FALSE   9.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95      (0,20]    (0,20]      FALSE  16.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96     (60,80]   (60,80]       TRUE  78.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97     (20,40]   (20,40]      FALSE  35.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98     (60,80]   (60,80]       TRUE  66.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99   (120,140] (120,140]       TRUE 122.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100   (80,100]  (80,100]       TRUE  89.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 101  (100,120] (100,120]       TRUE 110.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 102       &lt;NA&gt;      &lt;NA&gt;         NA  68.04199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 103       &lt;NA&gt;      &lt;NA&gt;         NA  82.39210</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 104    (40,60]   (40,60]       TRUE  44.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 105    (20,40]   (20,40]      FALSE  28.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 106    (60,80]   (60,80]       TRUE  65.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 107       &lt;NA&gt;      &lt;NA&gt;         NA  24.12887</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 108    (20,40]   (20,40]      FALSE  22.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 109    (40,60]   (40,60]       TRUE  59.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 110    (20,40]   (20,40]      FALSE  23.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 111    (20,40]   (20,40]      FALSE  31.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 112    (40,60]   (40,60]       TRUE  44.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 113    (20,40]   (20,40]      FALSE  21.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 114     (0,20]    (0,20]      FALSE   9.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 115       &lt;NA&gt;      &lt;NA&gt;         NA  38.27053</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 116    (40,60]   (40,60]       TRUE  45.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 117       &lt;NA&gt;      &lt;NA&gt;       TRUE 168.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 118    (60,80]   (60,80]       TRUE  73.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 119       &lt;NA&gt;      &lt;NA&gt;         NA  61.49894</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 120    (60,80]   (60,80]       TRUE  76.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 121  (100,120] (100,120]       TRUE 118.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 122   (80,100]  (80,100]       TRUE  84.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 123   (80,100]  (80,100]       TRUE  85.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 124   (80,100]  (80,100]       TRUE  96.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 125    (60,80]   (60,80]       TRUE  78.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 126    (60,80]   (60,80]       TRUE  73.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 127   (80,100]  (80,100]       TRUE  91.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 128    (40,60]   (40,60]       TRUE  47.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 129    (20,40]   (20,40]      FALSE  32.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 130     (0,20]    (0,20]      FALSE  20.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 131    (20,40]   (20,40]      FALSE  23.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 132    (20,40]   (20,40]      FALSE  21.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 133    (20,40]   (20,40]      FALSE  24.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 134    (40,60]   (40,60]       TRUE  44.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 135    (20,40]   (20,40]      FALSE  21.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 136    (20,40]   (20,40]      FALSE  28.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 137     (0,20]    (0,20]      FALSE   9.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 138     (0,20]    (0,20]      FALSE  13.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 139    (40,60]   (40,60]       TRUE  46.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 140     (0,20]    (0,20]      FALSE  18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 141     (0,20]    (0,20]      FALSE  13.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 142    (20,40]   (20,40]      FALSE  24.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 143     (0,20]    (0,20]      FALSE  16.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 144     (0,20]    (0,20]      FALSE  13.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 145    (20,40]   (20,40]      FALSE  23.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 146    (20,40]   (20,40]      FALSE  36.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 147     (0,20]    (0,20]      FALSE   7.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 148     (0,20]    (0,20]      FALSE  14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149    (20,40]   (20,40]      FALSE  30.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150       &lt;NA&gt;      &lt;NA&gt;         NA  19.92993</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151     (0,20]    (0,20]      FALSE  14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152     (0,20]    (0,20]      FALSE  18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153     (0,20]    (0,20]      FALSE  20.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28     (20,40]   (20,40]      FALSE        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29     (40,60]   (40,60]       TRUE        45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30   (100,120] (100,120]       TRUE       115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31     (20,40]   (20,40]      FALSE        37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32        &lt;NA&gt;      &lt;NA&gt;         NA        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33        &lt;NA&gt;      &lt;NA&gt;         NA        40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34        &lt;NA&gt;      &lt;NA&gt;         NA        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35        &lt;NA&gt;      &lt;NA&gt;         NA        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36        &lt;NA&gt;      &lt;NA&gt;         NA        28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37        &lt;NA&gt;      &lt;NA&gt;         NA        16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38     (20,40]   (20,40]      FALSE        29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39        &lt;NA&gt;      &lt;NA&gt;         NA        96</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40     (60,80]   (60,80]       TRUE        71</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41     (20,40]   (20,40]      FALSE        39</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42        &lt;NA&gt;      &lt;NA&gt;         NA        16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43        &lt;NA&gt;      &lt;NA&gt;         NA        52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44     (20,40]   (20,40]      FALSE        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45        &lt;NA&gt;      &lt;NA&gt;         NA        32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46        &lt;NA&gt;      &lt;NA&gt;         NA        39</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47     (20,40]   (20,40]      FALSE        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48     (20,40]   (20,40]      FALSE        37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49      (0,20]    (0,20]      FALSE        20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50      (0,20]    (0,20]      FALSE        12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51      (0,20]    (0,20]      FALSE        13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52        &lt;NA&gt;      &lt;NA&gt;         NA       108</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53        &lt;NA&gt;      &lt;NA&gt;         NA       118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54        &lt;NA&gt;      &lt;NA&gt;         NA        29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55        &lt;NA&gt;      &lt;NA&gt;         NA        79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56        &lt;NA&gt;      &lt;NA&gt;         NA        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57        &lt;NA&gt;      &lt;NA&gt;         NA        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 58        &lt;NA&gt;      &lt;NA&gt;         NA        11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59        &lt;NA&gt;      &lt;NA&gt;         NA        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 60        &lt;NA&gt;      &lt;NA&gt;         NA        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 61        &lt;NA&gt;      &lt;NA&gt;         NA        59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 62   (120,140] (120,140]       TRUE       135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 63     (40,60]   (40,60]       TRUE        49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 64     (20,40]   (20,40]      FALSE        32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 65        &lt;NA&gt;      &lt;NA&gt;         NA        24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 66     (60,80]   (60,80]       TRUE        64</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 67     (20,40]   (20,40]      FALSE        40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68     (60,80]   (60,80]       TRUE        77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 69    (80,100]  (80,100]       TRUE        97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 70    (80,100]  (80,100]       TRUE        97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71    (80,100]  (80,100]       TRUE        85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 72        &lt;NA&gt;      &lt;NA&gt;         NA        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 73      (0,20]    (0,20]      FALSE        10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 74     (20,40]   (20,40]      FALSE        27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 75        &lt;NA&gt;      &lt;NA&gt;         NA        14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 76      (0,20]    (0,20]      FALSE         7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 77     (40,60]   (40,60]       TRUE        48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 78     (20,40]   (20,40]      FALSE        35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 79     (60,80]   (60,80]       TRUE        61</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 80     (60,80]   (60,80]       TRUE        79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 81     (60,80]   (60,80]       TRUE        63</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 82      (0,20]    (0,20]      FALSE        16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 83        &lt;NA&gt;      &lt;NA&gt;         NA        12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 84        &lt;NA&gt;      &lt;NA&gt;         NA        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 85     (60,80]   (60,80]       TRUE        80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 86   (100,120] (100,120]       TRUE       108</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 87      (0,20]    (0,20]      FALSE        20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 88     (40,60]   (40,60]       TRUE        52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 89    (80,100]  (80,100]       TRUE        82</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90     (40,60]   (40,60]       TRUE        50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 91     (60,80]   (60,80]       TRUE        64</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 92     (40,60]   (40,60]       TRUE        59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 93     (20,40]   (20,40]      FALSE        39</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 94      (0,20]    (0,20]      FALSE         9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95      (0,20]    (0,20]      FALSE        16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 96     (60,80]   (60,80]       TRUE        78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 97     (20,40]   (20,40]      FALSE        35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 98     (60,80]   (60,80]       TRUE        66</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 99   (120,140] (120,140]       TRUE       122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100   (80,100]  (80,100]       TRUE        89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 101  (100,120] (100,120]       TRUE       110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 102       &lt;NA&gt;      &lt;NA&gt;         NA        50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 103       &lt;NA&gt;      &lt;NA&gt;         NA        91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 104    (40,60]   (40,60]       TRUE        44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 105    (20,40]   (20,40]      FALSE        28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 106    (60,80]   (60,80]       TRUE        65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 107       &lt;NA&gt;      &lt;NA&gt;         NA        13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 108    (20,40]   (20,40]      FALSE        22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 109    (40,60]   (40,60]       TRUE        59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 110    (20,40]   (20,40]      FALSE        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 111    (20,40]   (20,40]      FALSE        31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 112    (40,60]   (40,60]       TRUE        44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 113    (20,40]   (20,40]      FALSE        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 114     (0,20]    (0,20]      FALSE         9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 115       &lt;NA&gt;      &lt;NA&gt;         NA        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 116    (40,60]   (40,60]       TRUE        45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 117       &lt;NA&gt;      &lt;NA&gt;       TRUE       168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 118    (60,80]   (60,80]       TRUE        73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 119       &lt;NA&gt;      &lt;NA&gt;         NA        73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 120    (60,80]   (60,80]       TRUE        76</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 121  (100,120] (100,120]       TRUE       118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 122   (80,100]  (80,100]       TRUE        84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 123   (80,100]  (80,100]       TRUE        85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 124   (80,100]  (80,100]       TRUE        96</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 125    (60,80]   (60,80]       TRUE        78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 126    (60,80]   (60,80]       TRUE        73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 127   (80,100]  (80,100]       TRUE        91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 128    (40,60]   (40,60]       TRUE        47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 129    (20,40]   (20,40]      FALSE        32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 130     (0,20]    (0,20]      FALSE        20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 131    (20,40]   (20,40]      FALSE        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 132    (20,40]   (20,40]      FALSE        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 133    (20,40]   (20,40]      FALSE        24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 134    (40,60]   (40,60]       TRUE        44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 135    (20,40]   (20,40]      FALSE        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 136    (20,40]   (20,40]      FALSE        28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 137     (0,20]    (0,20]      FALSE         9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 138     (0,20]    (0,20]      FALSE        13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 139    (40,60]   (40,60]       TRUE        46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 140     (0,20]    (0,20]      FALSE        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 141     (0,20]    (0,20]      FALSE        13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 142    (20,40]   (20,40]      FALSE        24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 143     (0,20]    (0,20]      FALSE        16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 144     (0,20]    (0,20]      FALSE        13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 145    (20,40]   (20,40]      FALSE        23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 146    (20,40]   (20,40]      FALSE        36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 147     (0,20]    (0,20]      FALSE         7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 148     (0,20]    (0,20]      FALSE        14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149    (20,40]   (20,40]      FALSE        30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150       &lt;NA&gt;      &lt;NA&gt;         NA        21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 151     (0,20]    (0,20]      FALSE        14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 152     (0,20]    (0,20]      FALSE        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 153     (0,20]    (0,20]      FALSE        20</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># dplyr: lm_noise with weights</span></span></span>
 <span class="r-in"><span><span class="va">air_miss</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
@@ -833,17 +833,17 @@ and for the lms models if number of independent variables is smaller than number
 <span class="r-out co"><span class="r-pr">#&gt;</span> 153:    20     223  11.5    68    30         1   153 1.0056592      9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      x_character Ozone_chac Ozone_f Ozone_high Ozone_pmm</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;char&gt;     &lt;char&gt;  &lt;fctr&gt;     &lt;lgcl&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1:   (140,210]    (40,60] (40,60]      FALSE  41.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    (70,140]    (20,40] (20,40]      FALSE  36.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3:   (140,210]     (0,20]  (0,20]      FALSE  12.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   4:   (280,350]     (0,20]  (0,20]      FALSE  18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   5:        &lt;NA&gt;       &lt;NA&gt;    &lt;NA&gt;         NA  19.07459</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:   (140,210]    (40,60] (40,60]      FALSE        41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    (70,140]    (20,40] (20,40]      FALSE        36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:   (140,210]     (0,20]  (0,20]      FALSE        12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:   (280,350]     (0,20]  (0,20]      FALSE        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:        &lt;NA&gt;       &lt;NA&gt;    &lt;NA&gt;         NA        14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149:   (140,210]    (20,40] (20,40]      FALSE  30.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150:   (140,210]       &lt;NA&gt;    &lt;NA&gt;         NA  36.83221</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151:   (140,210]     (0,20]  (0,20]      FALSE  14.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152:    (70,140]     (0,20]  (0,20]      FALSE  18.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153:   (210,280]     (0,20]  (0,20]      FALSE  20.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:   (140,210]    (20,40] (20,40]      FALSE        30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150:   (140,210]       &lt;NA&gt;    &lt;NA&gt;         NA        28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 151:   (140,210]     (0,20]  (0,20]      FALSE        14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 152:    (70,140]     (0,20]  (0,20]      FALSE        18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 153:   (210,280]     (0,20]  (0,20]      FALSE        20</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># See the vignette for full examples:</span></span></span>
 <span class="r-in"><span><span class="co"># vignette("miceFast-intro", package = "miceFast")</span></span></span>

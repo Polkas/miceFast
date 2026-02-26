@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">miceFast</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.1</span>
       </span>
     </div>
 
@@ -50,6 +50,30 @@
       <small>Source: <a href="https://github.com/Polkas/miceFast/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.9.1" id="micefast-091">miceFast 0.9.1<a class="anchor" aria-label="anchor" href="#micefast-091"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-9-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-1"></a></h3>
+<ul><li>PMM returned predicted values instead of observed values (C++): The <code>pmm</code> model returned predicted <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>y</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{y}</annotation></semantics></math> for missing rows instead of the nearest observed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math> values. Now it follows Little and Rubin (2002).</li>
+<li>PMM with character/factor variables (R): <code><a href="../reference/fill_NA_N.html">fill_NA_N()</a></code> with <code>model = "pmm"</code> and a character dependent variable failed because it attempted <code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric()</a></code> on non-numeric strings, producing all NAs.</li>
+<li>Character dependent variable with lm models: <code><a href="../reference/fill_NA.html">fill_NA()</a></code> and <code><a href="../reference/fill_NA_N.html">fill_NA_N()</a></code> with <code>model = "lm_pred"</code>, <code>"lm_bayes"</code>, or <code>"lm_noise"</code> silently returned all NAs when the dependent variable was character with non-numeric labels (e.g., <code>"apple"</code>, <code>"banana"</code>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-9-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-9-1"></a></h3>
+<ul><li>README: added sequential-chain MI examples (dplyr and data.table) showing how to impute multiple variables and pool with Rubin’s rules.</li>
+<li>Introduction vignette: added full imputation workflow with sequential ordering (impute variables whose predictors are complete first), FCS (chained equations) section with data.table example, and PMM note for the OOP interface.</li>
+<li>MI vignette: expanded Rubin’s rules derivations, added PMM MI example using the OOP interface, expanded “Important caveat” section with OOP and data.table FCS code snippets for non-monotone patterns.</li>
+<li>Documented PMM as a proper MI method throughout vignettes and README.</li>
+<li>Improved prose throughout vignettes and README.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tests-0-9-1">Tests<a class="anchor" aria-label="anchor" href="#tests-0-9-1"></a></h3>
+<ul><li>Added 20 PMM-specific tests (<code>test-pmm.R</code>): observed-value returns, factor/character support, weighted PMM, grouped data.table, reproducibility, stochasticity.</li>
+<li>Added 31 FCS tests (<code>test-fcs.R</code>): data.table, data.frame, and OOP FCS helpers; joint-missingness handling; MI+pool workflow; comparison with <code>mice</code> (pooled estimates and imputed means).</li>
+<li>Added tests for character dependent variables with non-numeric labels across all models and data types.</li>
+<li>Test suite expanded from 243 to 311 tests.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.0" id="micefast-090">miceFast 0.9.0<a class="anchor" aria-label="anchor" href="#micefast-090"></a></h2>
 <p>Kota Hattori, thank you for your feedback and for motivating me for this deep update.</p>
