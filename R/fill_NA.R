@@ -188,11 +188,7 @@ fill_NA.data.frame <- function(
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- if (model != "lda") {
-      factor(yy, levels = sort(as.numeric(unique(yy))))
-    } else {
-      factor(yy)
-    }
+    yy <- factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
     f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))
@@ -277,11 +273,7 @@ fill_NA.data.table <- function(
     f[f > length(l)] <- length(l)
     ff <- factor(l[f])
   } else if (is_character_y) {
-    yy <- if (model != "lda") {
-      factor(yy, levels = sort(as.numeric(unique(yy))))
-    } else {
-      factor(yy)
-    }
+    yy <- factor(yy)
     l <- levels(yy)
     yy <- as.numeric(yy)
     f <- round(fill_NA_(cbind(yy, xx), model, 1, 2:(ncol(xx) + 1), ww, ridge))

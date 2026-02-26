@@ -86,10 +86,10 @@ Quantitative models were built under Rcpp packages and the C++ library Armadillo
 
 }}
 \note{
-There is assumed that users add the intercept by their own.
-The miceFast module provides the most efficient environment, the second recommended option is to use data.table and the numeric matrix data type.
-The lda model is assessed only if there are more than 15 complete observations
-and for the lms models if number of independent variables is smaller than number of observations.
+It is assumed that users add the intercept column themselves.
+The miceFast module provides the most efficient environment; the second recommended option is data.table with a numeric matrix.
+Only \code{"lm_bayes"}, \code{"lm_noise"}, and \code{"pmm"} models are supported.
+The model is fitted only when the number of complete observations exceeds the number of independent variables.
 }
 \examples{
 library(miceFast)

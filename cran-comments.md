@@ -2,11 +2,9 @@
   
 github actions:
   
-* {os: macOS-latest,   r: 'release'}
-* {os: windows-latest, r: 'release'}
-* {os: windows-latest, r: '3.6'}
-* {os: ubuntu-18.04,   r: 'devel', http-user-agent: 'release'}
-* {os: ubuntu-18.04,   r: 'release'}
+- {os: macOS-latest,   r: 'release'}
+- {os: windows-latest, r: 'release'}
+- {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
   
 and:
 

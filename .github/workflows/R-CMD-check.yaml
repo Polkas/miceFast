@@ -24,7 +24,6 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          # Use 3.6 to trigger usage of RTools35
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
 
     env:

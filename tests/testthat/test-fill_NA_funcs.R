@@ -956,3 +956,86 @@ testthat::test_that("data.table pipeline fill_NA/fill_NA_N accuracy - disc", {
       10
   ))
 })
+
+# Character y with non-numeric labels -----------------------------------------
+
+test_that("fill_NA: character y with non-numeric labels works for all models", {
+  set.seed(42)
+  n <- 200
+  x1 <- rnorm(n)
+  x2 <- rnorm(n)
+  y_char <- sample(c("apple", "banana", "cherry"), n, replace = TRUE)
+  y_char[sample(n, 30)] <- NA
+
+  df <- data.frame(y = y_char, x1 = x1, x2 = x2, stringsAsFactors = FALSE)
+  dt <- data.table::as.data.table(df)
+  valid_labels <- c("apple", "banana", "cherry")
+
+  for (m in c("lm_pred", "lm_bayes", "lm_noise", "lda")) {
+    # data.frame
+    res_df <- fill_NA(df, model = m, posit_y = 1, posit_x = 2:3)
+    expect_true(all(!is.na(res_df)), info = paste("fill_NA data.frame", m))
+    expect_true(
+      all(res_df %in% valid_labels),
+      info = paste("fill_NA data.frame values valid", m)
+    )
+
+    # data.table
+    res_dt <- fill_NA(dt, model = m, posit_y = 1L, posit_x = 2:3)
+    expect_true(all(!is.na(res_dt)), info = paste("fill_NA data.table", m))
+    expect_true(
+      all(res_dt %in% valid_labels),
+      info = paste("fill_NA data.table values valid", m)
+    )
+  }
+})
+
+test_that("fill_NA_N: character y with non-numeric labels works for all models", {
+  set.seed(42)
+  n <- 200
+  x1 <- rnorm(n)
+  x2 <- rnorm(n)
+  y_char <- sample(c("apple", "banana", "cherry"), n, replace = TRUE)
+  y_char[sample(n, 30)] <- NA
+
+  df <- data.frame(y = y_char, x1 = x1, x2 = x2, stringsAsFactors = FALSE)
+  dt <- data.table::as.data.table(df)
+  valid_labels <- c("apple", "banana", "cherry")
+
+  for (m in c("lm_bayes", "lm_noise", "pmm")) {
+    # data.frame
+    res_df <- fill_NA_N(df, model = m, posit_y = 1, posit_x = 2:3, k = 10)
+    expect_true(all(!is.na(res_df)), info = paste("fill_NA_N data.frame", m))
+    expect_true(
+      all(res_df %in% valid_labels),
+      info = paste("fill_NA_N data.frame values valid", m)
+    )
+
+    # data.table
+    res_dt <- fill_NA_N(dt, model = m, posit_y = 1L, posit_x = 2:3, k = 10)
+    expect_true(all(!is.na(res_dt)), info = paste("fill_NA_N data.table", m))
+    expect_true(
+      all(res_dt %in% valid_labels),
+      info = paste("fill_NA_N data.table values valid", m)
+    )
+  }
+})
+
+test_that("fill_NA: numeric-looking character y still works correctly", {
+  set.seed(42)
+  n <- 200
+  x1 <- rnorm(n)
+  y_numchar <- sample(c("1", "2", "3"), n, replace = TRUE)
+  y_numchar[sample(n, 30)] <- NA
+
+  df <- data.frame(y = y_numchar, x1 = x1, stringsAsFactors = FALSE)
+
+  for (m in c("lm_pred", "lm_bayes", "lm_noise", "lda")) {
+    res <- fill_NA(df, model = m, posit_y = 1, posit_x = 2)
+    expect_true(all(!is.na(res)), info = paste("fill_NA numchar", m))
+    expect_true(
+      all(res %in% c("1", "2", "3")),
+      info = paste("fill_NA numchar values valid", m)
+    )
+  }
+})

@@ -8,3 +8,7 @@ Meta
 ^\revdep$
 /doc/
 /Meta/
+.DS_Store
+Rplots.pdf
+*.Rcheck/
+inst/doc/

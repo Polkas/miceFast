@@ -1,3 +1,26 @@
+# miceFast 0.9.1
+
+## Bug fixes
+
+* PMM returned predicted values instead of observed values (C++): The `pmm` model returned predicted $\hat{y}$ for missing rows instead of the nearest observed $y$ values. Now it follows Little and Rubin (2002).
+* PMM with character/factor variables (R): `fill_NA_N()` with `model = "pmm"` and a character dependent variable failed because it attempted `as.numeric()` on non-numeric strings, producing all NAs.
+* Character dependent variable with lm models: `fill_NA()` and `fill_NA_N()` with `model = "lm_pred"`, `"lm_bayes"`, or `"lm_noise"` silently returned all NAs when the dependent variable was character with non-numeric labels (e.g., `"apple"`, `"banana"`).
+
+## Documentation
+
+* README: added sequential-chain MI examples (dplyr and data.table) showing how to impute multiple variables and pool with Rubin's rules.
+* Introduction vignette: added full imputation workflow with sequential ordering (impute variables whose predictors are complete first), FCS (chained equations) section with data.table example, and PMM note for the OOP interface.
+* MI vignette: expanded Rubin's rules derivations, added PMM MI example using the OOP interface, expanded "Important caveat" section with OOP and data.table FCS code snippets for non-monotone patterns.
+* Documented PMM as a proper MI method throughout vignettes and README.
+* Improved prose throughout vignettes and README.
+
+## Tests
+
+* Added 20 PMM-specific tests (`test-pmm.R`): observed-value returns, factor/character support, weighted PMM, grouped data.table, reproducibility, stochasticity.
+* Added 31 FCS tests (`test-fcs.R`): data.table, data.frame, and OOP FCS helpers; joint-missingness handling; MI+pool workflow; comparison with `mice` (pooled estimates and imputed means).
+* Added tests for character dependent variables with non-numeric labels across all models and data types.
+* Test suite expanded from 243 to 311 tests.
+
 # miceFast 0.9.0
 
 Kota Hattori, thank you for your feedback and for motivating me for this deep update.
